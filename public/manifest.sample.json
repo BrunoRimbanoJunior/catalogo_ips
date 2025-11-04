@@ -1,0 +1,15 @@
+{
+  "db": {
+    "version": 1,
+    "url": "https://raw.githubusercontent.com/sua-conta/seu-repo/main/catalog/catalog.db",
+    "sha256": null
+  },
+  "images": {
+    "base_url": "https://your-onedrive-public-base-url/path/to/images/",
+    "files": [
+      { "file": "ABC123.jpg", "sha256": null },
+      { "file": "ABC123_2.jpg", "sha256": null }
+    ]
+  }
+}
+
