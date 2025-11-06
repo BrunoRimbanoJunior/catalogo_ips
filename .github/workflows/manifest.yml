@@ -1,4 +1,4 @@
-name: manifest
+﻿name: manifest
 
 on:
   workflow_dispatch:
@@ -9,7 +9,6 @@ on:
     paths:
       - 'data/**'
       - 'scripts/gen-manifest-r2.mjs'
-  push:
     tags:
       - 'v*'
 
