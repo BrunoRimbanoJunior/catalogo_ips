@@ -33,6 +33,9 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+      - name: Install pnpm
+        run: npm i -g pnpm@8
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -74,4 +77,3 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: manifest.json
-
