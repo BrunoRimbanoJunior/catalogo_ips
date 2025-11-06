@@ -1,0 +1,264 @@
+{
+  "db": {
+    "version": 1762458202,
+    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
+    "sha256": null
+  },
+  "images": {
+    "base_url": "https://cb22ba5d68afe5d6c90b2ca2600099ae.r2.cloudflarestorage.com/",
+    "files": [
+      {
+        "file": "7111032801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111042801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111042802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111042803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111052801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111062801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111302801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111302802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111302803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111432801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111432802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111432803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111442801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111442802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111442812.png",
+        "sha256": null
+      },
+      {
+        "file": "7111442813.png",
+        "sha256": null
+      },
+      {
+        "file": "7111482801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111482802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111482803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111682801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111682802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111682803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111682812.png",
+        "sha256": null
+      },
+      {
+        "file": "7111702802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111762801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111762802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111762803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111802801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111802802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111822801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111822802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111822803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111822811.png",
+        "sha256": null
+      },
+      {
+        "file": "7111852801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111852802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111852803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111932801.png",
+        "sha256": null
+      },
+      {
+        "file": "7111932802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111932803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111962802.png",
+        "sha256": null
+      },
+      {
+        "file": "7111962803.png",
+        "sha256": null
+      },
+      {
+        "file": "7111962811.png",
+        "sha256": null
+      },
+      {
+        "file": "7111962812.png",
+        "sha256": null
+      },
+      {
+        "file": "7111962813.png",
+        "sha256": null
+      },
+      {
+        "file": "7111962814.png",
+        "sha256": null
+      },
+      {
+        "file": "7111962815.png",
+        "sha256": null
+      },
+      {
+        "file": "7115162801.png",
+        "sha256": null
+      },
+      {
+        "file": "7115302802.png",
+        "sha256": null
+      },
+      {
+        "file": "7115302803.png",
+        "sha256": null
+      },
+      {
+        "file": "7115302804.png",
+        "sha256": null
+      },
+      {
+        "file": "7115302805.png",
+        "sha256": null
+      },
+      {
+        "file": "7115342801.png",
+        "sha256": null
+      },
+      {
+        "file": "7115342802.png",
+        "sha256": null
+      },
+      {
+        "file": "7115342812.png",
+        "sha256": null
+      },
+      {
+        "file": "7115342822.png",
+        "sha256": null
+      },
+      {
+        "file": "7115482802.png",
+        "sha256": null
+      },
+      {
+        "file": "7115482811.png",
+        "sha256": null
+      },
+      {
+        "file": "7115482812.png",
+        "sha256": null
+      },
+      {
+        "file": "7115502802.png",
+        "sha256": null
+      },
+      {
+        "file": "7115502821.png",
+        "sha256": null
+      },
+      {
+        "file": "7115502822.png",
+        "sha256": null
+      },
+      {
+        "file": "7115502831.png",
+        "sha256": null
+      },
+      {
+        "file": "7115502832.png",
+        "sha256": null
+      }
+    ]
+  }
+}
