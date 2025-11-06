@@ -1,12 +1,15 @@
 name: build
 
 on:
-  # Constrói apenas em tags para evitar duplicidade com push em main
+  # Constrói em tags e também quando o workflow auto-tag terminar (para contornar GITHUB_TOKEN não disparando outros workflows)
   push:
     tags:
       - 'v*'
   pull_request:
     branches: [ main ]
+  workflow_run:
+    workflows: ["auto-tag"]
+    types: [completed]
 
 concurrency:
   group: build-${{ github.ref }}
@@ -14,6 +17,8 @@ concurrency:
 
 jobs:
   tauri-build:
+    # Se veio de workflow_run, garante que foi sucesso e branch main
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: windows-latest
     env:
       MANIFEST_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/manifest.json
@@ -53,4 +58,3 @@ jobs:
           prerelease: false
           includeDebug: false
           tauriScript: pnpm tauri
-

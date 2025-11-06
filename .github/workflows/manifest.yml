@@ -1,4 +1,4 @@
-﻿name: manifest
+name: manifest
 
 on:
   workflow_dispatch:
@@ -11,12 +11,17 @@ on:
       - 'scripts/gen-manifest-r2.mjs'
     tags:
       - 'v*'
+  workflow_run:
+    workflows: ["auto-tag"]
+    types: [completed]
 
 permissions:
   contents: write
 
 jobs:
   gen-manifest:
+    # Se veio de workflow_run, garante que foi sucesso e branch main
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -69,3 +74,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: manifest.json
+
