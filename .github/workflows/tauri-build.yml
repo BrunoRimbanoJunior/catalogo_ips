@@ -1,4 +1,4 @@
-name: build
+﻿name: build
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
   tauri-build:
     runs-on: windows-latest
     env:
-      # URL do manifest publicado no próprio repositório
+      # URL do manifest publicado no prÃ³prio repositÃ³rio
       MANIFEST_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/manifest.json
     steps:
       - name: Checkout
@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
+
+      - name: Install pnpm (fallback)
+        run: npm i -g pnpm@8
+
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -57,3 +61,4 @@ jobs:
         with:
           files: |
             src-tauri/target/release/bundle/**
+
