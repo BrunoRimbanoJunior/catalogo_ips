@@ -66,6 +66,8 @@ mod core {
     pub struct ImageIndexResult { pub scanned: usize, pub matched: usize, pub inserted: usize }
     #[derive(Debug, Serialize, Deserialize)]
     pub struct ExportResult { pub ok: bool, pub output: String }
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct BrandingResult { pub ok: bool, pub logo: Option<String>, pub background: Option<String> }
 
     fn app_data_dir(app: &AppHandle) -> Result<PathBuf> { Ok(app.path().app_local_data_dir()?) }
     fn db_path(app: &AppHandle) -> Result<PathBuf> { Ok(app_data_dir(app)?.join(DB_FILE_NAME)) }
@@ -332,6 +334,28 @@ mod core {
     }
 
     #[tauri::command]
+    pub fn set_branding_image(kind: String, source_path: String) -> Result<BrandingResult, String> {
+        use std::io::Write;
+        let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
+        let out_dir = if cwd.ends_with("src-tauri") { cwd.parent().unwrap_or(&cwd).join("public").join("images") } else { cwd.join("public").join("images") };
+        fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
+        let ext = std::path::Path::new(&source_path).extension().and_then(|e| e.to_str()).unwrap_or("png");
+        let fixed = if kind.to_lowercase().starts_with("logo") { format!("logo.{}", ext) } else { format!("bg.{}", ext) };
+        let dest = out_dir.join(&fixed);
+        fs::copy(&source_path, &dest).map_err(|e| e.to_string())?;
+        let json_path = out_dir.join("branding.json");
+        let mut logo: Option<String> = None;
+        let mut background: Option<String> = None;
+        if json_path.exists() {
+            if let Ok(bytes) = fs::read(&json_path) { if let Ok(val) = serde_json::from_slice::<serde_json::Value>(&bytes) { logo = val.get("logo").and_then(|v| v.as_str()).map(|s| s.to_string()); background = val.get("background").and_then(|v| v.as_str()).map(|s| s.to_string()); } }
+        }
+        if kind.to_lowercase().starts_with("logo") { logo = Some(fixed.clone()); } else { background = Some(fixed.clone()); }
+        let obj = serde_json::json!({ "logo": logo, "background": background });
+        let mut f = std::fs::File::create(&json_path).map_err(|e| e.to_string())?; f.write_all(serde_json::to_string_pretty(&obj).unwrap().as_bytes()).map_err(|e| e.to_string())?;
+        Ok(BrandingResult { ok: true, logo, background })
+    }
+
+    #[tauri::command]
     pub async fn sync_from_manifest(app: AppHandle, manifest_url: String) -> Result<SyncResult, String> {
         let client = Client::new(); let (_, dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
         let manifest: CatalogManifest = client.get(&manifest_url).send().await.map_err(|e| e.to_string())?.error_for_status().map_err(|e| e.to_string())?.json().await.map_err(|e| e.to_string())?;
@@ -585,7 +609,8 @@ pub fn run() {
             core::index_images_from_manifest,
             core::import_excel,
             core::index_images,
-            core::export_db_to
+            core::export_db_to,
+            core::set_branding_image
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

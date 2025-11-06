@@ -1,4 +1,4 @@
-.logo.vite:hover {
+﻿.logo.vite:hover {
   filter: drop-shadow(0 0 2em #747bff);
 }
 
@@ -115,9 +115,10 @@ button {
   }
 }
 
-/* Catálogo custom */
-.appbar { position: sticky; top: 0; z-index: 10; background: #e57373; color: #fff; padding: 12px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-.appbar h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.3px; }
+/* CatÃ¡logo custom */
+.appbar { position: sticky; top: 0; z-index: 10; background: #e6c5c5; color: #fff; padding: 12px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: grid; grid-template-columns: 160px 1fr auto; align-items: center; gap: 12px; }
+.appbar h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.3px; text-align: center; }
+.appbar .logo { height: 150px; width: auto; object-fit: contain; }
 .appbar span { font-weight: 700; }
 .tools details { margin-left: auto; }
 .tools summary { cursor: pointer; padding: 8px 12px; background: #c62828; border-radius: 6px; color: #fff; font-weight: 700; }
@@ -147,5 +148,15 @@ button {
 .item .code { font-weight: 800; min-width: 110px; color: #c62828; }
 .item .brand { margin-left: auto; opacity: 0.7; }
 
+/* Preservar quebras de linha (\n) vindas do Excel/DB */
+.panel p { white-space: pre-line; }
+.item { white-space: pre-line; }
+
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
 .thumb { width: 100%; height: 120px; object-fit: contain; background: #f7f7f7; border: 1px solid #eee; border-radius: 4px; }
+
+/* Detalhes: subtÃ­tulo e compatibilidade */
+.details-wrap .subtitle { font-weight: 700; font-size: 14px; opacity: 0.85; text-align: left; margin-top: 4px; }
+.details-wrap .compat-list, .details-wrap .brand-list, .details-wrap .details-text { white-space: pre-line; text-align: left; margin-top: 4px; }
+.details-wrap .sep { border-top: 1px solid #e6e6e6; margin: 8px 0; }
+

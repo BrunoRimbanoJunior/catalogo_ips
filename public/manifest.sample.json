@@ -1,15 +1,15 @@
 {
   "db": {
     "version": 1,
-    "url": "https://raw.githubusercontent.com/sua-conta/seu-repo/main/catalog/catalog.db",
+    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
     "sha256": null
   },
   "images": {
-    "base_url": "https://your-onedrive-public-base-url/path/to/images/",
+    "base_url": "https://cb22ba5d68afe5d6c90b2ca2600099ae.r2.cloudflarestorage.com/ipsimages/",
     "files": [
-      { "file": "ABC123.jpg", "sha256": null },
-      { "file": "ABC123_2.jpg", "sha256": null }
+      { "file": "ISAKA/7111062801.jpg", "sha256": null },
+      { "file": "ISAKA/7111442802.jpg", "sha256": null },
+      { "file": "GENERICA/ABC123.jpg", "sha256": null }
     ]
   }
 }
-

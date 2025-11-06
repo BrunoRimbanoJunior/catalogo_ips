@@ -1,0 +1,50 @@
+name: auto-tag
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  bump-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Skip if commit from bot (manifest update)
+        id: skip
+        run: |
+          author=$(git log -1 --pretty=%an)
+          msg=$(git log -1 --pretty=%s)
+          echo "author=$author" >> $GITHUB_OUTPUT
+          echo "msg=$msg" >> $GITHUB_OUTPUT
+          if [ "$author" = "github-actions[bot]" ] && echo "$msg" | grep -qi "manifest" ; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Set fixed tag
+        if: steps.skip.outputs.skip == 'false'
+        id: ver
+        run: |
+          echo "next=v0.0.1" >> $GITHUB_OUTPUT
+
+      - name: Create/force-update tag
+        if: steps.skip.outputs.skip == 'false'
+        env:
+          NEXT: ${{ steps.ver.outputs.next }}
+        run: |
+          # create or move the fixed tag to the current commit
+          if git rev-parse "$NEXT" >/dev/null 2>&1; then
+            git tag -f "$NEXT"
+          else
+            git tag -a "$NEXT" -m "auto: $NEXT"
+          fi
+          git push origin ":refs/tags/$NEXT" || true
+          git push origin "$NEXT"

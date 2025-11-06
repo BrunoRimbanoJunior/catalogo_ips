@@ -3,12 +3,17 @@ name: build
 on:
   push:
     branches: [ main ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main ]
 
 jobs:
   tauri-build:
     runs-on: windows-latest
+    env:
+      # URL do manifest publicado no próprio repositório
+      MANIFEST_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/manifest.json
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +38,10 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile=false
 
+      - name: Write .env.production
+        run: |
+          Set-Content -Path .env.production -Value "VITE_DEFAULT_MANIFEST_URL=$env:MANIFEST_URL"
+
       - name: Build
         run: pnpm tauri build
 
@@ -42,3 +51,9 @@ jobs:
           name: app-bundles
           path: src-tauri/target/release/bundle/**
 
+      - name: Release bundles (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            src-tauri/target/release/bundle/**

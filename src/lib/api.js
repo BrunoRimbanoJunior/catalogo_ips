@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+﻿import { invoke } from "@tauri-apps/api/core";
 
 export async function initApp() {
   return await invoke("init_app");
@@ -59,3 +59,12 @@ export async function fetchGroupsStats() {
 export async function indexImagesFromManifest(manifestUrl) {
   return await invoke("index_images_from_manifest", { manifestUrl });
 }
+
+export async function exportDbTo(destPath) {
+  return await invoke("export_db_to", { destPath });
+}
+
+export async function setBrandingImage(kind, path) {
+  return await invoke("set_branding_image", { kind, sourcePath: path });
+}
+

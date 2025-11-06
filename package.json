@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "manifest": "node scripts/gen-manifest.mjs",
-    "manifest:onedrive": "node scripts/gen-manifest-onedrive.mjs"
+    "manifest:onedrive": "node scripts/gen-manifest-onedrive.mjs",
+    "manifest:r2": "node scripts/gen-manifest-r2.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
@@ -22,6 +23,7 @@
     "@azure/msal-node": "^2.6.5",
     "@tauri-apps/cli": "^2",
     "@vitejs/plugin-react": "^4.6.0",
+    "@aws-sdk/client-s3": "^3.678.0",
     "vite": "^7.0.4"
   }
 }
