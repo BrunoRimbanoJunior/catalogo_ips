@@ -28,6 +28,7 @@ function App() {
   const [imagesRoot, setImagesRoot] = useState("");
   const [importMsg, setImportMsg] = useState("");
   const isDev = import.meta.env.MODE !== "production";
+  const PROD_MANIFEST_FALLBACK = "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json";
 
   useEffect(() => {
     (async () => {
@@ -39,7 +40,7 @@ function App() {
       setVehicles(vs);
       // Auto-sync + auto-index se houver manifest salvo
       const savedManifest = localStorage.getItem("manifestUrl") || "";
-      const defaultManifest = import.meta.env.VITE_DEFAULT_MANIFEST_URL || "";
+      const defaultManifest = import.meta.env.VITE_DEFAULT_MANIFEST_URL || (isDev ? "" : PROD_MANIFEST_FALLBACK);
       const manifestToUse = savedManifest || defaultManifest;
       if (manifestToUse) {
         setManifestUrl(manifestToUse);
@@ -160,6 +161,11 @@ function App() {
         <h1>Catálogo IPS</h1>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <span style={{ opacity: 0.9 }}>DB v{dbVersion}</span>
+          {(syncMsg || importMsg) && !isDev ? (
+            <span style={{ fontSize: 12, opacity: 0.85 }}>
+              {syncMsg}{importMsg ? (syncMsg?" | ":"") + importMsg : ""}
+            </span>
+          ) : null}
           {isDev && (<div className="tools">
             <details>
               <summary>Ferramentas</summary>
@@ -258,4 +264,3 @@ function App() {
 }
 
 export default App;
-
