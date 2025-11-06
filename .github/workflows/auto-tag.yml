@@ -35,6 +35,12 @@ jobs:
         run: |
           echo "next=v0.0.1" >> $GITHUB_OUTPUT
 
+      - name: Configure git user
+        if: steps.skip.outputs.skip == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create/force-update tag
         if: steps.skip.outputs.skip == 'false'
         env:

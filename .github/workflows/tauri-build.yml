@@ -1,4 +1,4 @@
-name: build
+﻿name: build
 
 on:
   push:
@@ -32,9 +32,11 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Tauri CLI
+shell: bash
         run: pnpm add -D @tauri-apps/cli@^2
 
       - name: Install deps
+shell: bash
         run: pnpm install --frozen-lockfile=false
 
       - name: Write .env.production
@@ -43,6 +45,7 @@ jobs:
           echo "VITE_DEFAULT_MANIFEST_URL=$MANIFEST_URL" > .env.production
 
       - name: Build
+shell: bash
         run: pnpm tauri build
 
       - name: Upload artifacts
@@ -57,4 +60,5 @@ jobs:
         with:
           files: |
             src-tauri/target/release/bundle/**
+
 
