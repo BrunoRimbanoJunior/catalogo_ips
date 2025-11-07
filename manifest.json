@@ -1,11 +1,11 @@
 {
   "db": {
-    "version": 1762487074,
+    "version": 1762516232,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
     "sha256": null
   },
   "images": {
-    "base_url": "https://cb22ba5d68afe5d6c90b2ca2600099ae.r2.cloudflarestorage.com/",
+    "base_url": "https://cb22ba5d68afe5d6c90b2ca2600099ae.r2.cloudflarestorage.com/ipsimages/",
     "files": [
       {
         "file": "7111032801.png",
