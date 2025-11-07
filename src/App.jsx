@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { convertFileSrc } from "@tauri-apps/api/core";
+﻿import { useEffect, useMemo, useState } from "react";
 import {
   initApp,
   fetchBrands,
@@ -42,7 +41,7 @@ function App() {
   const isDev = import.meta.env.MODE !== "production";
 
   // Estado básico
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(true);
   const [imagesDir, setImagesDir] = useState("");
   const [dataDir, setDataDir] = useState("");
   const [dbPath, setDbPath] = useState("");
@@ -93,27 +92,34 @@ function App() {
       setBrands(bs);
       setVehicles(vs);
 
+      // Libera a UI imediatamente
+      setReady(true);
+
+      // Executa sync + index em background (sem bloquear a renderização)
       const manifestToUse = resolveDefaultManifest(isDev);
       if (manifestToUse) {
-        try {
-          const res = await syncFromManifest(manifestToUse);
-          setDbVersion(res.db_version);
-          setSyncMsg(`Atualizado ao iniciar: db v${res.db_version} | imgs +${res.downloaded_images}`);
-          localStorage.setItem("manifestUrl", manifestToUse);
-        } catch (e) {
-          setSyncMsg(`Falha sync inicial: ${e}`);
-        }
-        try {
-          const r = await indexImagesFromManifest(manifestToUse);
-          setImportMsg(`Index inicial: varridos ${r.scanned} | correspondidos ${r.matched} | inseridos ${r.inserted}`);
-        } catch (e) {
-          setImportMsg(`Falha index inicial: ${e}`);
-        }
+        (async () => {
+          try {
+            const res = await syncFromManifest(manifestToUse);
+            setDbVersion(res.db_version);
+            setSyncMsg(`Atualizado ao iniciar: db v${res.db_version} | imgs +${res.downloaded_images}`);
+            localStorage.setItem("manifestUrl", manifestToUse);
+          } catch (e) {
+            setSyncMsg(`Falha sync inicial: ${e}`);
+          }
+          try {
+            const r = await indexImagesFromManifest(manifestToUse);
+            setImportMsg(`Index inicial: varridos ${r.scanned} | correspondidos ${r.matched} | inseridos ${r.inserted}`);
+          } catch (e) {
+            setImportMsg(`Falha index inicial: ${e}`);
+          }
+          try { await doSearch(); } catch {}
+        })();
       }
-
-      setReady(true);
     })();
   }, []);
+
+  
 
   // Carregar branding versionado do projeto (public/images/branding.json)
   useEffect(() => {
@@ -127,7 +133,7 @@ function App() {
       .catch(() => {});
   }, []);
 
-  // Atualizar grupos e veículos conforme marca/grupo
+  // Atualizar grupos e vei­culos conforme marca/grupo
   useEffect(() => {
     (async () => {
       const gs = await fetchGroups(brandId ? Number(brandId) : null);
@@ -142,6 +148,14 @@ function App() {
     const t = setTimeout(() => { doSearch(); }, 300);
     return () => clearTimeout(t);
   }, [brandId, group, vehicleId, codeQuery]);
+
+  // Auto‑ocultar mensagens da barra de status
+  useEffect(() => {
+    if (syncing) return; // não fecha enquanto estiver rodando
+    if (!syncMsg && !importMsg) return;
+    const h = setTimeout(() => { setSyncMsg(""); setImportMsg(""); }, 6000);
+    return () => clearTimeout(h);
+  }, [syncMsg, importMsg, syncing]);
 
   async function doSearch() {
     const params = {
@@ -164,7 +178,7 @@ function App() {
     return (p || "").replace(/\\/g, "/");
   }
   function joinFsPath(dir, file) {
-    // Se o arquivo já é absoluto (Windows C:\ ou Unix /), retorna normalizado
+    // Se o arquivo jÃ¡ Ã© absoluto (Windows C:\ ou Unix /), retorna normalizado
     if (/^[a-zA-Z]:\\/.test(file) || file.startsWith("/")) {
       return normalizeFsPath(file);
     }
@@ -187,7 +201,7 @@ function App() {
         }
         setImageUrls(outs.filter(Boolean));
       } catch {
-        // fallback para asset:// caso invoke não esteja disponível
+        // fallback para asset:// caso invoke nÃ£o esteja disponÃ­vel
         const outs = files.map((f) => {
           const norm = normalizeFsPath(joinFsPath(imagesDir, f));
           const trimmed = norm.startsWith("/") ? norm.slice(1) : norm;
@@ -210,14 +224,14 @@ function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [preview.open, imageUrls.length]);
 
-  // Sincronizar usando manifest padrão (sempre)
+  // Sincronizar usando manifest padrÃ£o (sempre)
   async function runSyncDefault() {
     const m = resolveDefaultManifest(isDev);
     if (!m) return;
     setSyncing(true);
     try {
       const res = await syncFromManifest(m);
-      setSyncMsg(`Banco atualizado: ${res.updated_db ? "sim" : "não"} | Imagens baixadas: ${res.downloaded_images} | versão: ${res.db_version}`);
+      setSyncMsg(`Banco atualizado: ${res.updated_db ? "sim" : "nÃ£o"} | Imagens baixadas: ${res.downloaded_images} | versÃ£o: ${res.db_version}`);
       setDbVersion(res.db_version);
       localStorage.setItem("manifestUrl", m);
       try {
@@ -241,7 +255,7 @@ function App() {
     setImportMsg(`Importando: ${selected}`);
     try {
       const res = await importExcel(selected);
-      setImportMsg(`Linhas: ${res.processed_rows} | Produtos upsert: ${res.upserted_products} | vínculos veículo: ${res.linked_vehicles} | nova versão: ${res.new_db_version}`);
+      setImportMsg(`Linhas: ${res.processed_rows} | Produtos upsert: ${res.upserted_products} | vÃ­nculos veÃ­culo: ${res.linked_vehicles} | nova versÃ£o: ${res.new_db_version}`);
       setDbVersion(res.new_db_version);
       const [bs, gs, vs] = await Promise.all([
         fetchBrands(),
@@ -303,7 +317,7 @@ function App() {
   if (!ready) {
     return (
       <main className="container" style={brandingBgUrl ? { backgroundImage: `url(${brandingBgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>
-        Carregando…
+        Carregandoâ€¦
       </main>
     );
   }
@@ -324,17 +338,17 @@ function App() {
               <details>
                 <summary>Ferramentas</summary>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8 }}>
-                  <button disabled={syncing} onClick={runSyncDefault}>{syncing ? "Sincronizando…" : "Verificar atualizações (manifest padrão)"}</button>
-                  <button onClick={async()=>{ const m = resolveDefaultManifest(isDev); if(!m) return; setImportMsg("Indexando via manifest…"); try { const r = await indexImagesFromManifest(m); setImportMsg(`Index manifest: varridos ${r.scanned} | correspondidos ${r.matched} | inseridos ${r.inserted}`); } catch(e){ setImportMsg(`Falha ao indexar manifest: ${e}`);} }}>Indexar via manifest (padrão)</button>
+                  <button disabled={syncing} onClick={runSyncDefault}>{syncing ? "Sincronizandoâ€¦" : "Verificar atualizações (manifest padrão)"}</button>
+                  <button onClick={async()=>{ const m = resolveDefaultManifest(isDev); if(!m) return; setImportMsg("Indexando via manifestâ€¦"); try { const r = await indexImagesFromManifest(m); setImportMsg(`Index manifest: varridos ${r.scanned} | correspondidos ${r.matched} | inseridos ${r.inserted}`); } catch(e){ setImportMsg(`Falha ao indexar manifest: ${e}`);} }}>Indexar via manifest (padrão)</button>
                   <button onClick={runImportExcel}>Importar Excel</button>
-                  <button onClick={runExportDb}>Exportar DB…</button>
+                  <button onClick={runExportDb}>Exportar DB</button>
                   <button onClick={runExportDbAndManifest}>Exportar DB + Manifest (R2)</button>
                   <button onClick={()=>{ localStorage.removeItem("manifestUrl"); setImportMsg("Manifest salvo limpo. Usando padrão."); }}>Limpar manifest salvo</button>
                   {/* Abrir pastas/arquivo */}
                   <button onClick={openDataDirFolder}>Abrir dados</button>
                   <button onClick={openImagesFolder}>Abrir imagens</button>
                   <button onClick={openDbFilePath}>Abrir DB</button>
-                  <button onClick={async ()=>{ const s = await fetchGroupsStats(); setImportMsg(`Grupos: ${s.distinct_groups} | Produtos c/ grupo: ${s.products_with_group}`); }}>Diagnóstico grupos</button>
+                  <button onClick={async ()=>{ const s = await fetchGroupsStats(); setImportMsg(`Grupos: ${s.distinct_groups} | Produtos c/ grupo: ${s.products_with_group}`); }}>Diagnóstico de grupos</button>
                   <div style={{ gridColumn: "1 / -1", marginTop: 8 }}>
                     <details>
                       <summary>Credenciais R2 / Config Manifest</summary>
@@ -343,8 +357,8 @@ function App() {
                         <input placeholder="R2 Bucket" title="Nome exato do bucket (ex.: ipsimages)" value={r2Bucket} onChange={(e)=>setR2Bucket(e.target.value)} />
                         <input placeholder="R2 Access Key ID" title="Chave de acesso S3 do R2 (Access Key ID)" value={r2AccessKeyId} onChange={(e)=>setR2AccessKeyId(e.target.value)} />
                         <input placeholder="R2 Secret Access Key" title="Segredo da chave S3 do R2 (Secret Access Key)" value={r2SecretAccessKey} onChange={(e)=>setR2SecretAccessKey(e.target.value)} />
-                        <input placeholder="R2 Endpoint (opcional)" title="Endpoint S3 opcional (deixe vazio para usar padrão)" value={r2Endpoint} onChange={(e)=>setR2Endpoint(e.target.value)} />
-                        <input placeholder="R2 Public Base URL" title="URL pública do bucket (https://pub-…r2.dev/)" value={r2PublicBaseUrl} onChange={(e)=>setR2PublicBaseUrl(e.target.value)} />
+                        <input placeholder="R2 Endpoint (opcional)" title="Endpoint S3 opcional (deixe vazio para usar padrÃ£o)" value={r2Endpoint} onChange={(e)=>setR2Endpoint(e.target.value)} />
+                        <input placeholder="R2 Public Base URL" title="URL pÃºblica do bucket (https://pub-â€¦r2.dev/)" value={r2PublicBaseUrl} onChange={(e)=>setR2PublicBaseUrl(e.target.value)} />
                         <input placeholder="DB URL (raw Git)" title="URL raw do catalog.db no GitHub" value={manifestDbUrl} onChange={(e)=>setManifestDbUrl(e.target.value)} />
                         <button onClick={()=>{ localStorage.setItem("r2.account_id", r2AccountId); localStorage.setItem("r2.bucket", r2Bucket); localStorage.setItem("r2.access_key_id", r2AccessKeyId); localStorage.setItem("r2.secret_access_key", r2SecretAccessKey); localStorage.setItem("r2.endpoint", r2Endpoint); localStorage.setItem("r2.public_base_url", r2PublicBaseUrl); localStorage.setItem("manifest.db_url", manifestDbUrl); setImportMsg("Credenciais salvas."); }}>Salvar credenciais</button>
                       </div>
@@ -357,6 +371,13 @@ function App() {
           )}
         </div>
       </div>
+
+      {(syncMsg || importMsg || syncing) ? (
+        <div className="statusbar">
+          <div className="small">{syncing ? "Sincronizando... " : ""}{syncMsg}{importMsg ? (syncMsg ? " | " : "") + importMsg : ""}</div>
+          <button style={{ marginLeft: 8, marginTop: 6, padding: "2px 6px", borderRadius: 6, border: 0, cursor: "pointer" }} onClick={() => { setSyncMsg(""); setImportMsg(""); }}>X</button>
+        </div>
+      ) : null}
 
       <div className="layout">
         <aside className="sidebar">
@@ -371,7 +392,7 @@ function App() {
 
         <section className="panel">
           <div className="filters" style={{ flexWrap: "wrap" }}>
-            <input className="filter-code" placeholder="Pesquisar por código ou veículo (produto/OEM/Similar/Veículo)" value={codeQuery} onChange={(e)=>setCodeQuery(e.target.value)} />
+            <input className="filter-code" placeholder="Pesquisar por código ou veí­culo (produto/OEM/Similar/Veículo)" value={codeQuery} onChange={(e)=>setCodeQuery(e.target.value)} />
             <select value={group} onChange={(e) => { setGroup(e.target.value); setVehicleId(""); }}>
               <option value="">Grupo (todos)</option>
               {groups.map((t) => (<option key={t} value={t}>{t}</option>))}
@@ -392,7 +413,7 @@ function App() {
                     <span className="desc">{p.description}</span>
                     <span className="brand">{p.brand}</span>
                   </div>
-                  {p.vehicles && <div style={{ fontSize: 12, opacity: 0.9 }}>Aplicação: {p.vehicles}</div>}
+                  {p.vehicles && <div style={{ fontSize: 12, opacity: 0.9 }}>Aplicações: {p.vehicles}</div>}
                 </div>
               </li>
             ))}
@@ -416,7 +437,7 @@ function App() {
               <div className="sep" />
               {selected.application && (
                 <div className="compat">
-                  <div className="subtitle">Compatível com:</div>
+                  <div className="subtitle">Compatí­vel com:</div>
                   <div className="compat-list">{selected.application}</div>
                 </div>
               )}
@@ -441,7 +462,7 @@ function App() {
     </main>
     {preview.open && imageUrls.length > 0 && (
       <div className="modal-backdrop" onClick={()=>setPreview({open:false, index:0})}>
-        <button className="modal-close" onClick={(e)=>{ e.stopPropagation(); setPreview({open:false, index:0}); }}>✕</button>
+        <button className="modal-close" aria-label="Fechar" title="Fechar" onClick={(e)=>{ e.stopPropagation(); setPreview({open:false, index:0}); }}>X</button>
         <img className="modal-image" src={imageUrls[preview.index]} alt="preview" onClick={(e)=>{ e.stopPropagation(); setPreview(p=>({ open:true, index:(p.index+1)%imageUrls.length })); }} />
       </div>
     )}
@@ -450,4 +471,5 @@ function App() {
 }
 
 export default App;
+
 

@@ -5,6 +5,7 @@ use tauri::Manager;
 mod core {
     use super::*;
     use reqwest::Client;
+    use std::time::Duration;
     use rusqlite::{params, Connection, OptionalExtension};
     use walkdir::WalkDir;
     use calamine::{open_workbook_auto, Reader};
@@ -379,7 +380,8 @@ mod core {
 
     #[tauri::command]
     pub async fn sync_from_manifest(app: AppHandle, manifest_url: String) -> Result<SyncResult, String> {
-        let client = Client::new(); let (_, dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        let client = Client::builder().timeout(Duration::from_secs(20)).build().map_err(|e| e.to_string())?;
+        let (_, dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
         let manifest: CatalogManifest = client.get(&manifest_url).send().await.map_err(|e| e.to_string())?.error_for_status().map_err(|e| e.to_string())?.json().await.map_err(|e| e.to_string())?;
         let mut updated_db = false; let local_version = { let conn = open_db(&dbf).map_err(|e| e.to_string())?; migrate(&conn).map_err(|e| e.to_string())?; get_db_version(&conn).unwrap_or(0) };
         if manifest.db.version > local_version { download_to_file(&client, &manifest.db.url, &dbf).await.map_err(|e| e.to_string())?; let conn = open_db(&dbf).map_err(|e| e.to_string())?; migrate(&conn).map_err(|e| e.to_string())?; if get_db_version(&conn).unwrap_or(0) < manifest.db.version { set_db_version(&conn, manifest.db.version).ok(); } updated_db = true; }
@@ -389,7 +391,7 @@ mod core {
     }
 
     #[tauri::command]
-    pub async fn gen_manifest_r2(app: AppHandle, version: i64, db_url: String, out_path: String, r2: R2Creds) -> Result<String, String> {
+    pub async fn gen_manifest_r2(_app: AppHandle, version: i64, db_url: String, out_path: String, r2: R2Creds) -> Result<String, String> {
         // Executa o script Node local para gerar o manifest a partir do R2
         use std::process::Command as PCommand;
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
@@ -403,13 +405,14 @@ mod core {
             .arg("--version").arg(version.to_string())
             .arg("--db-url").arg(&db_url)
             .arg("--out").arg(&out_path);
-        // Env do R2
-        cmd.env("R2_ACCOUNT_ID", &r2.account_id)
-            .env("R2_BUCKET", &r2.bucket)
-            .env("R2_ACCESS_KEY_ID", &r2.access_key_id)
-            .env("R2_SECRET_ACCESS_KEY", &r2.secret_access_key);
-        if let Some(ep) = r2.endpoint.as_ref() { cmd.env("R2_ENDPOINT", ep); }
-        if let Some(pub_url) = r2.public_base_url.as_ref() { cmd.env("R2_PUBLIC_BASE_URL", pub_url); }
+        // Env do R2: só define variáveis se valores não estiverem vazios,
+        // permitindo que o script leia de .env/.env.development quando não passadas pela UI.
+        if !r2.account_id.trim().is_empty() { cmd.env("R2_ACCOUNT_ID", &r2.account_id); }
+        if !r2.bucket.trim().is_empty() { cmd.env("R2_BUCKET", &r2.bucket); }
+        if !r2.access_key_id.trim().is_empty() { cmd.env("R2_ACCESS_KEY_ID", &r2.access_key_id); }
+        if !r2.secret_access_key.trim().is_empty() { cmd.env("R2_SECRET_ACCESS_KEY", &r2.secret_access_key); }
+        if let Some(ep) = r2.endpoint.as_ref() { if !ep.trim().is_empty() { cmd.env("R2_ENDPOINT", ep); } }
+        if let Some(pub_url) = r2.public_base_url.as_ref() { if !pub_url.trim().is_empty() { cmd.env("R2_PUBLIC_BASE_URL", pub_url); } }
         let project_root: std::path::PathBuf = if cwd.ends_with("src-tauri") {
             cwd.parent().unwrap_or(&cwd).to_path_buf()
         } else {
@@ -430,20 +433,47 @@ mod core {
         use std::fs;
         // monta caminho absoluto
         let (_, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
-        let abs = {
+        let abs_try = {
             let p = std::path::PathBuf::from(&path_or_rel);
             if p.is_absolute() { p } else { imgs_dir.join(p) }
         };
-        let bytes = fs::read(&abs).map_err(|e| format!("Falha ao ler imagem: {}", e))?;
-        let ext = abs.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
-        let mime = match ext.as_str() { "jpg"|"jpeg" => "image/jpeg", "png" => "image/png", "webp" => "image/webp", "bmp" => "image/bmp", _ => "application/octet-stream" };
-        let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
-        Ok(format!("data:{};base64,{}", mime, encoded))
+
+        // Função auxiliar para converter bytes em data URL
+        fn to_data_url(path: &std::path::Path, bytes: Vec<u8>) -> String {
+            let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
+            let mime = match ext.as_str() { "jpg"|"jpeg" => "image/jpeg", "png" => "image/png", "webp" => "image/webp", "bmp" => "image/bmp", _ => "application/octet-stream" };
+            let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
+            format!("data:{};base64,{}", mime, encoded)
+        }
+
+        // 1) Tenta ler exatamente o caminho resolvido
+        match fs::read(&abs_try) {
+            Ok(bytes) => return Ok(to_data_url(&abs_try, bytes)),
+            Err(_) => {
+                // 2) Fallback: se o arquivo não existir (ex.: DB antigo salvou só o nome sem subpasta),
+                // procura pelo basename em subdiretórios de images_dir
+                if let Some(name) = abs_try.file_name().and_then(|s| s.to_str()) {
+                    for entry in WalkDir::new(&imgs_dir).into_iter().filter_map(|e| e.ok()) {
+                        let p = entry.path();
+                        if p.is_file() {
+                            if let Some(base) = p.file_name().and_then(|s| s.to_str()) {
+                                if base.eq_ignore_ascii_case(name) {
+                                    if let Ok(bytes) = fs::read(p) {
+                                        return Ok(to_data_url(p, bytes));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return Err(format!("Falha ao ler imagem (não encontrada): {}", abs_try.display()));
+            }
+        }
     }
 
     #[tauri::command]
     pub async fn index_images_from_manifest(app: AppHandle, manifest_url: String) -> Result<ImageIndexResult, String> {
-        let client = Client::new();
+        let client = Client::builder().timeout(Duration::from_secs(20)).build().map_err(|e| e.to_string())?;
         let (_, dbf, _) = ensure_dirs(&app).map_err(|e| e.to_string())?;
         let manifest: CatalogManifest = client
             .get(&manifest_url)
@@ -613,14 +643,33 @@ mod core {
     }
 
     fn candidate_codes(stem: &str) -> Vec<String> {
+        use std::collections::HashSet;
         let s = stem.trim();
         let up = s.to_ascii_uppercase();
-        let mut cands = Vec::new();
-        cands.push(up.clone());
-        if let Some((first, _)) = up.split_once('_') { cands.push(first.to_string()); }
-        if let Some((first, _)) = up.split_once('-') { cands.push(first.to_string()); }
-        if let Some((first, _)) = up.split_once(' ') { cands.push(first.to_string()); }
-        cands
+        let mut set: HashSet<String> = HashSet::new();
+
+        // original
+        if !up.is_empty() { set.insert(up.clone()); }
+
+        // até primeiro separador comum
+        for sep in ['_', '-', ' '] {
+            if let Some((first, _)) = up.split_once(sep) {
+                if !first.is_empty() { set.insert(first.to_string()); }
+            }
+        }
+
+        // somente caracteres alfanuméricos
+        let only_alnum: String = up.chars().filter(|c| c.is_ascii_alphanumeric()).collect();
+        if !only_alnum.is_empty() { set.insert(only_alnum.clone()); }
+
+        // prefixo numérico contínuo (ex.: "7111043002LE" -> "7111043002")
+        let digits_prefix: String = up.chars().take_while(|c| c.is_ascii_digit()).collect();
+        if !digits_prefix.is_empty() { set.insert(digits_prefix); }
+
+        // retorna em ordem determinística
+        let mut out: Vec<String> = set.into_iter().collect();
+        out.sort();
+        out
     }
 
     #[tauri::command]
@@ -693,3 +742,4 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+

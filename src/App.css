@@ -115,7 +115,7 @@ button {
   }
 }
 
-/* CatÃ¡logo custom */
+/* Catálogo custom */
 .appbar { position: sticky; top: 0; z-index: 10; background: #dce4f5; color: #060606; padding: 8px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: grid; grid-template-columns: 70px 1fr auto; align-items: center; gap: 12px; }
 .appbar h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.3px; text-align: center; }
 .appbar .logo { height: 80px; width: auto; object-fit: contain; }
@@ -177,4 +177,10 @@ button {
 .details-wrap .subtitle { font-weight: 700; font-size: 14px; opacity: 0.85; text-align: left; margin-top: 4px; }
 .details-wrap .compat-list, .details-wrap .brand-list, .details-wrap .details-text { white-space: pre-line; text-align: left; margin-top: 4px; }
 .details-wrap .sep { border-top: 1px solid #e6e6e6; margin: 8px 0; }
+
+/* Status bar (não intrusiva) */
+.statusbar { position: fixed; right: 16px; bottom: 16px; z-index: 9999; background: rgba(33,33,33,0.9); color: #fff; padding: 10px 12px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); max-width: 60vw; text-align: left; }
+.statusbar.success { background: rgba(0,128,96,0.9); }
+.statusbar.error { background: rgba(180,32,32,0.9); }
+.statusbar .small { font-size: 12px; opacity: 0.9; }
 

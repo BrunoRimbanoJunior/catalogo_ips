@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "catalogo_ips",
+        "title": "Catálogo de Peças - IPS",
         "width": 1280,
         "height": 900,
         "minWidth": 1024,

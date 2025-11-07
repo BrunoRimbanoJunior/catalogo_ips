@@ -1,81 +1,146 @@
-﻿# CatÃ¡logo IPS â€” Tauri + React + SQLite
+﻿# Catálogo IPS — Tauri + React + SQLite
 
-App desktop de catÃ¡logo com filtros por fabricante, descriÃ§Ã£o e veÃ­culo. Banco local SQLite e sincronizaÃ§Ã£o de base e imagens via manifest hospedado (Git/OneDrive).
+Aplicativo desktop de catálogo com filtros por fabricante, grupo e veículo; busca por código (produto/OEM/Similar/Veículo); detalhes com “Compatível com”, “Detalhes” e “Similares”. Banco local SQLite e sincronização de base e imagens via manifest hospedado (Git/R2).
 
-## Rodando em desenvolvimento
+## Funcionalidades
 
-- PrÃ©â€‘requisitos: Node 18+, pnpm, Rust (toolchain stable), Tauri CLI.
-- Comandos:
-  - `pnpm install`
-  - `pnpm tauri dev`
+- Filtros: Fabricante (chips), Grupo e Veículo (selects), e busca por código (produto/OEM/Similar/Veículo).
+- Detalhes do item: código, descrição, marca, compatibilidade, detalhes e similares. Galeria com visualização ampliada ao clique (lightbox).
+- Sincronização do cliente: em cada inicialização, o app resolve a URL do manifest.json, baixa o DB se versão maior e baixa imagens faltantes. Em seguida indexa imagens no DB.
+- Branding versionado: logo e fundo em public/images/ (definidos nas Ferramentas em Dev) são empacotados no build.
+- Ferramentas (somente Dev): Verificar atualizações (manifest padrão), Indexar via manifest, Importar Excel, Exportar DB, Exportar DB + Manifest (R2), Abrir dados/imagens/DB, Limpar manifest salvo.
 
-## Manifest (atualizaÃ§Ã£o de banco e imagens)
+## Estrutura do banco (resumo)
 
-Publique um arquivo `manifest.json` acessÃ­vel por HTTP (ex.: Git raw). Exemplo em `public/manifest.sample.json`:
+- Tabelas: rands, ehicles, products (campos principais: brand_id, code, description, application, details, oem, similar, pgroup), product_vehicles, images, meta (key=db_version).
+- meta.db_version identifica a versão do DB local; importações incrementam automaticamente.
 
-```
+## Manifest (DB + imagens)
+
+Exemplo de manifest.json:
+
+`
 {
-  "db": { "version": 3, "url": "https://.../catalog.db" },
+  "db": { "version": 3, "url": "https://raw.githubusercontent.com/<user>/<repo>/main/data/catalog.db", "sha256": null },
   "images": {
-    "base_url": "https://onedrive-public-url/imagens/",
-    "files": [ { "file": "ABC123.jpg" } ]
+    "base_url": "https://pub-xxxxxxxxxxxxxxxx.r2.dev/",
+    "files": [ { "file": "7111032801.png", "sha256": null } ]
   }
 }
-```
+`
 
-No app, informe a URL do manifest e clique “Verificar atualizações”. O app salva a última URL e, ao abrir, executa automaticamente sincronização do banco e indexação de imagens a partir do manifest salvo.
+Observações:
+- Use a “Public Development URL” do bucket no R2 como ase_url (ex.: https://pub-…r2.dev/, com / no final). Não use o endpoint S3 da conta (…cloudflarestorage.com), pois retorna 400 para público.
+- iles[].file deve conter o caminho/nome relativo dentro do bucket.
 
-### Gerar manifest a partir de uma pasta de imagens
+## Desenvolvimento (Dev)
 
-- Gere o DB localmente (via Importar Excel na UI) e depois exporte uma cÃ³pia compacta para o repositÃ³rio:
-  - Pela UI, chame o comando `export_db_to` (jÃ¡ exposto como API; posso colocar um botÃ£o se quiser) ou copie o DB de `init_app.db_path` para `data/catalog.db`.
-- Coloque as imagens pÃºblicas em `images/` dentro do repo (ou use outra pasta e ajuste os parÃ¢metros).
-- Rode:
-  - `pnpm manifest -- --version 3 --db-url https://raw.githubusercontent.com/<user>/<repo>/main/data/catalog.db --images-base-url https://raw.githubusercontent.com/<user>/<repo>/main/images/ --images-dir images --out manifest.json`
-- FaÃ§a commit de `data/catalog.db`, da pasta `images/` e do `manifest.json` no Git. A URL Raw do `manifest.json` serÃ¡ usada no app do cliente.
+Pré‑requisitos:
+- Node 20+, Rust (toolchain stable), Tauri (instala automaticamente via CLI), PNPM ou NPM.
 
-### Gerar manifest com OneDrive (links pÃºblicos)
+Passos:
+1) Instale dependências: pnpm install (ou 
+pm i)
+2) (Recomendado) crie .env.development na raiz com:
+   - VITE_DEFAULT_MANIFEST_URL=http://localhost:1420/manifest.json
+3) Rode o front e o shell do Tauri em terminais separados:
+   - pnpm dev
+   - pnpm tauri dev
+4) Ferramentas (Dev): clique em “Limpar manifest salvo” para garantir uso do padrão; depois “Verificar atualizações (manifest padrão)”.
+5) Selecione um produto e clique na miniatura para abrir a visualização ampliada.
 
-- PrÃ©-requisito: um App do Azure AD (public client) com permissÃµes Delegadas Microsoft Graph: `Files.Read.All` e `offline_access`. Copie o `Application (client) ID`.
-- AutenticaÃ§Ã£o: Device Code (o script mostra uma URL e um cÃ³digo para vocÃª entrar com sua conta do OneDrive).
-- Comando:
-  - `O365_CLIENT_ID=<seu_client_id> pnpm manifest:onedrive -- --version 3 --db-url https://raw.githubusercontent.com/<user>/<repo>/main/data/catalog.db --folder-path /Catalogo/Imagens --out manifest.json`
-- O script cria links de compartilhamento anÃ´nimos (view) e grava cada imagem como URL completa no `manifest.json` (forÃ§ando download com `?download=1`).
-- ObservaÃ§Ã£o: se preferir nÃ£o usar OneDrive, utilize a estratÃ©gia â€œbase_url + arquivos relativosâ€ com um hosting estÃ¡tico (GitHub/S3/R2/etc.).
+Notas de Dev (imagens):
+- Em desenvolvimento, as miniaturas e o preview usam data URLs (base64) geradas a partir dos arquivos baixados (garante render mesmo quando o scheme sset:// do WebView não está ativo no Dev).
 
-## Estrutura do banco
+## Importação do Excel
 
-- `brands`, `vehicles`, `products(oem, similar)`, `product_vehicles`, `images` e `meta(key=db_version)`.
+Layout suportado:
+- CODIGO | GRUPO | DESCRIÇÃO | MONTADORA | APLICAÇÃO | MARCA | OEM | SIMILAR
 
-## ImportaÃ§Ã£o do Excel
+Mapeamento (case/acentos indiferentes):
+- CODIGO → products.code (chave de upsert)
+- GRUPO/GRUPO DE PRODUTOS/CATEGORIA → products.pgroup
+- DESCRIÇÃO → products.description
+- MARCA/FABRICANTE → tabela rands + products.brand_id
+- APLICAÇÃO → vincula veículos (texto é dividido e indexado em ehicles + product_vehicles)
+- OEM, SIMILAR → products.oem, products.similar
+- MONTADORA é ignorada no import (veículos vêm de APLICAÇÃO)
+- Ignorados: ANO, LINK, FOTO/FOTOS (se existirem)
 
-- Novo layout suportado (ordem tÃ­pica):
-  - `CODIGO | GRUPO | DESCRIÃ‡ÃƒO | MONTADORA | APLICAÃ‡ÃƒO | MARCA | OEM | SIMILAR`
-- Mapeamento (case/acentos indiferentes):
-  - `CODIGO` â†’ `products.code` (chave de upsert)
-  - `GRUPO`/`GRUPO DE PRODUTOS`/`CATEGORIA` â†’ `products.pgroup`
-  - `DESCRIÃ‡ÃƒO` â†’ `products.description`
-  - `MARCA`/`FABRICANTE` â†’ tabela `brands` + `products.brand_id`
-  - `APLICAÃ‡ÃƒO` â†’ usada para vincular veÃ­culos; o texto Ã© dividido e indexado em `vehicles` + `product_vehicles`
-  - `OEM`, `SIMILAR` â†’ `products.oem`, `products.similar`
-  - `MONTADORA` Ã© ignorada no import (os veÃ­culos vÃªm de `APLICAÃ‡ÃƒO`)
-- Ignorados: `ANO`, `LINK`, `FOTO/FOTOS` (se existirem)
-- O import faz upsert por `products.code` e incrementa `db_version`.
+O import faz upsert por products.code e incrementa meta.db_version automaticamente.
+
+## Geração de manifest (R2)
+
+Pelo próprio app (Dev):
+- Ferramentas → “Exportar DB + Manifest (R2)”.
+- Preencha “Credenciais R2 / Config Manifest” (com tooltips):
+  - Account ID, Bucket (ex.: ipsimages), Access Key ID, Secret Access Key
+  - Public Base URL: https://pub-…r2.dev/
+  - DB URL (raw Git): URL completa do data/catalog.db no GitHub
+- O app executa scripts/gen-manifest-r2.mjs localmente e grava o manifest.json no caminho escolhido.
+
+Via CLI (alternativa):
+`
+R2_ACCOUNT_ID=... \
+R2_BUCKET=ipsimages \
+R2_ACCESS_KEY_ID=... \
+R2_SECRET_ACCESS_KEY=... \
+R2_PUBLIC_BASE_URL=https://pub-...r2.dev/ \
+node scripts/gen-manifest-r2.mjs --version 3 --db-url https://raw.githubusercontent.com/<user>/<repo>/main/data/catalog.db --out manifest.json
+`
+
+## Build local (Windows)
+
+Opção 1 (manual):
+- .env.production com a URL padrão do manifest (Git raw):
+  - VITE_DEFAULT_MANIFEST_URL=https://raw.githubusercontent.com/<user>/<repo>/main/manifest.json
+- Build front: pnpm build
+- Build app: pnpm tauri build
+- Saída: src-tauri/target/release/bundle/
+
+Opção 2 (script):
+- ./scripts/build-local.ps1 -ManifestUrl "https://raw.githubusercontent.com/<user>/<repo>/main/manifest.json"
+
+## Comportamento do cliente (produção)
+
+- Ao iniciar, o app resolve a URL do manifest (LocalStorage → VITE_DEFAULT_MANIFEST_URL → fallback Git) e executa:
+  1) sync_from_manifest: baixa DB novo (se db.version maior) e imagens faltantes.
+  2) index_images_from_manifest: indexa os nomes das imagens no DB para cada produto.
+- Imagens são salvas em:
+  - Windows: %LOCALAPPDATA%/com.jubar.catalogo-ips/images
+
+## Troubleshooting rápido
+
+- 400 ao baixar imagens: verifique images.base_url no manifest.json. Precisa ser a Public Development URL do bucket (https://pub-…r2.dev/), com / final.
+- Manifest “antigo” carregado: use “Limpar manifest salvo” (remove LocalStorage) e reinicie.
+- Dev não mostra imagens: em Dev usamos data URLs (base64) via ead_image_base64 — se ainda assim não aparecer, confirme se o arquivo existe na pasta de imagens e se o nome em selected.images bate com o arquivo.
 
 ## Comandos Tauri expostos
 
-- `init_app` â€” prepara diretÃ³rios e banco, retorna versÃ£o local.
-- `get_brands_cmd`, `get_vehicles_cmd`
-- `search_products_cmd` â€” filtros por marca/veÃ­culo e texto.
-- `get_product_details_cmd` â€” dados + nomes de arquivos de imagem.
-- `sync_from_manifest` â€” baixa DB e imagens conforme manifest.
-- `import_excel(path)` â€” importa/atualiza DB via XLSX.
-- `index_images(root)` â€” mapeia imagens por cÃ³digo do produto.
-- `export_db_to(dest_path)` â€” exporta o DB compactado (VACUUM INTO).
+- init_app — prepara diretórios e banco, retorna paths e versão local.
+- get_brands_cmd, get_groups_cmd, get_vehicles_cmd, get_vehicles_filtered_cmd, get_makes_cmd, get_vehicles_by_make_cmd
+- search_products_cmd — filtros (marca/grupo/veículo) + busca por código/OEM/Similar e também por veículo.
+- get_product_details_cmd — dados + imagens, inclui similar.
+- sync_from_manifest — baixa DB e imagens conforme manifest.
+- index_images_from_manifest — indexa nomes de imagens conforme manifest.
+- import_excel(path) — importa/atualiza DB via XLSX.
+- index_images(root) — (Dev/legado) varre pasta local e indexa por código do arquivo.
+- export_db_to(dest_path) — exporta o DB compactado (VACUUM INTO).
+- set_branding_image(kind, source_path) — copia logo/fundo para public/images/.
+- gen_manifest_r2(version, db_url, out_path, r2) — gera manifest.json listando objetos no bucket R2 (S3 API).
+- ead_image_base64(path_or_rel) — lê a imagem local e retorna data:image/...;base64,... (útil no Dev).
 
-## Build e instalador (Windows)
+---
 
-- Build release: `pnpm tauri build`.
-- SaÃ­da: `src-tauri/target/release/bundle/` (EXE/NSIS installer). O projeto estÃ¡ configurado para usar NSIS, que costuma gerar o instalador mais leve.
+Se precisar, posso adicionar índices SQL (em migrations) para acelerar buscas por products.code, products.oem, products.similar e ehicles.name.
 
+## Manutenção (atualização de base e imagens)
 
+1) Importe o Excel (Ferramentas → Importar Excel) para atualizar/incluir produtos. O db_version local será incrementado.
+2) Exporte o DB e gere o manifest do R2 (Ferramentas → Exportar DB + Manifest (R2)).
+   - Preencha/atualize as credenciais R2 e a Public Base URL (https://pub-…r2.dev/).
+   - O script usa um número de versão (padrão: timestamp) no campo db.version do manifest.
+3) Faça commit de data/catalog.db (se aplicável) e do manifest.json no repositório Git.
+4) Clientes: ao abrir, verificam a versão no manifest e baixam DB/imagens novos automaticamente.
+
+Observação: se desejar forçar a verificação em produção sem reiniciar o app, implemente no front um botão de “Verificar atualizações” (no cliente não expomos as Ferramentas Dev por padrão).

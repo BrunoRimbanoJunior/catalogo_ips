@@ -22,3 +22,48 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#env files
+# Env files (nunca commitar segredos)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.staging
+# Exceções: manter exemplos/produção sem segredos
+!.env.example
+!.env.production
+
+# Tauri / Rust build
+/src-tauri/target/
+/src-tauri/**/bundle/**
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Bancos locais e artefatos (mas mantenha o DB público oficial)
+*.db
+!data/catalog.db
+data/images/
+
+# Arquivos temporários diversos
+*.tmp
+*.temp
