@@ -53,7 +53,12 @@ async function main() {
   const secretAccessKey = ensure(process.env.R2_SECRET_ACCESS_KEY, 'Defina R2_SECRET_ACCESS_KEY');
 
   const endpoint = process.env.R2_ENDPOINT || `https://${accountId}.r2.cloudflarestorage.com`;
-  const baseUrl = (arg('base-url') || process.env.R2_PUBLIC_BASE_URL || `${endpoint}/${bucket}/`).replace(/([^/])$/, '$1/');
+  let baseUrl = (arg('base-url') || process.env.R2_PUBLIC_BASE_URL || `${endpoint}/${bucket}/`).replace(/([^/])$/, '$1/');
+  // Proteção: se usarem o endpoint público da conta sem o bucket, garanta que o bucket entre na URL
+  // Ex.: https://<account>.r2.cloudflarestorage.com/  -> precisa de /<bucket>/
+  if (baseUrl.includes(`${accountId}.r2.cloudflarestorage.com`) && !baseUrl.includes(`/${bucket}/`)) {
+    baseUrl = `${baseUrl}${bucket}/`;
+  }
 
   const s3 = new S3Client({
     region: 'auto',
@@ -73,4 +78,3 @@ async function main() {
 }
 
 main().catch(err => { console.error('Falha ao gerar manifest R2:', err); process.exit(1); });
-

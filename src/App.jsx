@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { initApp, fetchBrands, fetchVehicles, searchProducts, getProductDetails, syncFromManifest, importExcel, indexImages, fetchGroups, fetchVehiclesFiltered, fetchGroupsStats, indexImagesFromManifest, setBrandingImage } from "./lib/api";
-import { open } from "@tauri-apps/plugin-dialog";
+import { initApp, fetchBrands, fetchVehicles, searchProducts, getProductDetails, syncFromManifest, importExcel, indexImages, fetchGroups, fetchVehiclesFiltered, fetchGroupsStats, indexImagesFromManifest, setBrandingImage, exportDbTo } from "./lib/api";
+import { open, save } from "@tauri-apps/plugin-dialog";
 import "./App.css";
 
 function App() {
@@ -49,6 +49,16 @@ function App() {
           setDbVersion(res.db_version);
           setSyncMsg(`Atualizado ao iniciar: db v${res.db_version} | imgs +${res.downloaded_images}`);
           localStorage.setItem("manifestUrl", manifestToUse);
+          // Recarrega listas e resultados após sync
+          try {
+            const [bs2, gs2, vs2] = await Promise.all([
+              fetchBrands(),
+              fetchGroups(brandId ? Number(brandId) : null),
+              fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null),
+            ]);
+            setBrands(bs2); setGroups(gs2); setVehicles(vs2);
+            await doSearch();
+          } catch {}
         } catch (e) {
           setSyncMsg(`Falha sync inicial: ${e}`);
         }
@@ -152,6 +162,13 @@ function App() {
     catch (e) { setImportMsg(`Falha ao indexar imagens: ${e}`); }
   }
 
+  async function runExportDb() {
+    const dest = await save({ title: 'Salvar banco de dados', defaultPath: 'catalog.db', filters: [{ name: 'SQLite', extensions: ['db'] }] });
+    if (!dest) return;
+    try { const r = await exportDbTo(dest); setImportMsg(`DB exportado: ${r.output}`); }
+    catch (e) { setImportMsg(`Falha ao exportar DB: ${e}`); }
+  }
+
   if (!ready) return <main className="container" style={bgUrl ? { backgroundImage: `url(${bgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>Carregando…</main>;
 
   return (
@@ -174,6 +191,7 @@ function App() {
                 <button disabled={syncing || !manifestUrl} onClick={runSync}>{syncing ? "Sincronizando…" : "Verificar atualizações"}</button>
                 <button disabled={!manifestUrl} onClick={async()=>{ setImportMsg("Indexando via manifest…"); try { const r = await indexImagesFromManifest(manifestUrl); setImportMsg(`Index manifest: varridos ${r.scanned} | correspondidos ${r.matched} | inseridos ${r.inserted}`); } catch(e){ setImportMsg(`Falha ao indexar manifest: ${e}`);} }}>Indexar via manifest</button>
                 <button onClick={runImportExcel}>Importar Excel</button>
+                <button onClick={runExportDb}>Exportar DB…</button>
                 <button onClick={async()=>{ const p = await open({ multiple:false, filters:[{ name:"Imagens", extensions:["png","jpg","jpeg","webp"] }]}); if(!p || Array.isArray(p)) return; try { const res = await setBrandingImage("logo", p); localStorage.removeItem("ui.logoPath"); setLogoPath(""); if(res && res.logo) setBrandingLogoUrl(`/images/${res.logo}`); setImportMsg("Logo definida em public/images."); } catch(e){ setImportMsg("Falha ao definir logo: "+e); } }}>Definir logo…</button>
                 <button onClick={async()=>{ const p = await open({ multiple:false, filters:[{ name:"Imagens", extensions:["png","jpg","jpeg","webp"] }]}); if(!p || Array.isArray(p)) return; try { const res = await setBrandingImage("bg", p); localStorage.removeItem("ui.bgPath"); setBgPath(""); if(res && res.background) setBrandingBgUrl(`/images/${res.background}`); setImportMsg("Fundo definido em public/images."); } catch(e){ setImportMsg("Falha ao definir fundo: "+e); } }}>Definir fundo…</button>
                 <button onClick={()=>{ localStorage.removeItem("ui.logoPath"); setLogoPath(""); setImportMsg("Logo removida (usando branding do app)."); }}>Limpar logo</button>
