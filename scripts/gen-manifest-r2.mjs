@@ -48,7 +48,7 @@ async function main() {
   ensure(dbUrl, 'Faltou --db-url');
 
   const accountId = ensure(process.env.R2_ACCOUNT_ID, 'Defina R2_ACCOUNT_ID');
-  const bucket = ensure(process.env.R2_BUCKET, 'Defina R2_BUCKET');
+  const bucket = ensure(process.env.R2_BUCKET, 'Defina R2_BUCKET (nome exato do bucket no R2)');
   const accessKeyId = ensure(process.env.R2_ACCESS_KEY_ID, 'Defina R2_ACCESS_KEY_ID');
   const secretAccessKey = ensure(process.env.R2_SECRET_ACCESS_KEY, 'Defina R2_SECRET_ACCESS_KEY');
 
@@ -56,7 +56,7 @@ async function main() {
   let baseUrl = (arg('base-url') || process.env.R2_PUBLIC_BASE_URL || `${endpoint}/${bucket}/`).replace(/([^/])$/, '$1/');
   // Proteção: se usarem o endpoint público da conta sem o bucket, garanta que o bucket entre na URL
   // Ex.: https://<account>.r2.cloudflarestorage.com/  -> precisa de /<bucket>/
-  if (baseUrl.includes(`${accountId}.r2.cloudflarestorage.com`) && !baseUrl.includes(`/${bucket}/`)) {
+  if (baseUrl.includes(`${accountId}.r2.cloudflarestorage.com`) && bucket && !baseUrl.includes(`/${bucket}/`)) {
     baseUrl = `${baseUrl}${bucket}/`;
   }
 

@@ -1,0 +1,5 @@
+function runSync() {
+    if (!manifestUrl) return; setSyncing(true);
+    try {
+      const res = await syncFromManifest(manifestUrl);
+      setSyncMsg(`Banco atualizado: ${res.updated_db ? "sim" :

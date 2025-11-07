@@ -11,6 +11,7 @@ mod core {
     use std::fs;
     use std::path::{Path, PathBuf};
     use tauri::AppHandle;
+    use base64::Engine;
 
     pub const DB_FILE_NAME: &str = "catalog.db";
     pub const IMAGES_DIR_NAME: &str = "images";
@@ -38,6 +39,7 @@ mod core {
         pub brand: String,
         pub application: Option<String>,
         pub details: Option<String>,
+        pub similar: Option<String>,
         pub images: Vec<String>,
     }
     #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -69,9 +71,18 @@ mod core {
     #[derive(Debug, Serialize, Deserialize)]
     pub struct BrandingResult { pub ok: bool, pub logo: Option<String>, pub background: Option<String> }
 
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct R2Creds {
+        pub account_id: String,
+        pub bucket: String,
+        pub access_key_id: String,
+        pub secret_access_key: String,
+        pub endpoint: Option<String>,
+        pub public_base_url: Option<String>,
+    }
+
     fn app_data_dir(app: &AppHandle) -> Result<PathBuf> { Ok(app.path().app_local_data_dir()?) }
     fn db_path(app: &AppHandle) -> Result<PathBuf> { Ok(app_data_dir(app)?.join(DB_FILE_NAME)) }
-    fn images_dir(app: &AppHandle) -> Result<PathBuf> { Ok(app_data_dir(app)?.join(IMAGES_DIR_NAME)) }
 
     fn ensure_dirs(app: &AppHandle) -> Result<(PathBuf, PathBuf, PathBuf)> {
         let data = app_data_dir(app)?;
@@ -277,7 +288,12 @@ mod core {
         if params.brand_id.is_some() { where_clauses.push("p.brand_id = ?".into()); }
         if params.group.as_ref().map(|s| !s.trim().is_empty()).unwrap_or(false) { where_clauses.push("UPPER(COALESCE(p.pgroup,'')) = ?".into()); }
         if params.vehicle_id.is_some() { where_clauses.push("EXISTS (SELECT 1 FROM product_vehicles pv WHERE pv.product_id=p.id AND pv.vehicle_id = ?)".into()); }
-        if params.code_query.as_ref().map(|s| !s.trim().is_empty()).unwrap_or(false) { where_clauses.push("(p.code LIKE ? OR COALESCE(p.oem,'') LIKE ? OR COALESCE(p.similar,'') LIKE ?)".into()); }
+        if params.code_query.as_ref().map(|s| !s.trim().is_empty()).unwrap_or(false) {
+            where_clauses.push(
+                "(p.code LIKE ? OR COALESCE(p.oem,'') LIKE ? OR COALESCE(p.similar,'') LIKE ? OR EXISTS (SELECT 1 FROM product_vehicles pv3 JOIN vehicles v3 ON v3.id=pv3.vehicle_id WHERE pv3.product_id=p.id AND v3.name LIKE ?))"
+                .into()
+            );
+        }
         if !where_clauses.is_empty() { sql.push_str(" WHERE "); sql.push_str(&where_clauses.join(" AND ")); }
         sql.push_str(" ORDER BY b.name, p.description"); if let Some(limit) = params.limit { sql.push_str(&format!(" LIMIT {}", limit)); }
 
@@ -285,7 +301,13 @@ mod core {
         if let Some(b) = params.brand_id { values.push(b.into()); }
         if let Some(g) = params.group.as_ref().filter(|s| !s.trim().is_empty()) { values.push(g.to_ascii_uppercase().into()); }
         if let Some(v) = params.vehicle_id { values.push(v.into()); }
-        if let Some(q) = params.code_query.as_ref().filter(|s| !s.trim().is_empty()) { let like = format!("%{}%", q); values.push(like.clone().into()); values.push(like.clone().into()); values.push(like.into()); }
+        if let Some(q) = params.code_query.as_ref().filter(|s| !s.trim().is_empty()) {
+            let like = format!("%{}%", q);
+            values.push(like.clone().into()); // code
+            values.push(like.clone().into()); // oem
+            values.push(like.clone().into()); // similar
+            values.push(like.into()); // vehicle name
+        }
 
         let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
         let mut rows = stmt.query(rusqlite::params_from_iter(values)).map_err(|e| e.to_string())?;
@@ -299,11 +321,11 @@ mod core {
     #[tauri::command]
     pub fn get_product_details_cmd(app: AppHandle, product_id: i64) -> Result<ProductDetails, String> {
         let conn = open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-        let mut stmt = conn.prepare("SELECT p.id, p.code, p.description, p.application, p.details, b.name FROM products p JOIN brands b ON b.id = p.brand_id WHERE p.id = ?1").map_err(|e| e.to_string())?;
-        let (id, code, description, application, details, brand): (i64, String, String, Option<String>, Option<String>, String) = stmt.query_row(params![product_id], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?, row.get(5)?))).map_err(|e| e.to_string())?;
+        let mut stmt = conn.prepare("SELECT p.id, p.code, p.description, p.application, p.details, p.similar, b.name FROM products p JOIN brands b ON b.id = p.brand_id WHERE p.id = ?1").map_err(|e| e.to_string())?;
+        let (id, code, description, application, details, similar, brand): (i64, String, String, Option<String>, Option<String>, Option<String>, String) = stmt.query_row(params![product_id], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?, row.get(5)?, row.get(6)?))).map_err(|e| e.to_string())?;
         let mut img_stmt = conn.prepare("SELECT filename FROM images WHERE product_id = ?1 ORDER BY filename").map_err(|e| e.to_string())?;
         let images: Vec<String> = img_stmt.query_map(params![product_id], |row| row.get::<_, String>(0)).map_err(|e| e.to_string())?.filter_map(|r| r.ok()).collect();
-        Ok(ProductDetails { id, code, description, brand, application, details, images })
+        Ok(ProductDetails { id, code, description, brand, application, details, similar, images })
     }
 
     async fn download_to_file(client: &Client, url: &str, dest: &Path) -> Result<()> {
@@ -367,6 +389,59 @@ mod core {
     }
 
     #[tauri::command]
+    pub async fn gen_manifest_r2(app: AppHandle, version: i64, db_url: String, out_path: String, r2: R2Creds) -> Result<String, String> {
+        // Executa o script Node local para gerar o manifest a partir do R2
+        use std::process::Command as PCommand;
+        let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
+        // Resolve caminho do script considerando dev (../scripts) ou raiz (scripts)
+        let script_path = if cwd.ends_with("src-tauri") { cwd.parent().unwrap_or(&cwd).join("scripts").join("gen-manifest-r2.mjs") } else { cwd.join("scripts").join("gen-manifest-r2.mjs") };
+        if !script_path.exists() {
+            return Err(format!("Script não encontrado: {}", script_path.display()));
+        }
+        let mut cmd = PCommand::new("node");
+        cmd.arg(script_path.as_os_str())
+            .arg("--version").arg(version.to_string())
+            .arg("--db-url").arg(&db_url)
+            .arg("--out").arg(&out_path);
+        // Env do R2
+        cmd.env("R2_ACCOUNT_ID", &r2.account_id)
+            .env("R2_BUCKET", &r2.bucket)
+            .env("R2_ACCESS_KEY_ID", &r2.access_key_id)
+            .env("R2_SECRET_ACCESS_KEY", &r2.secret_access_key);
+        if let Some(ep) = r2.endpoint.as_ref() { cmd.env("R2_ENDPOINT", ep); }
+        if let Some(pub_url) = r2.public_base_url.as_ref() { cmd.env("R2_PUBLIC_BASE_URL", pub_url); }
+        let project_root: std::path::PathBuf = if cwd.ends_with("src-tauri") {
+            cwd.parent().unwrap_or(&cwd).to_path_buf()
+        } else {
+            cwd.clone()
+        };
+        cmd.current_dir(&project_root);
+        let output = cmd.output().map_err(|e| format!("Falha ao iniciar Node: {}", e))?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            return Err(format!("Manifest R2 falhou: {}\n{}", stderr, stdout));
+        }
+        Ok(out_path)
+    }
+
+    #[tauri::command]
+    pub fn read_image_base64(app: AppHandle, path_or_rel: String) -> Result<String, String> {
+        use std::fs;
+        // monta caminho absoluto
+        let (_, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        let abs = {
+            let p = std::path::PathBuf::from(&path_or_rel);
+            if p.is_absolute() { p } else { imgs_dir.join(p) }
+        };
+        let bytes = fs::read(&abs).map_err(|e| format!("Falha ao ler imagem: {}", e))?;
+        let ext = abs.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
+        let mime = match ext.as_str() { "jpg"|"jpeg" => "image/jpeg", "png" => "image/png", "webp" => "image/webp", "bmp" => "image/bmp", _ => "application/octet-stream" };
+        let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
+        Ok(format!("data:{};base64,{}", mime, encoded))
+    }
+
+    #[tauri::command]
     pub async fn index_images_from_manifest(app: AppHandle, manifest_url: String) -> Result<ImageIndexResult, String> {
         let client = Client::new();
         let (_, dbf, _) = ensure_dirs(&app).map_err(|e| e.to_string())?;
@@ -392,14 +467,15 @@ mod core {
     pub fn export_db_to(app: AppHandle, dest_path: String) -> Result<ExportResult, String> {
         let (_, dbf, _) = ensure_dirs(&app).map_err(|e| e.to_string())?;
         let dest = std::path::PathBuf::from(&dest_path);
+        if dest.exists() {
+            std::fs::remove_file(&dest).map_err(|e| format!("Falha ao remover destino existente: {}", e))?;
+        }
         let conn = open_db(&dbf).map_err(|e| e.to_string())?;
-        // Fornece arquivo compacto usando VACUUM INTO se disponível
-        let quoted = dest.to_string_lossy().replace('"', "\"");
+        let quoted = dest.to_string_lossy().replace('"', "\\\"");
         let sql = format!("VACUUM INTO \"{}\"", quoted);
         if let Err(e) = conn.execute(&sql, []) { return Err(format!("Falha no VACUUM INTO: {}", e)); }
         Ok(ExportResult { ok: true, output: dest_path })
     }
-
     fn norm(s: &str) -> String {
         let s = s.trim();
         let up = s.to_ascii_uppercase();
@@ -610,7 +686,9 @@ pub fn run() {
             core::import_excel,
             core::index_images,
             core::export_db_to,
-            core::set_branding_image
+            core::set_branding_image,
+            core::gen_manifest_r2,
+            core::read_image_base64
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

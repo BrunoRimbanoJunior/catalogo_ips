@@ -1,64 +1,105 @@
 import { useEffect, useMemo, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { initApp, fetchBrands, fetchVehicles, searchProducts, getProductDetails, syncFromManifest, importExcel, indexImages, fetchGroups, fetchVehiclesFiltered, fetchGroupsStats, indexImagesFromManifest, setBrandingImage, exportDbTo } from "./lib/api";
+import {
+  initApp,
+  fetchBrands,
+  fetchVehicles,
+  fetchGroups,
+  fetchVehiclesFiltered,
+  searchProducts,
+  getProductDetails,
+  syncFromManifest,
+  importExcel,
+  indexImagesFromManifest,
+  setBrandingImage,
+  exportDbTo,
+  genManifestR2,
+} from "./lib/api";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import "./App.css";
 
+function resolveDefaultManifest(isDev) {
+  const saved = localStorage.getItem("manifestUrl") || "";
+  const envUrl = import.meta.env.VITE_DEFAULT_MANIFEST_URL || "";
+  const devLocal = `${window.location.origin}/manifest.json`;
+  const fallbackGit = "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json";
+  if (isDev) return saved || envUrl || devLocal;
+  return saved || envUrl || fallbackGit;
+}
+
+async function openExternalIfAvailable(path) {
+  try {
+    const mod = await import("@tauri-apps/plugin-opener");
+    if (mod && typeof mod.open === "function") {
+      await mod.open(path);
+      return true;
+    }
+  } catch (_) {}
+  return false;
+}
+
 function App() {
+  const isDev = import.meta.env.MODE !== "production";
+
+  // Estado básico
   const [ready, setReady] = useState(false);
   const [imagesDir, setImagesDir] = useState("");
+  const [dataDir, setDataDir] = useState("");
+  const [dbPath, setDbPath] = useState("");
   const [dbVersion, setDbVersion] = useState(0);
+
+  // Listas e filtros
   const [brands, setBrands] = useState([]);
-  const [vehicles, setVehicles] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [group, setGroup] = useState("");
-  const [codeQuery, setCodeQuery] = useState("");
+  const [vehicles, setVehicles] = useState([]);
   const [brandId, setBrandId] = useState("");
+  const [group, setGroup] = useState("");
   const [vehicleId, setVehicleId] = useState("");
-  const [query, setQuery] = useState("");
+  const [codeQuery, setCodeQuery] = useState("");
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [manifestUrl, setManifestUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState([]);
+  const [preview, setPreview] = useState({ open: false, index: 0 });
+
+  // Branding + mensagens
   const [brandingLogoUrl, setBrandingLogoUrl] = useState("");
   const [brandingBgUrl, setBrandingBgUrl] = useState("");
-  const [logoPath, setLogoPath] = useState(localStorage.getItem("ui.logoPath") || "");
-  const [bgPath, setBgPath] = useState(localStorage.getItem("ui.bgPath") || "");
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState("");
-  const [imagesRoot, setImagesRoot] = useState("");
   const [importMsg, setImportMsg] = useState("");
-  const isDev = import.meta.env.MODE !== "production";
-  const PROD_MANIFEST_FALLBACK = "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json";
 
+  // Credenciais R2 (para gerar manifest localmente no Dev)
+  const [r2AccountId, setR2AccountId] = useState(localStorage.getItem("r2.account_id") || "");
+  const [r2Bucket, setR2Bucket] = useState(localStorage.getItem("r2.bucket") || "");
+  const [r2AccessKeyId, setR2AccessKeyId] = useState(localStorage.getItem("r2.access_key_id") || "");
+  const [r2SecretAccessKey, setR2SecretAccessKey] = useState(localStorage.getItem("r2.secret_access_key") || "");
+  const [r2Endpoint, setR2Endpoint] = useState(localStorage.getItem("r2.endpoint") || "");
+  const [r2PublicBaseUrl, setR2PublicBaseUrl] = useState(localStorage.getItem("r2.public_base_url") || "");
+  const [manifestDbUrl, setManifestDbUrl] = useState(
+    localStorage.getItem("manifest.db_url") ||
+      "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db"
+  );
+
+  // Inicialização do app + auto-sync/index
   useEffect(() => {
     (async () => {
       const info = await initApp();
       setImagesDir(info.images_dir);
+      setDataDir(info.data_dir);
+      setDbPath(info.db_path);
       setDbVersion(info.db_version);
+
       const [bs, vs] = await Promise.all([fetchBrands(), fetchVehicles()]);
       setBrands(bs);
       setVehicles(vs);
-      // Auto-sync + auto-index se houver manifest salvo
-      const savedManifest = localStorage.getItem("manifestUrl") || "";
-      const defaultManifest = import.meta.env.VITE_DEFAULT_MANIFEST_URL || (isDev ? "" : PROD_MANIFEST_FALLBACK);
-      const manifestToUse = savedManifest || defaultManifest;
+
+      const manifestToUse = resolveDefaultManifest(isDev);
       if (manifestToUse) {
-        setManifestUrl(manifestToUse);
         try {
           const res = await syncFromManifest(manifestToUse);
           setDbVersion(res.db_version);
           setSyncMsg(`Atualizado ao iniciar: db v${res.db_version} | imgs +${res.downloaded_images}`);
           localStorage.setItem("manifestUrl", manifestToUse);
-          // Recarrega listas e resultados após sync
-          try {
-            const [bs2, gs2, vs2] = await Promise.all([
-              fetchBrands(),
-              fetchGroups(brandId ? Number(brandId) : null),
-              fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null),
-            ]);
-            setBrands(bs2); setGroups(gs2); setVehicles(vs2);
-            await doSearch();
-          } catch {}
         } catch (e) {
           setSyncMsg(`Falha sync inicial: ${e}`);
         }
@@ -69,11 +110,12 @@ function App() {
           setImportMsg(`Falha index inicial: ${e}`);
         }
       }
+
       setReady(true);
     })();
   }, []);
 
-  // Carrega branding versionado do projeto (public/images/branding.json)
+  // Carregar branding versionado do projeto (public/images/branding.json)
   useEffect(() => {
     fetch("/images/branding.json")
       .then((r) => (r.ok ? r.json() : null))
@@ -85,6 +127,7 @@ function App() {
       .catch(() => {});
   }, []);
 
+  // Atualizar grupos e veículos conforme marca/grupo
   useEffect(() => {
     (async () => {
       const gs = await fetchGroups(brandId ? Number(brandId) : null);
@@ -94,51 +137,106 @@ function App() {
     })();
   }, [brandId, group]);
 
-  // Busca automática com debounce quando filtros mudam
+  // Debounce de busca
   useEffect(() => {
     const t = setTimeout(() => { doSearch(); }, 300);
     return () => clearTimeout(t);
   }, [brandId, group, vehicleId, codeQuery]);
 
   async function doSearch() {
-    const mapped = {
+    const params = {
       brand_id: brandId ? Number(brandId) : null,
       group: group || null,
       vehicle_id: vehicleId ? Number(vehicleId) : null,
       code_query: codeQuery || null,
       limit: 200,
     };
-    const list = await searchProducts(mapped);
+    const list = await searchProducts(params);
     setResults(list);
   }
 
-  async function openDetails(id) { const d = await getProductDetails(id); setSelected(d); }
+  async function openDetails(id) {
+    const d = await getProductDetails(id);
+    setSelected(d);
+  }
 
-  const imageUrls = useMemo(() => (!selected ? [] : (selected.images || []).map((f) => convertFileSrc(`${imagesDir}/${f}`))), [selected, imagesDir]);
-  const logoUrl = useMemo(() => (logoPath ? convertFileSrc(logoPath) : (brandingLogoUrl || "")), [logoPath, brandingLogoUrl]);
-  const bgUrl = useMemo(() => (bgPath ? convertFileSrc(bgPath) : (brandingBgUrl || "")), [bgPath, brandingBgUrl]);
+  function normalizeFsPath(p) {
+    return (p || "").replace(/\\/g, "/");
+  }
+  function joinFsPath(dir, file) {
+    // Se o arquivo já é absoluto (Windows C:\ ou Unix /), retorna normalizado
+    if (/^[a-zA-Z]:\\/.test(file) || file.startsWith("/")) {
+      return normalizeFsPath(file);
+    }
+    const sep = dir.endsWith("/") || dir.endsWith("\\") ? "" : "/";
+    return normalizeFsPath(`${dir}${sep}${file}`);
+  }
 
-  async function runSync() {
-    if (!manifestUrl) return; setSyncing(true);
+  // Carrega imagens como data URL (garante render mesmo no dev)
+  useEffect(() => {
+    (async () => {
+      if (!selected) { setImageUrls([]); return; }
+      const files = selected.images || [];
+      try {
+        const { readImageBase64 } = await import("./lib/api.js");
+        const outs = [];
+        for (const f of files) {
+          const p = joinFsPath(imagesDir, f);
+          try { outs.push(await readImageBase64(p)); }
+          catch { outs.push(""); }
+        }
+        setImageUrls(outs.filter(Boolean));
+      } catch {
+        // fallback para asset:// caso invoke não esteja disponível
+        const outs = files.map((f) => {
+          const norm = normalizeFsPath(joinFsPath(imagesDir, f));
+          const trimmed = norm.startsWith("/") ? norm.slice(1) : norm;
+          return `asset://localhost/${trimmed}`;
+        });
+        setImageUrls(outs);
+      }
+    })();
+  }, [selected, imagesDir]);
+
+  // Atalhos de teclado para fechar/navegar preview
+  useEffect(() => {
+    function onKey(e) {
+      if (!preview.open) return;
+      if (e.key === "Escape") setPreview({ open: false, index: 0 });
+      if (e.key === "ArrowRight") setPreview(p => ({ open: true, index: (p.index + 1) % imageUrls.length }));
+      if (e.key === "ArrowLeft") setPreview(p => ({ open: true, index: (p.index + imageUrls.length - 1) % imageUrls.length }));
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [preview.open, imageUrls.length]);
+
+  // Sincronizar usando manifest padrão (sempre)
+  async function runSyncDefault() {
+    const m = resolveDefaultManifest(isDev);
+    if (!m) return;
+    setSyncing(true);
     try {
-      const res = await syncFromManifest(manifestUrl);
+      const res = await syncFromManifest(m);
       setSyncMsg(`Banco atualizado: ${res.updated_db ? "sim" : "não"} | Imagens baixadas: ${res.downloaded_images} | versão: ${res.db_version}`);
       setDbVersion(res.db_version);
-      localStorage.setItem("manifestUrl", manifestUrl);
+      localStorage.setItem("manifestUrl", m);
       try {
-        const r = await indexImagesFromManifest(manifestUrl);
+        const r = await indexImagesFromManifest(m);
         setImportMsg(`Index manifest: varridos ${r.scanned} | correspondidos ${r.matched} | inseridos ${r.inserted}`);
       } catch (e) {
         setImportMsg(`Falha ao indexar manifest: ${e}`);
       }
       await doSearch();
+    } catch (e) {
+      setSyncMsg(`Falha ao sincronizar: ${e}`);
+    } finally {
+      setSyncing(false);
     }
-    catch (e) { setSyncMsg(`Falha ao sincronizar: ${e}`); }
-    finally { setSyncing(false); }
   }
 
+  // Importar Excel
   async function runImportExcel() {
-    const selected = await open({ multiple: false, filters: [{ name: 'Excel', extensions: ['xlsx','xls'] }] });
+    const selected = await open({ multiple: false, filters: [{ name: "Excel", extensions: ["xlsx", "xls"] }] });
     if (!selected || Array.isArray(selected)) return;
     setImportMsg(`Importando: ${selected}`);
     try {
@@ -148,61 +246,115 @@ function App() {
       const [bs, gs, vs] = await Promise.all([
         fetchBrands(),
         fetchGroups(brandId ? Number(brandId) : null),
-        fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null)
+        fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null),
       ]);
       setBrands(bs); setGroups(gs); setVehicles(vs);
       await doSearch();
+    } catch (e) {
+      setImportMsg(`Falha ao importar: ${e}`);
     }
-    catch (e) { setImportMsg(`Falha ao importar: ${e}`); }
   }
 
-  async function runIndexImages() {
-    if (!imagesRoot) return; setImportMsg("Indexando imagens…");
-    try { const res = await indexImages(imagesRoot); setImportMsg(`Imagens varridas: ${res.scanned} | correspondidas: ${res.matched} | inseridas: ${res.inserted}`); if (selected) await openDetails(selected.id); }
-    catch (e) { setImportMsg(`Falha ao indexar imagens: ${e}`); }
-  }
-
+  // Exportar DB
   async function runExportDb() {
-    const dest = await save({ title: 'Salvar banco de dados', defaultPath: 'catalog.db', filters: [{ name: 'SQLite', extensions: ['db'] }] });
+    const dest = await save({ title: "Salvar banco de dados", defaultPath: "catalog.db", filters: [{ name: "SQLite", extensions: ["db"] }] });
     if (!dest) return;
-    try { const r = await exportDbTo(dest); setImportMsg(`DB exportado: ${r.output}`); }
-    catch (e) { setImportMsg(`Falha ao exportar DB: ${e}`); }
+    try {
+      const r = await exportDbTo(dest);
+      setImportMsg(`DB exportado: ${r.output}`);
+    } catch (e) {
+      setImportMsg(`Falha ao exportar DB: ${e}`);
+    }
   }
 
-  if (!ready) return <main className="container" style={bgUrl ? { backgroundImage: `url(${bgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>Carregando…</main>;
+  // Exportar DB + Manifest (R2)
+  async function runExportDbAndManifest() {
+    const dest = await save({ title: "Salvar banco de dados", defaultPath: "catalog.db", filters: [{ name: "SQLite", extensions: ["db"] }] });
+    if (!dest) return;
+    try {
+      const r = await exportDbTo(dest);
+      const manifestOut = await save({ title: "Salvar manifest.json", defaultPath: "manifest.json", filters: [{ name: "JSON", extensions: ["json"] }] });
+      if (!manifestOut) { setImportMsg(`DB exportado: ${r.output} | Manifest cancelado.`); return; }
+      const version = Math.floor(Date.now() / 1000);
+      const outPath = await genManifestR2({
+        version,
+        dbUrl: manifestDbUrl,
+        outPath: manifestOut,
+        r2: {
+          account_id: r2AccountId,
+          bucket: r2Bucket,
+          access_key_id: r2AccessKeyId,
+          secret_access_key: r2SecretAccessKey,
+          endpoint: r2Endpoint || null,
+          public_base_url: r2PublicBaseUrl || null,
+        },
+      });
+      setImportMsg(`DB exportado: ${r.output} | Manifest gerado: ${outPath}`);
+    } catch (e) {
+      setImportMsg(`Falha ao exportar/manifest: ${e}`);
+    }
+  }
+
+  // Abrir pastas/arquivo
+  async function openDataDirFolder() { if (dataDir) await openExternalIfAvailable(dataDir); }
+  async function openImagesFolder() { if (imagesDir) await openExternalIfAvailable(imagesDir); }
+  async function openDbFilePath() { if (dbPath) await openExternalIfAvailable(dbPath); }
+
+  if (!ready) {
+    return (
+      <main className="container" style={brandingBgUrl ? { backgroundImage: `url(${brandingBgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>
+        Carregando…
+      </main>
+    );
+  }
 
   return (
-    <main className="container" style={bgUrl ? { backgroundImage: `url(${bgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>
+    <>
+    <main className="container" style={brandingBgUrl ? { backgroundImage: `url(${brandingBgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>
       <div className="appbar">
-        <div>{logoUrl ? <img className="logo" src={logoUrl} alt="logo" onError={(e)=>{ e.currentTarget.style.display="none"; }} /> : null}</div>
+        <div>{brandingLogoUrl ? <img className="logo" src={brandingLogoUrl} alt="logo" onError={(e)=>{ e.currentTarget.style.display = "none"; }} /> : null}</div>
         <h1>Catálogo IPS</h1>
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ opacity: 0.9 }}>DB v{dbVersion}</span>
           {(syncMsg || importMsg) && !isDev ? (
-            <span style={{ fontSize: 12, opacity: 0.85 }}>
-              {syncMsg}{importMsg ? (syncMsg?" | ":"") + importMsg : ""}
-            </span>
+            <span style={{ fontSize: 12, opacity: 0.85 }}>{syncMsg}{importMsg ? (syncMsg ? " | " : "") + importMsg : ""}</span>
           ) : null}
-          {isDev && (<div className="tools">
-            <details>
-              <summary>Ferramentas</summary>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, marginTop: 8 }}>
-                <input placeholder="URL do manifest.json (Git/R2)" value={manifestUrl} onChange={(e) => setManifestUrl(e.target.value)} />
-                <button disabled={syncing || !manifestUrl} onClick={runSync}>{syncing ? "Sincronizando…" : "Verificar atualizações"}</button>
-                <button disabled={!manifestUrl} onClick={async()=>{ setImportMsg("Indexando via manifest…"); try { const r = await indexImagesFromManifest(manifestUrl); setImportMsg(`Index manifest: varridos ${r.scanned} | correspondidos ${r.matched} | inseridos ${r.inserted}`); } catch(e){ setImportMsg(`Falha ao indexar manifest: ${e}`);} }}>Indexar via manifest</button>
-                <button onClick={runImportExcel}>Importar Excel</button>
-                <button onClick={runExportDb}>Exportar DB…</button>
-                <button onClick={async()=>{ const p = await open({ multiple:false, filters:[{ name:"Imagens", extensions:["png","jpg","jpeg","webp"] }]}); if(!p || Array.isArray(p)) return; try { const res = await setBrandingImage("logo", p); localStorage.removeItem("ui.logoPath"); setLogoPath(""); if(res && res.logo) setBrandingLogoUrl(`/images/${res.logo}`); setImportMsg("Logo definida em public/images."); } catch(e){ setImportMsg("Falha ao definir logo: "+e); } }}>Definir logo…</button>
-                <button onClick={async()=>{ const p = await open({ multiple:false, filters:[{ name:"Imagens", extensions:["png","jpg","jpeg","webp"] }]}); if(!p || Array.isArray(p)) return; try { const res = await setBrandingImage("bg", p); localStorage.removeItem("ui.bgPath"); setBgPath(""); if(res && res.background) setBrandingBgUrl(`/images/${res.background}`); setImportMsg("Fundo definido em public/images."); } catch(e){ setImportMsg("Falha ao definir fundo: "+e); } }}>Definir fundo…</button>
-                <button onClick={()=>{ localStorage.removeItem("ui.logoPath"); setLogoPath(""); setImportMsg("Logo removida (usando branding do app)."); }}>Limpar logo</button>
-                <button onClick={()=>{ localStorage.removeItem("ui.bgPath"); setBgPath(""); setImportMsg("Fundo removido (usando branding do app)."); }}>Limpar fundo</button>
-                <input placeholder="Pasta raiz das imagens (local)" value={imagesRoot} onChange={(e) => setImagesRoot(e.target.value)} />
-                <button onClick={runIndexImages}>Indexar Imagens</button>
-                <button onClick={async ()=>{ const s = await fetchGroupsStats(); setImportMsg(`Grupos: ${s.distinct_groups} | Produtos c/ grupo: ${s.products_with_group}`); }}>Diagnóstico grupos</button>
-              </div>
-              {(syncMsg || importMsg) && <p style={{ marginTop: 6 }}>{syncMsg} {importMsg && (syncMsg ? " | " : null)} {importMsg}</p>}
-            </details>
-          </div>)}
+          {isDev && (
+            <div className="tools">
+              <details>
+                <summary>Ferramentas</summary>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8 }}>
+                  <button disabled={syncing} onClick={runSyncDefault}>{syncing ? "Sincronizando…" : "Verificar atualizações (manifest padrão)"}</button>
+                  <button onClick={async()=>{ const m = resolveDefaultManifest(isDev); if(!m) return; setImportMsg("Indexando via manifest…"); try { const r = await indexImagesFromManifest(m); setImportMsg(`Index manifest: varridos ${r.scanned} | correspondidos ${r.matched} | inseridos ${r.inserted}`); } catch(e){ setImportMsg(`Falha ao indexar manifest: ${e}`);} }}>Indexar via manifest (padrão)</button>
+                  <button onClick={runImportExcel}>Importar Excel</button>
+                  <button onClick={runExportDb}>Exportar DB…</button>
+                  <button onClick={runExportDbAndManifest}>Exportar DB + Manifest (R2)</button>
+                  <button onClick={()=>{ localStorage.removeItem("manifestUrl"); setImportMsg("Manifest salvo limpo. Usando padrão."); }}>Limpar manifest salvo</button>
+                  {/* Abrir pastas/arquivo */}
+                  <button onClick={openDataDirFolder}>Abrir dados</button>
+                  <button onClick={openImagesFolder}>Abrir imagens</button>
+                  <button onClick={openDbFilePath}>Abrir DB</button>
+                  <button onClick={async ()=>{ const s = await fetchGroupsStats(); setImportMsg(`Grupos: ${s.distinct_groups} | Produtos c/ grupo: ${s.products_with_group}`); }}>Diagnóstico grupos</button>
+                  <div style={{ gridColumn: "1 / -1", marginTop: 8 }}>
+                    <details>
+                      <summary>Credenciais R2 / Config Manifest</summary>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8 }}>
+                        <input placeholder="R2 Account ID" title="ID da conta R2 (Account ID)" value={r2AccountId} onChange={(e)=>setR2AccountId(e.target.value)} />
+                        <input placeholder="R2 Bucket" title="Nome exato do bucket (ex.: ipsimages)" value={r2Bucket} onChange={(e)=>setR2Bucket(e.target.value)} />
+                        <input placeholder="R2 Access Key ID" title="Chave de acesso S3 do R2 (Access Key ID)" value={r2AccessKeyId} onChange={(e)=>setR2AccessKeyId(e.target.value)} />
+                        <input placeholder="R2 Secret Access Key" title="Segredo da chave S3 do R2 (Secret Access Key)" value={r2SecretAccessKey} onChange={(e)=>setR2SecretAccessKey(e.target.value)} />
+                        <input placeholder="R2 Endpoint (opcional)" title="Endpoint S3 opcional (deixe vazio para usar padrão)" value={r2Endpoint} onChange={(e)=>setR2Endpoint(e.target.value)} />
+                        <input placeholder="R2 Public Base URL" title="URL pública do bucket (https://pub-…r2.dev/)" value={r2PublicBaseUrl} onChange={(e)=>setR2PublicBaseUrl(e.target.value)} />
+                        <input placeholder="DB URL (raw Git)" title="URL raw do catalog.db no GitHub" value={manifestDbUrl} onChange={(e)=>setManifestDbUrl(e.target.value)} />
+                        <button onClick={()=>{ localStorage.setItem("r2.account_id", r2AccountId); localStorage.setItem("r2.bucket", r2Bucket); localStorage.setItem("r2.access_key_id", r2AccessKeyId); localStorage.setItem("r2.secret_access_key", r2SecretAccessKey); localStorage.setItem("r2.endpoint", r2Endpoint); localStorage.setItem("r2.public_base_url", r2PublicBaseUrl); localStorage.setItem("manifest.db_url", manifestDbUrl); setImportMsg("Credenciais salvas."); }}>Salvar credenciais</button>
+                      </div>
+                    </details>
+                  </div>
+                </div>
+                {(syncMsg || importMsg) && <p style={{ marginTop: 6 }}>{syncMsg} {importMsg && (syncMsg ? " | " : null)} {importMsg}</p>}
+              </details>
+            </div>
+          )}
         </div>
       </div>
 
@@ -218,8 +370,8 @@ function App() {
         </aside>
 
         <section className="panel">
-          <div className="filters" style={{flexWrap:'wrap'}}>
-            <input className="filter-code" placeholder="Pesquisar por código (produto/OEM/Similar)" value={codeQuery} onChange={(e)=>setCodeQuery(e.target.value)} />
+          <div className="filters" style={{ flexWrap: "wrap" }}>
+            <input className="filter-code" placeholder="Pesquisar por código ou veículo (produto/OEM/Similar/Veículo)" value={codeQuery} onChange={(e)=>setCodeQuery(e.target.value)} />
             <select value={group} onChange={(e) => { setGroup(e.target.value); setVehicleId(""); }}>
               <option value="">Grupo (todos)</option>
               {groups.map((t) => (<option key={t} value={t}>{t}</option>))}
@@ -234,13 +386,13 @@ function App() {
           <ul className="list">
             {results.map((p) => (
               <li key={p.id} onClick={() => openDetails(p.id)} className="item">
-                <div style={{display: 'flex', flexDirection: 'column', gap: 4, width: '100%'}}>
-                  <div style={{display:'flex', gap:8, alignItems:'center'}}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4, width: "100%" }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     <span className="code">{p.code}</span>
                     <span className="desc">{p.description}</span>
                     <span className="brand">{p.brand}</span>
                   </div>
-                  {p.vehicles && <div style={{fontSize: 12, opacity: 0.9}}>Aplicação: {p.vehicles}</div>}
+                  {p.vehicles && <div style={{ fontSize: 12, opacity: 0.9 }}>Aplicação: {p.vehicles}</div>}
                 </div>
               </li>
             ))}
@@ -270,15 +422,32 @@ function App() {
               )}
               <div className="sep" />
               {selected.details && (<div className="details-text">{selected.details}</div>)}
+              <div className="sep" />
+              {selected.similar && (
+                <div className="similar">
+                  <div className="subtitle">Similares:</div>
+                  <div className="details-text">{selected.similar}</div>
+                </div>
+              )}
               <div className="grid">
-                {imageUrls.map((u, i) => (<img key={i} src={u} alt="produto" className="thumb" />))}
+                {imageUrls.map((u, i) => (
+                  <img key={i} src={u} alt="produto" className="thumb" onClick={()=>setPreview({ open:true, index:i })} />
+                ))}
               </div>
             </div>
           )}
         </section>
       </div>
     </main>
+    {preview.open && imageUrls.length > 0 && (
+      <div className="modal-backdrop" onClick={()=>setPreview({open:false, index:0})}>
+        <button className="modal-close" onClick={(e)=>{ e.stopPropagation(); setPreview({open:false, index:0}); }}>✕</button>
+        <img className="modal-image" src={imageUrls[preview.index]} alt="preview" onClick={(e)=>{ e.stopPropagation(); setPreview(p=>({ open:true, index:(p.index+1)%imageUrls.length })); }} />
+      </div>
+    )}
+    </>
   );
 }
 
 export default App;
+

@@ -5,7 +5,7 @@
     "sha256": null
   },
   "images": {
-    "base_url": "https://cb22ba5d68afe5d6c90b2ca2600099ae.r2.cloudflarestorage.com/ipsimages/",
+    "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
     "files": [
       {
         "file": "7111032801.png",
