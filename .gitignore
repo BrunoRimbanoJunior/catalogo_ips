@@ -67,3 +67,4 @@ data/images/
 # Arquivos temporários diversos
 *.tmp
 *.temp
+rclone.txt
