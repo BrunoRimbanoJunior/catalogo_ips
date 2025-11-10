@@ -113,6 +113,10 @@ mod core {
               id INTEGER PRIMARY KEY, product_id INTEGER NOT NULL, filename TEXT NOT NULL,
               UNIQUE(product_id, filename)
             );
+            CREATE TABLE IF NOT EXISTS images_cache (
+              filename TEXT PRIMARY KEY,
+              sha256 TEXT
+            );
         "#)?;
         let current: Option<i64> = conn
             .query_row("SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?1", params![META_DB_VERSION_KEY], |row| row.get(0))
