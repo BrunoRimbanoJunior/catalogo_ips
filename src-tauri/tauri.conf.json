@@ -27,6 +27,10 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "resources": [
+      "../data/catalog.db",
+      "../manifest.json"
+    ],
     "windows": {
       "nsis": {
         "displayLanguageSelector": false,

@@ -139,6 +139,18 @@ mod core {
     pub fn init_app(app: AppHandle) -> Result<InitInfo, String> {
         let (data_dir, db_file, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
         let created = !db_file.exists();
+        if created {
+            if let Ok(res_dir) = app.path().resource_dir() {
+                let seed = res_dir.join("catalog.db");
+                if seed.exists() { let _ = std::fs::copy(&seed, &db_file); }
+            }
+            if !db_file.exists() {
+                if let Ok(cwd) = std::env::current_dir() {
+                    let maybe = if cwd.ends_with("src-tauri") { cwd.parent().unwrap_or(&cwd).join("data").join("catalog.db") } else { cwd.join("data").join("catalog.db") };
+                    if maybe.exists() { let _ = std::fs::copy(&maybe, &db_file); }
+                }
+            }
+        }
         let conn = open_db(&db_file).map_err(|e| e.to_string())?;
         migrate(&conn).map_err(|e| e.to_string())?;
         if created { conn.execute("INSERT OR IGNORE INTO brands(id,name) VALUES(1,'GENÉRICO')", []).ok(); }
@@ -382,7 +394,7 @@ mod core {
     pub async fn sync_from_manifest(app: AppHandle, manifest_url: String) -> Result<SyncResult, String> {
         let client = Client::builder().timeout(Duration::from_secs(20)).build().map_err(|e| e.to_string())?;
         let (_, dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
-        let manifest: CatalogManifest = client.get(&manifest_url).send().await.map_err(|e| e.to_string())?.error_for_status().map_err(|e| e.to_string())?.json().await.map_err(|e| e.to_string())?;
+        let manifest: CatalogManifest = fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
         let mut updated_db = false; let local_version = { let conn = open_db(&dbf).map_err(|e| e.to_string())?; migrate(&conn).map_err(|e| e.to_string())?; get_db_version(&conn).unwrap_or(0) };
         if manifest.db.version > local_version { download_to_file(&client, &manifest.db.url, &dbf).await.map_err(|e| e.to_string())?; let conn = open_db(&dbf).map_err(|e| e.to_string())?; migrate(&conn).map_err(|e| e.to_string())?; if get_db_version(&conn).unwrap_or(0) < manifest.db.version { set_db_version(&conn, manifest.db.version).ok(); } updated_db = true; }
         let mut downloaded_images: usize = 0; if let Some(imgs) = manifest.images { for item in imgs.files { let local_path = imgs_dir.join(&item.file); if !local_path.exists() { let url = if item.file.starts_with("http://") || item.file.starts_with("https://") { item.file.clone() } else { format!("{}{}", imgs.base_url, item.file) }; if let Err(e) = download_to_file(&client, &url, &local_path).await { eprintln!("Falha ao baixar imagem {}: {}", item.file, e); } else { downloaded_images += 1; } } } }
@@ -475,22 +487,49 @@ mod core {
     pub async fn index_images_from_manifest(app: AppHandle, manifest_url: String) -> Result<ImageIndexResult, String> {
         let client = Client::builder().timeout(Duration::from_secs(20)).build().map_err(|e| e.to_string())?;
         let (_, dbf, _) = ensure_dirs(&app).map_err(|e| e.to_string())?;
-        let manifest: CatalogManifest = client
-            .get(&manifest_url)
-            .send()
-            .await
-            .map_err(|e| e.to_string())?
-            .error_for_status()
-            .map_err(|e| e.to_string())?
-            .json()
-            .await
-            .map_err(|e| e.to_string())?;
+        let manifest: CatalogManifest = fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
         let files: Vec<String> = if let Some(imgs) = manifest.images {
             imgs.files.into_iter().map(|it| it.file).collect()
         } else { Vec::new() };
         let mut conn = open_db(&dbf).map_err(|e| e.to_string())?;
         migrate(&conn).map_err(|e| e.to_string())?;
         index_from_file_list(&mut conn, &files).map_err(|e| e.to_string())
+    }
+
+    // Tenta baixar manifest por HTTP; se falhar, usa seed do bundle (manifest.json em resources).
+    async fn fetch_or_seed_manifest(client: &Client, app: &AppHandle, manifest_url: &str) -> Result<CatalogManifest, String> {
+        // Se não for http(s), tenta ler como arquivo local
+        if !(manifest_url.starts_with("http://") || manifest_url.starts_with("https://")) {
+            return read_manifest_from_path(std::path::Path::new(manifest_url));
+        }
+        let http_res = client
+            .get(manifest_url)
+            .send()
+            .await
+            .and_then(|r| r.error_for_status())
+            .map_err(|e| e.to_string());
+        match http_res {
+            Ok(resp) => {
+                let m: CatalogManifest = resp.json().await.map_err(|e| e.to_string())?;
+                Ok(m)
+            }
+            Err(_e) => {
+                // Fallback seed do bundle
+                if let Ok(res_dir) = app.path().resource_dir() {
+                    let p = res_dir.join("manifest.json");
+                    if p.exists() {
+                        return read_manifest_from_path(&p);
+                    }
+                }
+                Err("Falha ao obter manifest e sem seed local".to_string())
+            }
+        }
+    }
+
+    fn read_manifest_from_path(path: &std::path::Path) -> Result<CatalogManifest, String> {
+        let txt = std::fs::read_to_string(path).map_err(|e| format!("Falha lendo manifest local: {}", e))?;
+        let m: CatalogManifest = serde_json::from_str(&txt).map_err(|e| format!("Falha parse manifest local: {}", e))?;
+        Ok(m)
     }
 
     #[tauri::command]
