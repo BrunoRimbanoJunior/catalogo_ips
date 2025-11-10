@@ -410,7 +410,44 @@ mod core {
         let manifest: CatalogManifest = fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
         let mut updated_db = false; let local_version = { let conn = open_db(&dbf).map_err(|e| e.to_string())?; migrate(&conn).map_err(|e| e.to_string())?; get_db_version(&conn).unwrap_or(0) };
         if manifest.db.version > local_version { download_to_file(&client, &manifest.db.url, &dbf).await.map_err(|e| e.to_string())?; let conn = open_db(&dbf).map_err(|e| e.to_string())?; migrate(&conn).map_err(|e| e.to_string())?; if get_db_version(&conn).unwrap_or(0) < manifest.db.version { set_db_version(&conn, manifest.db.version).ok(); } updated_db = true; }
-        let mut downloaded_images: usize = 0; if let Some(imgs) = manifest.images { for item in imgs.files { let local_path = imgs_dir.join(&item.file); if !local_path.exists() { let url = if item.file.starts_with("http://") || item.file.starts_with("https://") { item.file.clone() } else { format!("{}{}", imgs.base_url, item.file) }; if let Err(e) = download_to_file(&client, &url, &local_path).await { eprintln!("Falha ao baixar imagem {}: {}", item.file, e); } else { downloaded_images += 1; } } } }
+        let mut downloaded_images: usize = 0;
+        if let Some(imgs) = manifest.images {
+            // Abrir conexão para cache de hashes
+            let conn_cache = open_db(&dbf).map_err(|e| e.to_string())?;
+            for item in imgs.files {
+                let local_path = imgs_dir.join(&item.file);
+                let mut need = false;
+                if !local_path.exists() {
+                    need = true;
+                } else if let Some(ref man_sha) = item.sha256 {
+                    // compara com cache
+                    let cached: Option<String> = conn_cache.query_row(
+                        "SELECT sha256 FROM images_cache WHERE filename=?1",
+                        params![&item.file],
+                        |row| row.get(0)
+                    ).optional().unwrap_or(None);
+                    if cached.as_deref() != Some(man_sha.as_str()) {
+                        need = true;
+                    }
+                }
+                if need {
+                    let url = if item.file.starts_with("http://") || item.file.starts_with("https://") { item.file.clone() } else { format!("{}{}", imgs.base_url, item.file) };
+                    // garantir diretório
+                    if let Some(parent) = local_path.parent() { if !parent.exists() { let _= std::fs::create_dir_all(parent); } }
+                    if let Err(e) = download_to_file(&client, &url, &local_path).await {
+                        eprintln!("Falha ao baixar imagem {}: {}", item.file, e);
+                    } else {
+                        downloaded_images += 1;
+                        if let Some(ref man_sha) = item.sha256 {
+                            let _ = conn_cache.execute(
+                                "INSERT OR REPLACE INTO images_cache(filename, sha256) VALUES(?1, ?2)",
+                                params![&item.file, man_sha]
+                            );
+                        }
+                    }
+                }
+            }
+        }
         let conn = open_db(&dbf).map_err(|e| e.to_string())?; let final_version = get_db_version(&conn).unwrap_or(0);
         Ok(SyncResult { updated_db, downloaded_images, db_version: final_version })
     }

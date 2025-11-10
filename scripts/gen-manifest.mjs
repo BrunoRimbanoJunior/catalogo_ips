@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 
 function arg(name, def) {
   const idx = process.argv.indexOf(`--${name}`);
@@ -22,6 +23,17 @@ async function listFiles(root) {
   return out;
 }
 
+async function sha256File(p) {
+  const fs = await import('node:fs');
+  return await new Promise((resolve, reject) => {
+    const h = createHash('sha256');
+    const s = fs.createReadStream(p);
+    s.on('error', reject);
+    s.on('data', (chunk) => h.update(chunk));
+    s.on('end', () => resolve(h.digest('hex')));
+  });
+}
+
 async function main() {
   const version = Number(arg('version', 1));
   const dbUrl = arg('db-url');
@@ -33,15 +45,16 @@ async function main() {
     process.exit(2);
   }
   const all = await listFiles(imagesDir);
-  const files = all
+  const files = (await Promise.all(
+    all
     .filter((p) => /\.(jpe?g|png|webp|bmp)$/i.test(p))
     .map((p) => path.relative(imagesDir, p).replace(/\\/g, '/'))
     .sort()
-    .map((file) => ({ file }));
+    .map(async (file) => ({ file, sha256: await sha256File(path.join(imagesDir, file)) }))
+  ));
   const manifest = { db: { version, url: dbUrl }, images: { base_url: imagesBase.endsWith('/') ? imagesBase : imagesBase + '/', files } };
   await fs.writeFile(output, JSON.stringify(manifest, null, 2));
   console.log('Manifesto gerado em', output, 'com', files.length, 'imagens.');
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
-

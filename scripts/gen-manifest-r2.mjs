@@ -56,15 +56,22 @@ async function loadEnvFiles() {
   }
 }
 
+function cleanETag(tag) {
+  if (!tag) return null;
+  return String(tag).replace(/^\"|\"$/g, '');
+}
+
 async function listAllObjects(s3, bucket, prefix) {
-  const keys = [];
+  const items = [];
   let ContinuationToken = undefined;
   do {
     const out = await s3.send(new ListObjectsV2Command({ Bucket: bucket, Prefix: prefix, ContinuationToken }));
-    (out.Contents || []).forEach(obj => { if (obj.Key && !obj.Key.endsWith('/')) keys.push(obj.Key); });
+    (out.Contents || []).forEach(obj => {
+      if (obj.Key && !obj.Key.endsWith('/')) items.push({ key: obj.Key, etag: cleanETag(obj.ETag) });
+    });
     ContinuationToken = out.IsTruncated ? out.NextContinuationToken : undefined;
   } while (ContinuationToken);
-  return keys;
+  return items;
 }
 
 async function main() {
@@ -99,17 +106,17 @@ async function main() {
   });
 
   console.log('Listando objetos do R2...', { bucket, prefix, endpoint });
-  let keys;
+  let objects;
   try {
-    keys = await listAllObjects(s3, bucket, prefix);
+    objects = await listAllObjects(s3, bucket, prefix);
   } catch (err) {
     const code = (err && (err.name || err.Code)) || 'UnknownError';
     const status = (err && err.$metadata && err.$metadata.httpStatusCode) || (err && err.statusCode) || 'n/a';
     throw new Error(`Falha ao listar objetos no R2 (bucket="${bucket}", endpoint="${endpoint}"): ${code} (HTTP ${status}). Verifique: R2_BUCKET, Account ID/endpoint e permissões do token (List/Read no bucket). Detalhe: ${err}`);
   }
-  console.log(`Encontrados ${keys.length} arquivos.`);
+  console.log(`Encontrados ${objects.length} arquivos.`);
 
-  const files = keys.map(k => ({ file: k, sha256: null }));
+  const files = objects.map(o => ({ file: o.key, sha256: o.etag || null }));
   const manifest = { db: { version, url: dbUrl, sha256: null }, images: { base_url: baseUrl, files } };
   await writeFile(outPath, JSON.stringify(manifest, null, 2));
   console.log('Manifest escrito em', outPath);
