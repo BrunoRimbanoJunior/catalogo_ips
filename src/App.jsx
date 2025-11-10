@@ -104,6 +104,16 @@ function App() {
             setDbVersion(res.db_version);
             setSyncMsg(`Atualizado ao iniciar: db v${res.db_version} | imgs +${res.downloaded_images}`);
             localStorage.setItem("manifestUrl", manifestToUse);
+            // Recarrega listas após atualizar o DB
+            try {
+              const [nBrands, nVehicles] = await Promise.all([fetchBrands(), fetchVehicles()]);
+              setBrands(nBrands);
+              setVehicles(nVehicles);
+              const gs = await fetchGroups(brandId ? Number(brandId) : null);
+              setGroups(gs);
+              const vs2 = await fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null);
+              setVehicles(vs2);
+            } catch {}
           } catch (e) {
             setSyncMsg(`Falha sync inicial: ${e}`);
           }
@@ -240,6 +250,16 @@ function App() {
       } catch (e) {
         setImportMsg(`Falha ao indexar manifest: ${e}`);
       }
+      // Recarrega listas com o DB atualizado
+      try {
+        const [nBrands, nVehicles] = await Promise.all([fetchBrands(), fetchVehicles()]);
+        setBrands(nBrands);
+        setVehicles(nVehicles);
+        const gs = await fetchGroups(brandId ? Number(brandId) : null);
+        setGroups(gs);
+        const vs2 = await fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null);
+        setVehicles(vs2);
+      } catch {}
       await doSearch();
     } catch (e) {
       setSyncMsg(`Falha ao sincronizar: ${e}`);
