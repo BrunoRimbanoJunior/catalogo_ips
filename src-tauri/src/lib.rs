@@ -141,8 +141,17 @@ mod core {
         let created = !db_file.exists();
         if created {
             if let Ok(res_dir) = app.path().resource_dir() {
-                let seed = res_dir.join("catalog.db");
-                if seed.exists() { let _ = std::fs::copy(&seed, &db_file); }
+                // Tente múltiplos caminhos possíveis dentro de resources
+                let candidates = [
+                    res_dir.join("catalog.db"),
+                    res_dir.join("data").join("catalog.db"),
+                ];
+                for seed in candidates.iter() {
+                    if seed.exists() {
+                        let _ = std::fs::copy(seed, &db_file);
+                        break;
+                    }
+                }
             }
             if !db_file.exists() {
                 if let Ok(cwd) = std::env::current_dir() {
@@ -153,6 +162,10 @@ mod core {
         }
         let conn = open_db(&db_file).map_err(|e| e.to_string())?;
         migrate(&conn).map_err(|e| e.to_string())?;
+        // Garante uma marca padrão legível caso o seed falhe
+        if created { let _ = conn.execute("INSERT OR IGNORE INTO brands(id,name) VALUES(1,'GENÉRICO')", []); }
+        // Corrige possíveis corrupções de encoding deixadas por versões antigas
+        let _ = conn.execute("UPDATE brands SET name='GENÉRICO' WHERE id=1 AND (name LIKE 'GEN%RICO' OR name='GENERICO' OR name GLOB 'GEN?RICO')", []);
         if created { conn.execute("INSERT OR IGNORE INTO brands(id,name) VALUES(1,'GENÉRICO')", []).ok(); }
         let version = get_db_version(&conn).map_err(|e| e.to_string())?;
         Ok(InitInfo { data_dir: data_dir.to_string_lossy().into_owned(), images_dir: imgs_dir.to_string_lossy().into_owned(), db_path: db_file.to_string_lossy().into_owned(), db_version: version })
