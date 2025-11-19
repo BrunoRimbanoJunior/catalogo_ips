@@ -1,6 +1,6 @@
 {
   "db": {
-    "version": 1763577642,
+    "version": 1763578266,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
     "sha256": null
   },
@@ -2544,6 +2544,10 @@
         "sha256": "44d949461bc2eee7a9f3bafe48fa7661"
       },
       {
+        "file": "CAIXA_DIRECAO/7115806611.png",
+        "sha256": "92f7459b95d81ed690f874147b748a40"
+      },
+      {
         "file": "CAIXA_DIRECAO/7115886011.png",
         "sha256": "ce5431a7c3ea0ed42a3e9117a7a52ef5"
       },
@@ -3128,6 +3132,10 @@
         "sha256": "69642d17efbe288d7d74f29d3a64506f"
       },
       {
+        "file": "CAIXA_DIRECAO/7156426010.png",
+        "sha256": "31fd4149eaec6416caf87e7aae4da31f"
+      },
+      {
         "file": "CAIXA_DIRECAO/7156446000-1.png",
         "sha256": "43e4a89797b5a0891c84c4cdd89f84e6"
       },
@@ -3172,6 +3180,10 @@
         "sha256": "8cd546880ff8011990be287caeea1786"
       },
       {
+        "file": "CAIXA_DIRECAO/7156906610.png",
+        "sha256": "14cb926e0febbf71eb21fbba144e9490"
+      },
+      {
         "file": "CAIXA_DIRECAO/7156955900.png",
         "sha256": "806586e995c25298852abce864b41765"
       },
@@ -3192,8 +3204,16 @@
         "sha256": "504988849fe6b8d09286cf39b25a97ea"
       },
       {
+        "file": "CAIXA_DIRECAO/7163006610.png",
+        "sha256": "ecdb95a7f877a33a1356f1ddbc6d39f2"
+      },
+      {
         "file": "CAIXA_DIRECAO/7163105910.png",
         "sha256": "944fecd930801d273d78c8a3824e077a"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7163206610.png",
+        "sha256": "07e8bbb266a782307bab4e237d9b126d"
       },
       {
         "file": "CAIXA_DIRECAO/7163222002.png",
@@ -3212,12 +3232,24 @@
         "sha256": "749e9996877d756ed774e8ee9169264e"
       },
       {
+        "file": "CAIXA_DIRECAO/7163226610.png",
+        "sha256": "57f405dc48e20fcef9ba111e32395d84"
+      },
+      {
         "file": "CAIXA_DIRECAO/7163286000.png",
         "sha256": "43ec80dd468fcff9f7e881703aa5953f"
       },
       {
         "file": "CAIXA_DIRECAO/7163286010.png",
         "sha256": "4bc3697ee7c2e82df8e592149c95cebd"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7163286600.png",
+        "sha256": "fe6856e6130e2991fadf7ba238f54438"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7163286610.png",
+        "sha256": "f7bb76152efab964fa1d2edd91b7046f"
       },
       {
         "file": "CAIXA_DIRECAO/7163365900.png",
@@ -3426,6 +3458,10 @@
       {
         "file": "CAIXA_DIRECAO/7176106020.png",
         "sha256": "00e3861ad0da2ae6a4065b6cba9d75ed"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7176106610.png",
+        "sha256": "2368fdd569bfdd323279593e722246ea"
       },
       {
         "file": "CAIXA_DIRECAO/7176306010.png",
