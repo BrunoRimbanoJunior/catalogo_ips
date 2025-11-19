@@ -93,7 +93,12 @@ mod core {
         if !imgs.exists() { fs::create_dir_all(&imgs)?; }
         Ok((data, db, imgs))
     }
-    fn open_db(path: &Path) -> Result<Connection> { Ok(Connection::open(path)?) }
+    fn open_db(path: &Path) -> Result<Connection> {
+        let conn = Connection::open(path)?;
+        // Evita falhas "database is locked" quando outra operação ainda está finalizando.
+        conn.busy_timeout(Duration::from_secs(30))?;
+        Ok(conn)
+    }
     fn migrate(conn: &Connection) -> Result<()> {
         conn.execute_batch(r#"
             PRAGMA journal_mode=WAL;

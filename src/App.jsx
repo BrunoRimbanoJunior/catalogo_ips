@@ -29,11 +29,20 @@ function resolveDefaultManifest(isDev) {
 async function openExternalIfAvailable(path) {
   try {
     const mod = await import("@tauri-apps/plugin-opener");
-    if (mod && typeof mod.open === "function") {
-      await mod.open(path);
-      return true;
+    if (mod) {
+      if (typeof mod.openPath === "function") {
+        await mod.openPath(path);
+        return true;
+      }
+      // Compatibilidade com versões antigas do plugin
+      if (typeof mod.open === "function") {
+        await mod.open(path);
+        return true;
+      }
     }
-  } catch (_) {}
+  } catch (err) {
+    console.warn("Falha ao abrir caminho externo:", err);
+  }
   return false;
 }
 
