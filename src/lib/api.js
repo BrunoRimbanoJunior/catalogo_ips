@@ -44,8 +44,8 @@ export async function fetchTypes(brandId) {
   return await invoke("get_types_cmd", { brandId });
 }
 
-export async function fetchGroups(brandId) {
-  return await invoke("get_groups_cmd", { brand_id: brandId });
+export async function fetchGroups(brandId, brandName) {
+  return await invoke("get_groups_cmd", { brand_id: brandId, brand_name: brandName });
 }
 
 export async function fetchVehiclesFiltered(brandId, group) {

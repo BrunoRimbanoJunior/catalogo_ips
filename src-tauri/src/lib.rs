@@ -17,6 +17,7 @@ mod core {
     pub const DB_FILE_NAME: &str = "catalog.db";
     pub const IMAGES_DIR_NAME: &str = "images";
     pub const META_DB_VERSION_KEY: &str = "db_version";
+    const GROUP_EXPR_SQL: &str = "UPPER(TRIM(CASE WHEN TRIM(COALESCE(pgroup,''))<>'' THEN pgroup ELSE (CASE WHEN INSTR(description,' ')>0 THEN SUBSTR(description,1,INSTR(description,' ')-1) ELSE description END) END))";
 
     #[derive(Debug, Serialize, Deserialize, Clone)]
     pub struct InitInfo {
@@ -122,6 +123,12 @@ mod core {
               filename TEXT PRIMARY KEY,
               sha256 TEXT
             );
+            CREATE TABLE IF NOT EXISTS brand_groups (
+              brand_id INTEGER NOT NULL,
+              name TEXT NOT NULL,
+              PRIMARY KEY (brand_id, name),
+              FOREIGN KEY(brand_id) REFERENCES brands(id)
+            );
         "#)?;
         let current: Option<i64> = conn
             .query_row("SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?1", params![META_DB_VERSION_KEY], |row| row.get(0))
@@ -135,6 +142,7 @@ mod core {
         let _ = conn.execute("ALTER TABLE products ADD COLUMN oem TEXT", []);
         let _ = conn.execute("ALTER TABLE products ADD COLUMN similar TEXT", []);
         let _ = conn.execute("ALTER TABLE products ADD COLUMN pgroup TEXT", []);
+        let _ = seed_brand_groups(conn);
         Ok(())
     }
     fn get_db_version(conn: &Connection) -> Result<i64> {
@@ -225,22 +233,14 @@ mod core {
     }
 
     #[tauri::command]
-    pub fn get_groups_cmd(app: AppHandle, brand_id: Option<i64>) -> Result<Vec<String>, String> {
+    pub fn get_groups_cmd(app: AppHandle, brand_id: Option<i64>, brand_name: Option<String>) -> Result<Vec<String>, String> {
         let conn = open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-        let expr = group_expr_alias("g");
-        let mut sql = format!("SELECT DISTINCT {} FROM products", expr);
-        if brand_id.is_some() { sql.push_str(" WHERE brand_id = ?1"); }
-        sql.push_str(" ORDER BY g");
-        let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
-        let mut out = Vec::new();
-        if let Some(b) = brand_id {
-            let rows = stmt.query_map(params![b], |r| r.get::<_, String>(0)).map_err(|e| e.to_string())?;
-            for r in rows { if let Ok(g) = r { let gg = g.trim().to_string(); if !gg.is_empty() { out.push(gg); } } }
-        } else {
-            let rows = stmt.query_map([], |r| r.get::<_, String>(0)).map_err(|e| e.to_string())?;
-            for r in rows { if let Ok(g) = r { let gg = g.trim().to_string(); if !gg.is_empty() { out.push(gg); } } }
+        let resolved = resolve_brand_id(&conn, brand_id, brand_name).map_err(|e| e.to_string())?;
+        let mut from_table = fetch_brand_groups(&conn, resolved).map_err(|e| e.to_string())?;
+        if from_table.is_empty() {
+            from_table = fetch_groups_from_products(&conn, resolved).map_err(|e| e.to_string())?;
         }
-        Ok(out)
+        Ok(from_table)
     }
 
     #[tauri::command]
@@ -286,11 +286,92 @@ mod core {
     }
 
     fn group_expr_alias(alias: &str) -> String {
-        // Prefer pgroup; fallback to primeira palavra da descrição
-        format!(
-            "UPPER(TRIM(CASE WHEN TRIM(COALESCE(pgroup,''))<>'' THEN pgroup ELSE (CASE WHEN INSTR(description,' ')>0 THEN SUBSTR(description,1,INSTR(description,' ')-1) ELSE description END) END)) AS {}",
-            alias
-        )
+        format!("{} AS {}", GROUP_EXPR_SQL, alias)
+    }
+
+    fn seed_brand_groups(conn: &Connection) -> Result<()> {
+        conn.execute("DELETE FROM brand_groups", [])?;
+        let sql = format!(
+            "INSERT INTO brand_groups(brand_id, name)
+             SELECT DISTINCT brand_id, {expr}
+             FROM products
+             WHERE TRIM({expr}) <> ''",
+            expr = GROUP_EXPR_SQL
+        );
+        conn.execute(&sql, [])?;
+        Ok(())
+    }
+
+    fn fetch_brand_groups(conn: &Connection, brand_id: Option<i64>) -> Result<Vec<String>> {
+        let mut out = Vec::new();
+        if let Some(b) = brand_id {
+            let mut stmt = conn.prepare("SELECT name FROM brand_groups WHERE brand_id=?1 ORDER BY name")?;
+            let rows = stmt.query_map(params![b], |row| row.get::<_, String>(0))?;
+            for r in rows {
+                if let Ok(name) = r {
+                    let trimmed = name.trim().to_string();
+                    if !trimmed.is_empty() { out.push(trimmed); }
+                }
+            }
+        } else {
+            let mut stmt = conn.prepare("SELECT DISTINCT name FROM brand_groups ORDER BY name")?;
+            let rows = stmt.query_map([], |row| row.get::<_, String>(0))?;
+            for r in rows {
+                if let Ok(name) = r {
+                    let trimmed = name.trim().to_string();
+                    if !trimmed.is_empty() { out.push(trimmed); }
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    fn fetch_groups_from_products(conn: &Connection, brand_id: Option<i64>) -> Result<Vec<String>> {
+        let expr = group_expr_alias("g");
+        let mut sql = format!("SELECT DISTINCT {} FROM products", expr);
+        if brand_id.is_some() { sql.push_str(" WHERE brand_id = ?1"); }
+        sql.push_str(" ORDER BY g");
+        let mut stmt = conn.prepare(&sql)?;
+        let mut out = Vec::new();
+        if let Some(b) = brand_id {
+            let rows = stmt.query_map(params![b], |r| r.get::<_, String>(0))?;
+            for r in rows {
+                if let Ok(g) = r {
+                    let gg = g.trim().to_string();
+                    if !gg.is_empty() { out.push(gg); }
+                }
+            }
+        } else {
+            let rows = stmt.query_map([], |r| r.get::<_, String>(0))?;
+            for r in rows {
+                if let Ok(g) = r {
+                    let gg = g.trim().to_string();
+                    if !gg.is_empty() { out.push(gg); }
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    fn resolve_brand_id(conn: &Connection, brand_id: Option<i64>, brand_name: Option<String>) -> Result<Option<i64>> {
+        if brand_id.is_some() {
+            return Ok(brand_id);
+        }
+        if let Some(name) = brand_name {
+            let trimmed = name.trim();
+            if trimmed.is_empty() {
+                return Ok(None);
+            }
+            let found: Option<i64> = conn
+                .query_row(
+                    "SELECT id FROM brands WHERE UPPER(TRIM(name)) = UPPER(TRIM(?1))",
+                    params![trimmed],
+                    |r| r.get(0),
+                )
+                .optional()?;
+            return Ok(found);
+        }
+        Ok(None)
     }
     #[tauri::command]
     pub fn get_types_cmd(app: AppHandle, brand_id: Option<i64>) -> Result<Vec<String>, String> {
@@ -457,7 +538,9 @@ mod core {
                 }
             }
         }
-        let conn = open_db(&dbf).map_err(|e| e.to_string())?; let final_version = get_db_version(&conn).unwrap_or(0);
+        let conn = open_db(&dbf).map_err(|e| e.to_string())?;
+        seed_brand_groups(&conn).ok();
+        let final_version = get_db_version(&conn).unwrap_or(0);
         Ok(SyncResult { updated_db, downloaded_images, db_version: final_version })
     }
 
@@ -734,7 +817,7 @@ mod core {
             }
         }
         tx.commit().map_err(|e| e.to_string())?;
-
+        seed_brand_groups(&conn).map_err(|e| e.to_string())?;
         // bump version
         let v = get_db_version(&conn).unwrap_or(0) + 1; set_db_version(&conn, v).ok();
         Ok(ImportResult { processed_rows: processed, upserted_products: upserted, linked_vehicles: linked, new_db_version: v })

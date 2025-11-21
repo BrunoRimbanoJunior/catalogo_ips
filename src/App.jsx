@@ -46,6 +46,34 @@ async function openExternalIfAvailable(path) {
   return false;
 }
 
+function normalizeSocialLink(value, kind) {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (kind === "email" && !trimmed.toLowerCase().startsWith("mailto:")) {
+    return `mailto:${trimmed}`;
+  }
+  return trimmed;
+}
+
+const SOCIAL_ICONS = {
+  instagram: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zm5-3a1 1 0 1 1-1 1 1 1 0 0 1 1-1z" />
+    </svg>
+  ),
+  youtube: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M22 8.4v7.2c0 1.5-1 2.9-2.4 3.2A69 69 0 0 1 12 19a69 69 0 0 1-7.6-.2C3 18.7 2 17.3 2 15.6V8.4C2 6.7 3 5.3 4.4 5a69 69 0 0 1 7.6-.2 69 69 0 0 1 7.6.2C21 5.3 22 6.7 22 8.4zM10 9v4.8l4.5-2.4z" />
+    </svg>
+  ),
+  email: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm0 2v.2l8 4.6 8-4.6V7zm16 10V9.6l-7.4 4.3a1 1 0 0 1-1.2 0L4 9.6V17z" />
+    </svg>
+  ),
+};
+
 function App() {
   const isDev = import.meta.env.MODE !== "production";
 
@@ -75,6 +103,28 @@ function App() {
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState("");
   const [importMsg, setImportMsg] = useState("");
+
+  const instagramUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_INSTAGRAM || "", "link");
+  const youtubeUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_YOUTUBE || "", "link");
+  const emailUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_EMAIL || "", "email");
+  const socialLinks = useMemo(() => {
+    return [
+      { key: "instagram", label: "Instagram", url: instagramUrl },
+      { key: "youtube", label: "YouTube", url: youtubeUrl },
+      { key: "email", label: "E-mail", url: emailUrl },
+    ].filter((link) => !!link.url);
+  }, [instagramUrl, youtubeUrl, emailUrl]);
+
+  const selectedBrand = useMemo(
+    () => brands.find((b) => String(b.id) === String(brandId)) || null,
+    [brands, brandId]
+  );
+
+  const normalizedBrandId = useMemo(() => {
+    if (brandId === null || brandId === undefined || brandId === "") return null;
+    const n = Number(brandId);
+    return Number.isNaN(n) ? null : n;
+  }, [brandId]);
 
   // Credenciais R2 (para gerar manifest localmente no Dev)
   const [r2AccountId, setR2AccountId] = useState(localStorage.getItem("r2.account_id") || "");
@@ -118,9 +168,15 @@ function App() {
               const [nBrands, nVehicles] = await Promise.all([fetchBrands(), fetchVehicles()]);
               setBrands(nBrands);
               setVehicles(nVehicles);
-              const gs = await fetchGroups(brandId ? Number(brandId) : null);
+              const gs = await fetchGroups(
+                normalizedBrandId,
+                selectedBrand ? selectedBrand.name : null
+              );
               setGroups(gs);
-              const vs2 = await fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null);
+              const vs2 = await fetchVehiclesFiltered(
+                normalizedBrandId,
+                group || null
+              );
               setVehicles(vs2);
             } catch {}
           } catch (e) {
@@ -155,9 +211,12 @@ function App() {
   // Atualizar grupos e vei­culos conforme marca/grupo
   useEffect(() => {
     (async () => {
-      const gs = await fetchGroups(brandId ? Number(brandId) : null);
+      const gs = await fetchGroups(
+        normalizedBrandId,
+        selectedBrand ? selectedBrand.name : null
+      );
       setGroups(gs);
-      const vs = await fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null);
+      const vs = await fetchVehiclesFiltered(normalizedBrandId, group || null);
       setVehicles(vs);
     })();
   }, [brandId, group]);
@@ -178,7 +237,7 @@ function App() {
 
   async function doSearch() {
     const params = {
-      brand_id: brandId ? Number(brandId) : null,
+      brand_id: normalizedBrandId,
       group: group || null,
       vehicle_id: vehicleId ? Number(vehicleId) : null,
       code_query: codeQuery || null,
@@ -209,7 +268,13 @@ function App() {
   useEffect(() => {
     (async () => {
       if (!selected) { setImageUrls([]); return; }
-      const files = selected.images || [];
+      const seen = new Set();
+      const files = (selected.images || []).filter((raw) => {
+        const key = normalizeFsPath(raw).toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
       try {
         const { readImageBase64 } = await import("./lib/api.js");
         const outs = [];
@@ -264,9 +329,12 @@ function App() {
         const [nBrands, nVehicles] = await Promise.all([fetchBrands(), fetchVehicles()]);
         setBrands(nBrands);
         setVehicles(nVehicles);
-        const gs = await fetchGroups(brandId ? Number(brandId) : null);
+        const gs = await fetchGroups(
+          normalizedBrandId,
+          selectedBrand ? selectedBrand.name : null
+        );
         setGroups(gs);
-        const vs2 = await fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null);
+        const vs2 = await fetchVehiclesFiltered(normalizedBrandId, group || null);
         setVehicles(vs2);
       } catch {}
       await doSearch();
@@ -288,8 +356,11 @@ function App() {
       setDbVersion(res.new_db_version);
       const [bs, gs, vs] = await Promise.all([
         fetchBrands(),
-        fetchGroups(brandId ? Number(brandId) : null),
-        fetchVehiclesFiltered(brandId ? Number(brandId) : null, group || null),
+        fetchGroups(
+          normalizedBrandId,
+          selectedBrand ? selectedBrand.name : null
+        ),
+        fetchVehiclesFiltered(normalizedBrandId, group || null),
       ]);
       setBrands(bs); setGroups(gs); setVehicles(vs);
       await doSearch();
@@ -357,8 +428,16 @@ function App() {
       <div className="appbar">
         <div>{brandingLogoUrl ? <img className="logo" src={brandingLogoUrl} alt="logo" onError={(e)=>{ e.currentTarget.style.display = "none"; }} /> : null}</div>
         <h1>Catálogo IPS</h1>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ opacity: 0.9 }}>DB v{dbVersion}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {socialLinks.length > 0 && (
+            <nav className="social-links">
+              {socialLinks.map((link) => (
+                <a key={link.key} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label}>
+                  {SOCIAL_ICONS[link.key]}
+                </a>
+              ))}
+            </nav>
+          )}
           {(syncMsg || importMsg) && !isDev ? (
             <span style={{ fontSize: 12, opacity: 0.85 }}>{syncMsg}{importMsg ? (syncMsg ? " | " : "") + importMsg : ""}</span>
           ) : null}
@@ -424,7 +503,11 @@ function App() {
             <input className="filter-code" placeholder="Pesquisar por código ou veí­culo (produto/OEM/Similar/Veículo)" value={codeQuery} onChange={(e)=>setCodeQuery(e.target.value)} />
             <select value={group} onChange={(e) => { setGroup(e.target.value); setVehicleId(""); }}>
               <option value="">Grupo (todos)</option>
-              {groups.map((t) => (<option key={t} value={t}>{t}</option>))}
+              {groups.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
             </select>
             <select value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}>
               <option value="">Veículo (todos)</option>
