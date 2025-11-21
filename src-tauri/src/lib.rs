@@ -17,7 +17,7 @@ mod core {
     pub const DB_FILE_NAME: &str = "catalog.db";
     pub const IMAGES_DIR_NAME: &str = "images";
     pub const META_DB_VERSION_KEY: &str = "db_version";
-    const GROUP_EXPR_SQL: &str = "UPPER(TRIM(CASE WHEN TRIM(COALESCE(pgroup,''))<>'' THEN pgroup ELSE (CASE WHEN INSTR(description,' ')>0 THEN SUBSTR(description,1,INSTR(description,' ')-1) ELSE description END) END))";
+    const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
 
     #[derive(Debug, Serialize, Deserialize, Clone)]
     pub struct InitInfo {
@@ -250,7 +250,7 @@ mod core {
         let mut wherec: Vec<String> = Vec::new();
         if brand_id.is_some() { wherec.push("p.brand_id = ?".into()); }
         if group.as_ref().map(|s| !s.trim().is_empty()).unwrap_or(false) {
-            wherec.push("UPPER(TRIM(CASE WHEN TRIM(COALESCE(pgroup,''))<>'' THEN pgroup ELSE (CASE WHEN INSTR(description,' ')>0 THEN SUBSTR(description,1,INSTR(description,' ')-1) ELSE description END) END)) = ?".into());
+            wherec.push("UPPER(TRIM(COALESCE(pgroup,''))) = ?".into());
         }
         if !wherec.is_empty() { sql.push_str(" WHERE "); sql.push_str(&wherec.join(" AND ")); }
         sql.push_str(" ORDER BY v.name");
