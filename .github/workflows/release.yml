@@ -30,11 +30,24 @@ jobs:
       - name: Prepare pnpm
         run: corepack prepare pnpm@9.12.3 --activate
 
+      - name: Set version from tag (Tauri/package.json)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          APP_VERSION=${GITHUB_REF_NAME#v}
+          echo "Setting version to ${APP_VERSION}"
+          node -e "const fs=require('fs');const path=require('path');const pkgPath=path.join(process.cwd(),'package.json');const pkg=JSON.parse(fs.readFileSync(pkgPath,'utf8'));pkg.version='${APP_VERSION}';fs.writeFileSync(pkgPath,JSON.stringify(pkg,null,2));const tauriPath=path.join(process.cwd(),'src-tauri','tauri.conf.json');const tauri=JSON.parse(fs.readFileSync(tauriPath,'utf8')); if(!tauri.package) tauri.package={}; tauri.package.version='${APP_VERSION}'; fs.writeFileSync(tauriPath,JSON.stringify(tauri,null,2));"
+
       - name: Install Linux deps (glib/gtk)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev pkg-config
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libsoup-3.0-dev \
+            pkg-config
 
       - name: Install dependencies
         run: pnpm i --frozen-lockfile=false
