@@ -32,12 +32,28 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install deps (npm)
-        run: npm i
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare pnpm
+        run: corepack prepare pnpm@9.12.3 --activate
+
+      - name: Install deps (pnpm)
+        run: pnpm i --frozen-lockfile=false
 
       - name: Compute version
         id: ver
-        run: echo "version=$(date +%s)" >> $GITHUB_OUTPUT
+        run: |
+          DATE_VER=$(date +%d%m%y%H)
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            echo "version=${DATE_VER}" >> $GITHUB_OUTPUT
+            echo "app_version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+            echo "download_url=https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/installer.exe" >> $GITHUB_OUTPUT
+          else
+            echo "version=${DATE_VER}" >> $GITHUB_OUTPUT
+            echo "app_version=" >> $GITHUB_OUTPUT
+            echo "download_url=" >> $GITHUB_OUTPUT
+          fi
 
       - name: Generate manifest from R2
         env:
@@ -49,7 +65,12 @@ jobs:
           R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL }}
         run: |
           DB_URL="https://raw.githubusercontent.com/${{ github.repository }}/main/data/catalog.db"
-          node scripts/gen-manifest-r2.mjs --version ${{ steps.ver.outputs.version }} --db-url "$DB_URL" --out manifest.json
+          node scripts/gen-manifest-r2.mjs \
+            --version ${{ steps.ver.outputs.version }} \
+            --db-url "$DB_URL" \
+            --app-version "${{ steps.ver.outputs.app_version }}" \
+            --app-download-url "${{ steps.ver.outputs.download_url }}" \
+            --out manifest.json
 
       - name: Commit and push manifest
         uses: stefanzweifel/git-auto-commit-action@v5
