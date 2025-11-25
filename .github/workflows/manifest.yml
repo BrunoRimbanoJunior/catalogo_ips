@@ -73,11 +73,12 @@ jobs:
             --out manifest.json
 
       - name: Commit and push manifest
+        if: startsWith(github.ref, 'refs/heads/main')
         uses: stefanzweifel/git-auto-commit-action@v5
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
         with:
           commit_message: "ci: update manifest.json"
           file_pattern: manifest.json
+
 
       - name: Upload manifest artifact
         uses: actions/upload-artifact@v4
