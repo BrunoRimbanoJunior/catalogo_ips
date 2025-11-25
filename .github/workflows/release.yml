@@ -36,7 +36,7 @@ jobs:
         run: |
           APP_VERSION="${GITHUB_REF_NAME#v}"
           echo "Setting version to ${APP_VERSION}"
-          node -e "const fs=require('fs');const path=require('path');const pkgPath=path.join(process.cwd(),'package.json');const pkg=JSON.parse(fs.readFileSync(pkgPath,'utf8'));pkg.version='${APP_VERSION}';fs.writeFileSync(pkgPath,JSON.stringify(pkg,null,2));const tauriPath=path.join(process.cwd(),'src-tauri','tauri.conf.json');const tauri=JSON.parse(fs.readFileSync(tauriPath,'utf8')); if(!tauri.package) tauri.package={}; tauri.package.version='${APP_VERSION}'; fs.writeFileSync(tauriPath,JSON.stringify(tauri,null,2));"
+          node -e "const fs=require('fs');const path=require('path');const pkgPath=path.join(process.cwd(),'package.json');const pkg=JSON.parse(fs.readFileSync(pkgPath,'utf8'));pkg.version='${APP_VERSION}';fs.writeFileSync(pkgPath,JSON.stringify(pkg,null,2));const tauriPath=path.join(process.cwd(),'src-tauri','tauri.conf.json');const tauri=JSON.parse(fs.readFileSync(tauriPath,'utf8')); tauri.version='${APP_VERSION}'; fs.writeFileSync(tauriPath,JSON.stringify(tauri,null,2));"
 
       - name: Install Linux deps (glib/gtk)
         if: matrix.os == 'ubuntu-latest'
