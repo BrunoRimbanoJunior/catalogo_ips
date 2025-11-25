@@ -137,6 +137,7 @@ function App() {
   const [importMsg, setImportMsg] = useState("");
   const [updateInfo, setUpdateInfo] = useState(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
+  const [runtimeVersion, setRuntimeVersion] = useState(import.meta.env.VITE_APP_VERSION || "0.0.0");
 
   const instagramUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_INSTAGRAM || "", "link");
   const youtubeUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_YOUTUBE || "", "link");
@@ -160,7 +161,7 @@ function App() {
     return Number.isNaN(n) ? null : n;
   }, [brandId]);
 
-  const currentAppVersion = import.meta.env.VITE_APP_VERSION || "0.0.0";
+  const currentAppVersion = runtimeVersion || "0.0.0";
 
   const supabaseConfigured = Boolean(supabase && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
   const isAdminDev = Boolean(supabaseServiceKey && supabaseServiceKey.length > 0);
@@ -247,6 +248,18 @@ function App() {
   }, [isAdminDev]);
 
   useEffect(() => {
+    (async () => {
+      try {
+        const { getVersion } = await import("@tauri-apps/api/app");
+        const v = await getVersion();
+        if (v) setRuntimeVersion(v);
+      } catch {
+        // Web build: fica com VITE_APP_VERSION
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     if (authEmail) localStorage.setItem("registration.email", authEmail);
   }, [authEmail]);
 
@@ -263,15 +276,30 @@ function App() {
     setAuthMessage("");
     setSavingProfile(true);
     try {
+      let existingId = profile?.id || null;
+      if (!existingId && (registration.email || authEmail)) {
+        const { data: existing, error: exErr } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("email", registration.email || authEmail)
+          .maybeSingle();
+        if (!exErr && existing?.id) existingId = existing.id;
+      }
+
       const payload = {
         ...registration,
         email: registration.email || authEmail || "",
         status: "pending",
         device_fingerprint: profile?.device_fingerprint || deviceFingerprint,
+        id: existingId || undefined,
       };
 
       if (supabase) {
-        const { data, error } = await supabase.from("profiles").upsert(payload).select().maybeSingle();
+        const { data, error } = await supabase
+          .from("profiles")
+          .upsert(payload, { onConflict: "email" })
+          .select()
+          .maybeSingle();
         if (error) throw error;
         setProfile(data);
         setAuthMessage("Cadastro enviado. Aguarde aprovação do time.");
@@ -642,7 +670,18 @@ function App() {
             <div className="update-banner">
               <span>Nova versão disponível: {updateInfo.availableVersion} (atual {currentAppVersion})</span>
               {updateInfo.downloadUrl ? (
-                <button onClick={() => window.open(updateInfo.downloadUrl, "_blank")}>Baixar/Atualizar</button>
+                <button
+                  onClick={async () => {
+                    try {
+                      const { open } = await import("@tauri-apps/api/shell");
+                      await open(updateInfo.downloadUrl);
+                    } catch {
+                      window.open(updateInfo.downloadUrl, "_blank");
+                    }
+                  }}
+                >
+                  Baixar/Atualizar
+                </button>
               ) : null}
               <button className="ghost" onClick={() => setUpdateDismissed(true)}>Fechar</button>
             </div>

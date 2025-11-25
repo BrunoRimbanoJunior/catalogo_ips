@@ -1,146 +1,65 @@
-﻿# Catálogo IPS — Tauri + React + SQLite
+# Catálogo IPS
 
-Aplicativo desktop de catálogo com filtros por fabricante, grupo e veículo; busca por código (produto/OEM/Similar/Veículo); detalhes com “Compatível com”, “Detalhes” e “Similares”. Banco local SQLite e sincronização de base e imagens via manifest hospedado (Git/R2).
+App desktop (Tauri + React) para consulta de peças com sincronização de banco/imagens via manifest. Fluxo de controle de acesso usando Supabase e aprovação manual.
 
-## Funcionalidades
+## Como funciona
+- Manifest público (`VITE_DEFAULT_MANIFEST_URL`): aponta para o `manifest.json` publicado (raw da main). Contém `appVersion`, `appDownloadUrl`, `db.version/url` e lista de imagens (R2).
+- Cliente: ao abrir, lê o manifest, avisa se há nova versão do app, baixa DB/imagens se `db.version` subir e indexa imagens no SQLite local.
+- Auth: formulário de cadastro salva no Supabase (`profiles`), status `pending`; admin aprova (service role) e o app libera quando `status=approved`.
 
-- Filtros: Fabricante (chips), Grupo e Veículo (selects), e busca por código (produto/OEM/Similar/Veículo).
-- Detalhes do item: código, descrição, marca, compatibilidade, detalhes e similares. Galeria com visualização ampliada ao clique (lightbox).
-- Sincronização do cliente: em cada inicialização, o app resolve a URL do manifest.json, baixa o DB se versão maior e baixa imagens faltantes. Em seguida indexa imagens no DB.
-- Branding versionado: logo e fundo em public/images/ (definidos nas Ferramentas em Dev) são empacotados no build.
-- Ferramentas (somente Dev): Verificar atualizações (manifest padrão), Indexar via manifest, Importar Excel, Exportar DB, Exportar DB + Manifest (R2), Abrir dados/imagens/DB, Limpar manifest salvo.
+## Instalação do cliente
+- Baixar na aba Releases do GitHub (tags `v*`).
+- **Windows**: `catalogo_ips_*_x64-setup.exe` (instalador) ou `.msi`. Basta executar. Se o SmartScreen avisar, clique em “Mais informações” > “Executar assim mesmo”.
+- **macOS**: `catalogo_ips_*_aarch64.dmg` (Apple Silicon) ou `x64.dmg` (Intel). Abra o `.dmg`, arraste para Aplicativos; se o Gatekeeper bloquear, vá em Preferências > Segurança > “Abrir mesmo assim”.
+- **Linux**: `catalogo_ips_*_app.tar.gz` (AppImage). Dê permissão de execução (`chmod +x catalogo_ips_*.AppImage`) e rode; dependendo da distro, pode exigir libs GTK/webkit (já empacotadas na maioria das distros). Se usar installer `.deb/.rpm` quando disponível, instale com o gerenciador de pacotes.
+- Manifest padrão do app: `https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/refs/heads/main/manifest.json`.
 
-## Estrutura do banco (resumo)
+## Desenvolvimento local
+Pré-requisitos: Node 20, Rust toolchain, pnpm, Supabase (anon key), manifest público válido.
+1) `pnpm install`
+2) Configurar `.env.development` (exemplo):
+   ```
+   VITE_DEFAULT_MANIFEST_URL=https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/refs/heads/main/manifest.json
+   VITE_SUPABASE_URL=...
+   VITE_SUPABASE_ANON_KEY=...
+   VITE_APP_VERSION=dev
+   ```
+3) Rodar front/Tauri dev: `pnpm dev` e em outro terminal `pnpm tauri dev`.
 
-- Tabelas: rands, ehicles, products (campos principais: brand_id, code, description, application, details, oem, similar, pgroup), product_vehicles, images, meta (key=db_version).
-- meta.db_version identifica a versão do DB local; importações incrementam automaticamente.
+## Backend de aprovação (FastAPI)
+Local (apenas dev) para aprovar cadastros sem expor service role no front:
+1) `cd backend`
+2) `.env` com `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`
+3) `uv venv && uv pip install -r requirements.txt`
+4) `uv run uvicorn main:app --reload --port 8000`
+5) Painel: `http://localhost:8000/admin`
 
-## Manifest (DB + imagens)
+## Workflows (CI)
+- `manifest.yml`: gera `manifest.json` a partir do R2 (usa secrets `R2_*`), insere `appVersion/appDownloadUrl`, comita na `main` (inclusive em tags) e anexa na release.
+- `release.yml`: em tags `v*`, alinha versão do Tauri/package com a tag, instala deps (inclui libs GTK para Linux), builda com `tauri-action` e publica instaladores na release.
+- `auto-tag.yml`: tagging automática básica (pode ser ajustada conforme a estratégia).
 
-Exemplo de manifest.json:
+## Geração de manifest manual (dev)
+```
+APP_VERSION=1.0.1 APP_DOWNLOAD_URL=https://github.com/<org>/<repo>/releases/download/v1.0.1/installer.exe \
+node scripts/gen-manifest-r2.mjs \
+  --version 25012518 \
+  --db-url https://raw.githubusercontent.com/<org>/<repo>/main/data/catalog.db \
+  --out manifest.json
+```
+Credenciais R2 vêm do ambiente (`R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BASE_URL`).
 
-`
+## Estrutura do manifest (resumo)
+```json
 {
-  "db": { "version": 3, "url": "https://raw.githubusercontent.com/<user>/<repo>/main/data/catalog.db", "sha256": null },
-  "images": {
-    "base_url": "https://pub-xxxxxxxxxxxxxxxx.r2.dev/",
-    "files": [ { "file": "7111032801.png", "sha256": null } ]
-  }
+  "appVersion": "1.0.1",
+  "appDownloadUrl": ".../installer.exe",
+  "db": { "version": 25012518, "url": "https://raw.githubusercontent.com/.../data/catalog.db", "sha256": null },
+  "images": { "base_url": "https://pub-xxxx.r2.dev/", "files": [ { "file": "7111032801.png", "sha256": "..." } ] }
 }
-`
+```
 
-Observações:
-- Use a “Public Development URL” do bucket no R2 como ase_url (ex.: https://pub-…r2.dev/, com / no final). Não use o endpoint S3 da conta (…cloudflarestorage.com), pois retorna 400 para público.
-- iles[].file deve conter o caminho/nome relativo dentro do bucket.
-
-## Desenvolvimento (Dev)
-
-Pré‑requisitos:
-- Node 20+, Rust (toolchain stable), Tauri (instala automaticamente via CLI), PNPM ou NPM.
-
-Passos:
-1) Instale dependências: pnpm install (ou 
-pm i)
-2) (Recomendado) crie .env.development na raiz com:
-   - VITE_DEFAULT_MANIFEST_URL=http://localhost:1420/manifest.json
-3) Rode o front e o shell do Tauri em terminais separados:
-   - pnpm dev
-   - pnpm tauri dev
-4) Ferramentas (Dev): clique em “Limpar manifest salvo” para garantir uso do padrão; depois “Verificar atualizações (manifest padrão)”.
-5) Selecione um produto e clique na miniatura para abrir a visualização ampliada.
-
-Notas de Dev (imagens):
-- Em desenvolvimento, as miniaturas e o preview usam data URLs (base64) geradas a partir dos arquivos baixados (garante render mesmo quando o scheme sset:// do WebView não está ativo no Dev).
-
-## Importação do Excel
-
-Layout suportado:
-- CODIGO | GRUPO | DESCRIÇÃO | MONTADORA | APLICAÇÃO | MARCA | OEM | SIMILAR
-
-Mapeamento (case/acentos indiferentes):
-- CODIGO → products.code (chave de upsert)
-- GRUPO/GRUPO DE PRODUTOS/CATEGORIA → products.pgroup
-- DESCRIÇÃO → products.description
-- MARCA/FABRICANTE → tabela rands + products.brand_id
-- APLICAÇÃO → vincula veículos (texto é dividido e indexado em ehicles + product_vehicles)
-- OEM, SIMILAR → products.oem, products.similar
-- MONTADORA é ignorada no import (veículos vêm de APLICAÇÃO)
-- Ignorados: ANO, LINK, FOTO/FOTOS (se existirem)
-
-O import faz upsert por products.code e incrementa meta.db_version automaticamente.
-
-## Geração de manifest (R2)
-
-Pelo próprio app (Dev):
-- Ferramentas → “Exportar DB + Manifest (R2)”.
-- Preencha “Credenciais R2 / Config Manifest” (com tooltips):
-  - Account ID, Bucket (ex.: ipsimages), Access Key ID, Secret Access Key
-  - Public Base URL: https://pub-…r2.dev/
-  - DB URL (raw Git): URL completa do data/catalog.db no GitHub
-- O app executa scripts/gen-manifest-r2.mjs localmente e grava o manifest.json no caminho escolhido.
-
-Via CLI (alternativa):
-`
-R2_ACCOUNT_ID=... \
-R2_BUCKET=ipsimages \
-R2_ACCESS_KEY_ID=... \
-R2_SECRET_ACCESS_KEY=... \
-R2_PUBLIC_BASE_URL=https://pub-...r2.dev/ \
-node scripts/gen-manifest-r2.mjs --version 3 --db-url https://raw.githubusercontent.com/<user>/<repo>/main/data/catalog.db --out manifest.json
-`
-
-## Build local (Windows)
-
-Opção 1 (manual):
-- .env.production com a URL padrão do manifest (Git raw):
-  - VITE_DEFAULT_MANIFEST_URL=https://raw.githubusercontent.com/<user>/<repo>/main/manifest.json
-- Build front: pnpm build
-- Build app: pnpm tauri build
-- Saída: src-tauri/target/release/bundle/
-
-Opção 2 (script):
-- ./scripts/build-local.ps1 -ManifestUrl "https://raw.githubusercontent.com/<user>/<repo>/main/manifest.json"
-
-## Comportamento do cliente (produção)
-
-- Ao iniciar, o app resolve a URL do manifest (LocalStorage → VITE_DEFAULT_MANIFEST_URL → fallback Git) e executa:
-  1) sync_from_manifest: baixa DB novo (se db.version maior) e imagens faltantes.
-  2) index_images_from_manifest: indexa os nomes das imagens no DB para cada produto.
-- Imagens são salvas em:
-  - Windows: %LOCALAPPDATA%/com.jubar.catalogo-ips/images
-
-## Troubleshooting rápido
-
-- 400 ao baixar imagens: verifique images.base_url no manifest.json. Precisa ser a Public Development URL do bucket (https://pub-…r2.dev/), com / final.
-- Manifest “antigo” carregado: use “Limpar manifest salvo” (remove LocalStorage) e reinicie.
-- Dev não mostra imagens: em Dev usamos data URLs (base64) via ead_image_base64 — se ainda assim não aparecer, confirme se o arquivo existe na pasta de imagens e se o nome em selected.images bate com o arquivo.
-
-## Comandos Tauri expostos
-
-- init_app — prepara diretórios e banco, retorna paths e versão local.
-- get_brands_cmd, get_groups_cmd, get_vehicles_cmd, get_vehicles_filtered_cmd, get_makes_cmd, get_vehicles_by_make_cmd
-- search_products_cmd — filtros (marca/grupo/veículo) + busca por código/OEM/Similar e também por veículo.
-- get_product_details_cmd — dados + imagens, inclui similar.
-- sync_from_manifest — baixa DB e imagens conforme manifest.
-- index_images_from_manifest — indexa nomes de imagens conforme manifest.
-- import_excel(path) — importa/atualiza DB via XLSX.
-- index_images(root) — (Dev/legado) varre pasta local e indexa por código do arquivo.
-- export_db_to(dest_path) — exporta o DB compactado (VACUUM INTO).
-- set_branding_image(kind, source_path) — copia logo/fundo para public/images/.
-- gen_manifest_r2(version, db_url, out_path, r2) — gera manifest.json listando objetos no bucket R2 (S3 API).
-- ead_image_base64(path_or_rel) — lê a imagem local e retorna data:image/...;base64,... (útil no Dev).
-
----
-
-Se precisar, posso adicionar índices SQL (em migrations) para acelerar buscas por products.code, products.oem, products.similar e ehicles.name.
-
-## Manutenção (atualização de base e imagens)
-
-1) Importe o Excel (Ferramentas → Importar Excel) para atualizar/incluir produtos. O db_version local será incrementado.
-2) Exporte o DB e gere o manifest do R2 (Ferramentas → Exportar DB + Manifest (R2)).
-   - Preencha/atualize as credenciais R2 e a Public Base URL (https://pub-…r2.dev/).
-   - O script usa um número de versão (padrão: timestamp) no campo db.version do manifest.
-3) Faça commit de data/catalog.db (se aplicável) e do manifest.json no repositório Git.
-4) Clientes: ao abrir, verificam a versão no manifest e baixam DB/imagens novos automaticamente.
-
-Observação: se desejar forçar a verificação em produção sem reiniciar o app, implemente no front um botão de “Verificar atualizações” (no cliente não expomos as Ferramentas Dev por padrão).
+## Dicas para produção
+- Supabase: RLS ativa na tabela `profiles`, políticas para anon (insert/update/select) e UNIQUE no email. Service role nunca vai para o front.
+- Manifest público sempre na main (raw GitHub) ou asset de release; configure `VITE_DEFAULT_MANIFEST_URL` para esse endereço.
+- Releases: use tags `v*` para gerar instaladores e atualizar o manifest com `appVersion` e link de download.
