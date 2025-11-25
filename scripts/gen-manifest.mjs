@@ -40,6 +40,8 @@ async function main() {
   const imagesBase = arg('images-base-url');
   const imagesDir = arg('images-dir', 'images');
   const output = arg('out', 'manifest.json');
+  const appVersion = arg('app-version', process.env.APP_VERSION || null);
+  const appDownloadUrl = arg('app-download-url', process.env.APP_DOWNLOAD_URL || null);
   if (!dbUrl || !imagesBase) {
     console.error('Uso: node scripts/gen-manifest.mjs --version 3 --db-url https://raw.githubusercontent.com/user/repo/main/data/catalog.db --images-base-url https://raw.githubusercontent.com/user/repo/main/images/ [--images-dir data/images] [--out manifest.json]');
     process.exit(2);
@@ -52,7 +54,14 @@ async function main() {
     .sort()
     .map(async (file) => ({ file, sha256: await sha256File(path.join(imagesDir, file)) }))
   ));
-  const manifest = { db: { version, url: dbUrl }, images: { base_url: imagesBase.endsWith('/') ? imagesBase : imagesBase + '/', files } };
+  const manifest = {
+    appVersion: appVersion || undefined,
+    appDownloadUrl: appDownloadUrl || undefined,
+    db: { version, url: dbUrl },
+    images: { base_url: imagesBase.endsWith('/') ? imagesBase : imagesBase + '/', files },
+  };
+  // remove undefined keys
+  Object.keys(manifest).forEach((k) => manifest[k] === undefined && delete manifest[k]);
   await fs.writeFile(output, JSON.stringify(manifest, null, 2));
   console.log('Manifesto gerado em', output, 'com', files.length, 'imagens.');
 }

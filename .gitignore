@@ -31,9 +31,10 @@ dist-ssr
 .env.development
 .env.test
 .env.staging
-# Exceções: manter exemplos/produção sem segredos
+# Exceções: manter apenas exemplos sem segredos
 !.env.example
-!.env.production
+backend/.env
+.env.production
 
 # Tauri / Rust build
 /src-tauri/target/

@@ -80,6 +80,8 @@ async function main() {
   const version = Number(arg('version'));
   const dbUrl = arg('db-url');
   const outPath = arg('out', 'manifest.json');
+  const appVersion = arg('app-version', process.env.APP_VERSION || null);
+  const appDownloadUrl = arg('app-download-url', process.env.APP_DOWNLOAD_URL || null);
   const prefix = arg('prefix', '');
 
   ensure(version, 'Faltou --version');
@@ -117,7 +119,13 @@ async function main() {
   console.log(`Encontrados ${objects.length} arquivos.`);
 
   const files = objects.map(o => ({ file: o.key, sha256: o.etag || null }));
-  const manifest = { db: { version, url: dbUrl, sha256: null }, images: { base_url: baseUrl, files } };
+  const manifest = {
+    appVersion: appVersion || undefined,
+    appDownloadUrl: appDownloadUrl || undefined,
+    db: { version, url: dbUrl, sha256: null },
+    images: { base_url: baseUrl, files },
+  };
+  Object.keys(manifest).forEach((k) => manifest[k] === undefined && delete manifest[k]);
   await writeFile(outPath, JSON.stringify(manifest, null, 2));
   console.log('Manifest escrito em', outPath);
 }

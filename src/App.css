@@ -187,4 +187,44 @@ button {
 .statusbar.success { background: rgba(0,128,96,0.9); }
 .statusbar.error { background: rgba(180,32,32,0.9); }
 .statusbar .small { font-size: 12px; opacity: 0.9; }
+.update-banner { display: inline-flex; align-items: center; gap: 8px; background: #fff4e5; color: #8a4b00; padding: 6px 10px; border-radius: 8px; border: 1px solid #f0cfa0; font-size: 12px; }
+.update-banner button { background: #0b4d91; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.update-banner button.ghost { background: transparent; color: inherit; border: 0; }
+
+/* Auth gate */
+.app-blocked { filter: blur(2px); pointer-events: none; user-select: none; }
+.auth-backdrop { position: fixed; inset: 0; background: rgba(240,242,246,0.9); display: flex; justify-content: center; overflow: auto; padding: 24px 12px; z-index: 20000; }
+.auth-modal { width: min(860px, 100%); margin: auto; background: #ffffff; border-radius: 12px; padding: 18px; box-shadow: 0 16px 40px rgba(0,0,0,0.18); border: 1px solid #e4e7ed; color: #0f0f0f; max-height: 90vh; overflow: auto; }
+.auth-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.auth-header h2 { margin: 4px 0 2px; }
+.auth-kicker { text-transform: uppercase; font-size: 12px; letter-spacing: 0.8px; margin: 0; color: #e43f3f; font-weight: 800; }
+.auth-brand { font-weight: 800; letter-spacing: 0.6px; background: #0b4d91; color: #fff; padding: 8px 12px; border-radius: 8px; }
+.auth-status { margin: 4px 0; font-weight: 700; }
+.auth-muted { opacity: 0.8; margin: 4px 0; }
+.auth-muted.small { font-size: 12px; }
+.auth-alert { padding: 12px; border-radius: 8px; background: #fff4e5; color: #7a4c00; font-weight: 600; }
+.auth-section { margin-top: 14px; padding-top: 10px; border-top: 1px solid #ececec; text-align: left; }
+.auth-form { display: flex; flex-direction: column; gap: 8px; }
+.auth-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+.auth-row input { flex: 1; min-width: 0; }
+.auth-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 16px; text-align: left; margin-top: 10px; align-items: end; padding: 0 8px; }
+.auth-field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+.auth-field input { width: 100%; background: #ffffff !important; border: 1px solid #dcdcdc; color: #111; max-width: 100%; padding: 10px 12px; }
+.auth-field.wide { grid-column: 1 / -1; max-width: 100%; }
+.auth-field.wide input { max-width: 100%; }
+.auth-row-compact { display: grid; grid-template-columns: 140px 1fr; gap: 12px; grid-column: 1 / -1; }
+.auth-row button { min-width: 140px; }
+.auth-radio { display: flex; gap: 16px; align-items: center; grid-column: 1 / -1; margin: 6px 0; }
+.auth-meta { display: flex; flex-direction: column; gap: 4px; grid-column: 1 / -1; font-size: 12px; background: #f3f6fb; padding: 8px 10px; border-radius: 8px; }
+.auth-wait { padding: 14px; background: #f3f6fb; border: 1px solid #d9e3f2; border-radius: 10px; }
+.admin-panel { margin-top: 16px; border-top: 1px solid #e6e6e6; padding-top: 12px; }
+.admin-list { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.admin-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px; border: 1px solid #e4e4e4; border-radius: 8px; background: #fafafa; }
+.admin-list button { min-width: 120px; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.admin-fab { position: fixed; right: 16px; bottom: 16px; z-index: 15000; }
+.admin-fab button { background: #0b4d91; color: #fff; border: 0; padding: 10px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.admin-floating { position: fixed; right: 16px; bottom: 70px; width: min(420px, 90vw); max-height: 70vh; overflow: auto; z-index: 14999; }
+.auth-success { margin-top: 10px; padding: 10px; background: #e8fff5; color: #0c6b3d; border: 1px solid #b1e5c8; border-radius: 8px; }
+.auth-error { margin-top: 10px; padding: 10px; background: #ffecec; color: #9a1b1b; border: 1px solid #f3bbbb; border-radius: 8px; }
 

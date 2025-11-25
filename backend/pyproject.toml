@@ -1,0 +1,14 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.122.0",
+    "pydantic>=2.12.4",
+    "supabase>=2.24.0",
+    "uvicorn>=0.38.0",
+    "python-dotenv==1.0.1",
+    "email-validator==2.2.0"
+]

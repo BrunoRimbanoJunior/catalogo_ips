@@ -14,6 +14,7 @@ import {
   exportDbTo,
   genManifestR2,
 } from "./lib/api";
+import { supabase, supabaseService, supabaseServiceKey, supabaseRestUrl } from "./lib/supabaseClient";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import "./App.css";
 
@@ -74,8 +75,39 @@ const SOCIAL_ICONS = {
   ),
 };
 
+const EMPTY_REGISTRATION = {
+  person_type: "pf",
+  country: "Brasil",
+  state: "",
+  city: "",
+  cpf_cnpj: "",
+  full_name: "",
+  phone_area: "",
+  phone_number: "",
+  email: "",
+};
+
 function App() {
   const isDev = import.meta.env.MODE !== "production";
+  const deviceFingerprint = useMemo(() => {
+    const stored = localStorage.getItem("device.fingerprint");
+    if (stored) return stored;
+    const fresh = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `dev-${Date.now()}-${Math.random()}`;
+    localStorage.setItem("device.fingerprint", fresh);
+    return fresh;
+  }, []);
+
+  const [profile, setProfile] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authEmail, setAuthEmail] = useState(localStorage.getItem("registration.email") || "");
+  const [authMessage, setAuthMessage] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [registration, setRegistration] = useState(EMPTY_REGISTRATION);
+  const [adminError, setAdminError] = useState("");
+  const [pendingProfiles, setPendingProfiles] = useState([]);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Estado básico
   const [ready, setReady] = useState(true);
@@ -103,6 +135,8 @@ function App() {
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState("");
   const [importMsg, setImportMsg] = useState("");
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
 
   const instagramUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_INSTAGRAM || "", "link");
   const youtubeUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_YOUTUBE || "", "link");
@@ -125,6 +159,167 @@ function App() {
     const n = Number(brandId);
     return Number.isNaN(n) ? null : n;
   }, [brandId]);
+
+  const currentAppVersion = import.meta.env.VITE_APP_VERSION || "0.0.0";
+
+  const supabaseConfigured = Boolean(supabase && import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+  const isAdminDev = Boolean(supabaseServiceKey && supabaseServiceKey.length > 0);
+
+  function compareVersions(a, b) {
+    const pa = (a || "").split(".").map((n) => parseInt(n, 10) || 0);
+    const pb = (b || "").split(".").map((n) => parseInt(n, 10) || 0);
+    const len = Math.max(pa.length, pb.length);
+    for (let i = 0; i < len; i++) {
+      const va = pa[i] || 0;
+      const vb = pb[i] || 0;
+      if (va > vb) return 1;
+      if (va < vb) return -1;
+    }
+    return 0;
+  }
+
+  useEffect(() => {
+    if (!supabaseConfigured) {
+      setAuthLoading(false);
+      setAuthError("Supabase não configurado. Preencha VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
+      return;
+    }
+    (async () => {
+      setAuthLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id,status,person_type,country,state,city,cpf_cnpj,full_name,phone_area,phone_number,email,device_fingerprint")
+          .or(`device_fingerprint.eq.${deviceFingerprint}${authEmail ? `,email.eq.${authEmail}` : ""}`)
+          .maybeSingle();
+        if (error && error.code !== "PGRST116") throw error;
+        if (data) {
+          setProfile(data);
+          setRegistration((prev) => ({
+            ...prev,
+            person_type: data.person_type || prev.person_type,
+            country: data.country || prev.country,
+            state: data.state || prev.state,
+            city: data.city || prev.city,
+            cpf_cnpj: data.cpf_cnpj || prev.cpf_cnpj,
+            full_name: data.full_name || prev.full_name,
+            phone_area: data.phone_area || prev.phone_area,
+            phone_number: data.phone_number || prev.phone_number,
+            email: data.email || prev.email || authEmail,
+          }));
+        }
+        setAuthError("");
+      } catch (err) {
+        setAuthError(`Falha ao carregar cadastro: ${err.message || err}`);
+      } finally {
+        setAuthLoading(false);
+      }
+    })();
+  }, [supabaseConfigured, deviceFingerprint, authEmail]);
+
+  async function loadPendingProfiles() {
+    if (!isAdminDev || !supabaseRestUrl || !supabaseServiceKey) return;
+    try {
+      const res = await fetch(
+        `${supabaseRestUrl}/rest/v1/profiles?select=*&status=eq.pending&order=created_at.asc`,
+        {
+          headers: {
+            apikey: supabaseServiceKey,
+            Authorization: `Bearer ${supabaseServiceKey}`,
+          },
+        }
+      );
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      setPendingProfiles(data || []);
+      setAdminError("");
+    } catch (err) {
+      setAdminError(`Falha ao carregar pendentes: ${err.message || err}`);
+      console.error("Erro ao carregar pendentes", err);
+    }
+  }
+
+  useEffect(() => {
+    loadPendingProfiles();
+  }, [isAdminDev]);
+
+  useEffect(() => {
+    if (authEmail) localStorage.setItem("registration.email", authEmail);
+  }, [authEmail]);
+
+  async function handleSendMagicLink(e) {
+    e?.preventDefault();
+    setAuthError("");
+    setAuthMessage("");
+    setAuthMessage("Este fluxo usa aprovação manual. Apenas preencha a ficha e aguarde liberação.");
+  }
+
+  async function submitRegistration(e) {
+    e?.preventDefault();
+    setAuthError("");
+    setAuthMessage("");
+    setSavingProfile(true);
+    try {
+      const payload = {
+        ...registration,
+        email: registration.email || authEmail || "",
+        status: "pending",
+        device_fingerprint: profile?.device_fingerprint || deviceFingerprint,
+      };
+
+      if (supabase) {
+        const { data, error } = await supabase.from("profiles").upsert(payload).select().maybeSingle();
+        if (error) throw error;
+        setProfile(data);
+        setAuthMessage("Cadastro enviado. Aguarde aprovação do time.");
+        setSubmitted(true);
+        await loadPendingProfiles();
+      } else {
+        throw new Error("Supabase não configurado.");
+      }
+    } catch (err) {
+      setAuthError(`Falha ao salvar cadastro: ${err.message || err}`);
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
+  async function approveProfile(id) {
+    if (!isAdminDev || !supabaseRestUrl || !supabaseServiceKey) {
+      setAdminError("Service role não configurado (apenas dev).");
+      return;
+    }
+    try {
+      const res = await fetch(
+        `${supabaseRestUrl}/rest/v1/profiles?id=eq.${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            apikey: supabaseServiceKey,
+            Authorization: `Bearer ${supabaseServiceKey}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify({ status: "approved" }),
+        }
+      );
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `HTTP ${res.status}`);
+      }
+      setPendingProfiles((prev) => prev.filter((p) => p.id !== id));
+      if (profile && profile.id === id) {
+        setProfile({ ...profile, status: "approved" });
+        setSubmitted(false);
+      }
+      await loadPendingProfiles();
+    } catch (err) {
+      setAdminError(`Falha ao aprovar: ${err.message || err}`);
+    }
+  }
 
   // Credenciais R2 (para gerar manifest localmente no Dev)
   const [r2AccountId, setR2AccountId] = useState(localStorage.getItem("r2.account_id") || "");
@@ -159,6 +354,16 @@ function App() {
       if (manifestToUse) {
         (async () => {
           try {
+            try {
+              const manifestJson = await fetch(manifestToUse).then((r) => (r.ok ? r.json() : null));
+              if (manifestJson?.appVersion && compareVersions(manifestJson.appVersion, currentAppVersion) > 0) {
+                setUpdateInfo({
+                  availableVersion: manifestJson.appVersion,
+                  downloadUrl: manifestJson.appDownloadUrl || manifestToUse,
+                });
+              }
+            } catch {}
+
             const res = await syncFromManifest(manifestToUse);
             setDbVersion(res.db_version);
             setSyncMsg(`Atualizado ao iniciar: db v${res.db_version} | imgs +${res.downloaded_images}`);
@@ -414,6 +619,10 @@ function App() {
   async function openImagesFolder() { if (imagesDir) await openExternalIfAvailable(imagesDir); }
   async function openDbFilePath() { if (dbPath) await openExternalIfAvailable(dbPath); }
 
+  const isApproved = profile?.status === "approved";
+  const blockAccess = !supabaseConfigured || (!isApproved && !submitted);
+  const profileStatusLabel = profile?.status || "pending";
+
   if (!ready) {
     return (
       <main className="container" style={brandingBgUrl ? { backgroundImage: `url(${brandingBgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>
@@ -424,11 +633,20 @@ function App() {
 
   return (
     <>
-    <main className="container" style={brandingBgUrl ? { backgroundImage: `url(${brandingBgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>
+    <main className={`container ${blockAccess ? "app-blocked" : ""}`} style={brandingBgUrl ? { backgroundImage: `url(${brandingBgUrl})`, backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" } : undefined}>
       <div className="appbar">
         <div>{brandingLogoUrl ? <img className="logo" src={brandingLogoUrl} alt="logo" onError={(e)=>{ e.currentTarget.style.display = "none"; }} /> : null}</div>
         <h1>Catálogo IPS</h1>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {updateInfo && !updateDismissed && (
+            <div className="update-banner">
+              <span>Nova versão disponível: {updateInfo.availableVersion} (atual {currentAppVersion})</span>
+              {updateInfo.downloadUrl ? (
+                <button onClick={() => window.open(updateInfo.downloadUrl, "_blank")}>Baixar/Atualizar</button>
+              ) : null}
+              <button className="ghost" onClick={() => setUpdateDismissed(true)}>Fechar</button>
+            </div>
+          )}
           {socialLinks.length > 0 && (
             <nav className="social-links">
               {socialLinks.map((link) => (
@@ -577,6 +795,131 @@ function App() {
         <button className="modal-close" aria-label="Fechar" title="Fechar" onClick={(e)=>{ e.stopPropagation(); setPreview({open:false, index:0}); }}>X</button>
         <img className="modal-image" src={imageUrls[preview.index]} alt="preview" onClick={(e)=>{ e.stopPropagation(); setPreview(p=>({ open:true, index:(p.index+1)%imageUrls.length })); }} />
       </div>
+    )}
+    {blockAccess && (
+      <div className="auth-backdrop">
+        <div className="auth-modal">
+          <div className="auth-header">
+            <div>
+              <p className="auth-kicker">Acesso restrito</p>
+              <h2>Meu Cadastro</h2>
+              <p className="auth-muted">
+                Envie a ficha e aguarde aprovação. Enquanto o status não for aprovado, o catálogo fica bloqueado.
+              </p>
+              <p className="auth-status">Status atual: {profileStatusLabel}</p>
+            </div>
+            <div className="auth-brand">CATÁLOGO IPS</div>
+          </div>
+
+          {!supabaseConfigured ? (
+            <div className="auth-alert">
+              Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env antes de liberar o acesso.
+            </div>
+          ) : (
+            <>
+              <section className="auth-section">
+                <h3>Ficha de cadastro</h3>
+                <p className="auth-muted">Envie seus dados; o time aprova manualmente e libera o acesso.</p>
+                {submitted ? (
+                  <div className="auth-wait">
+                    <p><strong>Cadastro enviado.</strong> Aguarde aprovação do time.</p>
+                    <p className="auth-muted small">Se precisar corrigir algo, reabra a ficha e reenvie.</p>
+                  </div>
+                ) : (
+                  <form className="auth-grid" onSubmit={submitRegistration}>
+                    <div className="auth-radio">
+                      <label><input type="radio" name="personType" checked={registration.person_type === "pj"} onChange={()=>setRegistration((p)=>({ ...p, person_type: "pj" }))} /> Pessoa Jurídica</label>
+                      <label><input type="radio" name="personType" checked={registration.person_type === "pf"} onChange={()=>setRegistration((p)=>({ ...p, person_type: "pf" }))} /> Pessoa Física</label>
+                    </div>
+                    <label className="auth-field wide">
+                      Nome/Razão social
+                      <input value={registration.full_name} onChange={(e)=>setRegistration((p)=>({ ...p, full_name: e.target.value }))} placeholder="Nome completo ou razão social" />
+                    </label>
+                    <label className="auth-field wide">
+                      CPF/CNPJ
+                      <input value={registration.cpf_cnpj} onChange={(e)=>setRegistration((p)=>({ ...p, cpf_cnpj: e.target.value }))} placeholder="000.000.000-00" />
+                    </label>
+                    <label className="auth-field">
+                      País
+                      <input value={registration.country} onChange={(e)=>setRegistration((p)=>({ ...p, country: e.target.value }))} placeholder="Brasil" />
+                    </label>
+                    <label className="auth-field">
+                      Estado
+                      <input value={registration.state} onChange={(e)=>setRegistration((p)=>({ ...p, state: e.target.value }))} placeholder="UF" />
+                    </label>
+                    <label className="auth-field">
+                      Cidade
+                      <input value={registration.city} onChange={(e)=>setRegistration((p)=>({ ...p, city: e.target.value }))} placeholder="Curitiba" />
+                    </label>
+                    <div className="auth-row-compact">
+                      <label className="auth-field">
+                        DDD
+                        <input value={registration.phone_area} onChange={(e)=>setRegistration((p)=>({ ...p, phone_area: e.target.value }))} placeholder="41" />
+                      </label>
+                      <label className="auth-field">
+                        Telefone
+                        <input value={registration.phone_number} onChange={(e)=>setRegistration((p)=>({ ...p, phone_number: e.target.value }))} placeholder="999999999" />
+                      </label>
+                    </div>
+                    <label className="auth-field wide">
+                      E-mail
+                      <input type="email" value={registration.email || authEmail} onChange={(e)=>setRegistration((p)=>({ ...p, email: e.target.value }))} placeholder="usuario@empresa.com" />
+                    </label>
+                    <div className="auth-meta">
+                      <span>Código do cadastro: {profile?.id || "aguardando"}</span>
+                      <span>Dispositivo vinculado: {profile?.device_fingerprint || deviceFingerprint}</span>
+                    </div>
+                    <button type="submit" disabled={savingProfile}>
+                      {savingProfile ? "Enviando..." : "Enviar cadastro"}
+                    </button>
+                    <p className="auth-muted small">
+                      Após enviar, o admin aprova manualmente. Caso troque de máquina, solicite nova aprovação ou reset do dispositivo.
+                    </p>
+                  </form>
+                )}
+              </section>
+
+              {authMessage && <div className="auth-success">{authMessage}</div>}
+              {authError && <div className="auth-error">{authError}</div>}
+            </>
+          )}
+        </div>
+      </div>
+    )}
+    {isAdminDev && (
+      <>
+        <div className="admin-fab">
+          <button onClick={() => { loadPendingProfiles(); setShowAdminPanel((v) => !v); }}>
+            {showAdminPanel ? "Fechar painel de aprovação" : "Aprovar cadastros (dev)"}
+          </button>
+        </div>
+        {showAdminPanel && (
+          <section className="panel admin-floating">
+            <div className="admin-header">
+              <h3>Painel (Dev) - Aprovar cadastros</h3>
+              <span className="auth-muted small">Usa service_role; não publique esta chave.</span>
+            </div>
+            {adminError && <div className="auth-error">{adminError}</div>}
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <button onClick={loadPendingProfiles}>Atualizar</button>
+            </div>
+            {pendingProfiles.length === 0 && <p className="auth-muted small">Nenhum cadastro pendente.</p>}
+            {pendingProfiles.length > 0 && (
+              <ul className="admin-list">
+                {pendingProfiles.map((p) => (
+                  <li key={p.id}>
+                    <div>
+                      <strong>{p.full_name || "Sem nome"}</strong> - {p.email || "sem email"}
+                      <div className="auth-muted small">CPF/CNPJ: {p.cpf_cnpj || "-"} | Cidade: {p.city || "-"} | Device: {p.device_fingerprint || "-"}</div>
+                    </div>
+                    <button onClick={() => approveProfile(p.id)}>Aprovar</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+      </>
     )}
     </>
   );
