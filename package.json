@@ -10,7 +10,8 @@
     "tauri": "tauri",
     "manifest": "node scripts/gen-manifest.mjs",
     "manifest:onedrive": "node scripts/gen-manifest-onedrive.mjs",
-    "manifest:r2": "node scripts/gen-manifest-r2.mjs"
+    "manifest:r2": "node scripts/gen-manifest-r2.mjs",
+    "launches": "node scripts/gen-launches.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.84.0",

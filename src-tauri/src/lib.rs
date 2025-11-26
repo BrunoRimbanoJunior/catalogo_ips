@@ -13,10 +13,12 @@ mod core {
     use std::path::{Path, PathBuf};
     use tauri::AppHandle;
     use base64::Engine;
+    use sha2::{Sha256, Digest};
 
     pub const DB_FILE_NAME: &str = "catalog.db";
     pub const IMAGES_DIR_NAME: &str = "images";
     pub const META_DB_VERSION_KEY: &str = "db_version";
+    pub const META_MANIFEST_HASH_KEY: &str = "manifest_hash";
     const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
 
     #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -150,6 +152,12 @@ mod core {
     }
     fn set_db_version(conn: &Connection, v: i64) -> Result<()> {
         conn.execute("INSERT OR REPLACE INTO meta(key,value) VALUES(?1, ?2)", params![META_DB_VERSION_KEY, v.to_string()])?; Ok(())
+    }
+    fn get_manifest_hash(conn: &Connection) -> Result<Option<String>> {
+        Ok(conn.query_row("SELECT value FROM meta WHERE key = ?1", params![META_MANIFEST_HASH_KEY], |row| row.get(0)).optional()?)
+    }
+    fn set_manifest_hash(conn: &Connection, v: &str) -> Result<()> {
+        conn.execute("INSERT OR REPLACE INTO meta(key,value) VALUES(?1, ?2)", params![META_MANIFEST_HASH_KEY, v])?; Ok(())
     }
 
     #[tauri::command]
@@ -496,15 +504,32 @@ mod core {
     #[tauri::command]
     pub async fn sync_from_manifest(app: AppHandle, manifest_url: String) -> Result<SyncResult, String> {
         let client = Client::builder().timeout(Duration::from_secs(20)).build().map_err(|e| e.to_string())?;
-        let (_, dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
-        let manifest: CatalogManifest = fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
+        let (data_dir, dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        let (manifest, manifest_hash) = fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
         let mut updated_db = false; let local_version = { let conn = open_db(&dbf).map_err(|e| e.to_string())?; migrate(&conn).map_err(|e| e.to_string())?; get_db_version(&conn).unwrap_or(0) };
-        if manifest.db.version > local_version { download_to_file(&client, &manifest.db.url, &dbf).await.map_err(|e| e.to_string())?; let conn = open_db(&dbf).map_err(|e| e.to_string())?; migrate(&conn).map_err(|e| e.to_string())?; if get_db_version(&conn).unwrap_or(0) < manifest.db.version { set_db_version(&conn, manifest.db.version).ok(); } updated_db = true; }
+        let manifest_changed = {
+            let conn = open_db(&dbf).map_err(|e| e.to_string())?;
+            migrate(&conn).ok();
+            let last = get_manifest_hash(&conn).ok().flatten();
+            last.as_deref() != Some(&manifest_hash)
+        };
+        if manifest.db.version > local_version {
+            // Manifest mudou: limpar pasta de lan�amentos para evitar resqu��cios antigos
+            clear_launches_dir(&imgs_dir).ok();
+            download_to_file(&client, &manifest.db.url, &dbf).await.map_err(|e| e.to_string())?;
+            let conn = open_db(&dbf).map_err(|e| e.to_string())?;
+            migrate(&conn).map_err(|e| e.to_string())?;
+            if get_db_version(&conn).unwrap_or(0) < manifest.db.version { set_db_version(&conn, manifest.db.version).ok(); }
+            updated_db = true;
+        } else if manifest_changed {
+            // Mesmo sem alterar o DB, se o manifest mudou (imagens novas), limpa lan�amentos
+            clear_launches_dir(&imgs_dir).ok();
+        }
         let mut downloaded_images: usize = 0;
-        if let Some(imgs) = manifest.images {
+        if let Some(ref imgs) = manifest.images {
             // Abrir conexão para cache de hashes
             let conn_cache = open_db(&dbf).map_err(|e| e.to_string())?;
-            for item in imgs.files {
+            for item in imgs.files.iter() {
                 let local_path = imgs_dir.join(&item.file);
                 let mut need = false;
                 if !local_path.exists() {
@@ -521,7 +546,15 @@ mod core {
                     }
                 }
                 if need {
-                    let url = if item.file.starts_with("http://") || item.file.starts_with("https://") { item.file.clone() } else { format!("{}{}", imgs.base_url, item.file) };
+                    let url = if item.file.starts_with("http://") || item.file.starts_with("https://") {
+                        item.file.clone()
+                    } else {
+                        if let Ok(base) = url::Url::parse(&imgs.base_url) {
+                            base.join(&item.file).map(|u| u.to_string()).unwrap_or_else(|_| format!("{}{}", imgs.base_url, item.file))
+                        } else {
+                            format!("{}{}", imgs.base_url, item.file)
+                        }
+                    };
                     // garantir diretório
                     if let Some(parent) = local_path.parent() { if !parent.exists() { let _= std::fs::create_dir_all(parent); } }
                     if let Err(e) = download_to_file(&client, &url, &local_path).await {
@@ -540,8 +573,62 @@ mod core {
         }
         let conn = open_db(&dbf).map_err(|e| e.to_string())?;
         seed_brand_groups(&conn).ok();
+        set_manifest_hash(&conn, &manifest_hash).ok();
+        let manifest_path = data_dir.join("manifest.json");
+        if manifest_changed || !manifest_path.exists() {
+            let _ = std::fs::write(&manifest_path, serde_json::to_string_pretty(&manifest).unwrap_or_default());
+        }
         let final_version = get_db_version(&conn).unwrap_or(0);
         Ok(SyncResult { updated_db, downloaded_images, db_version: final_version })
+    }
+
+    fn clear_launches_dir(imgs_dir: &std::path::Path) -> std::io::Result<()> {
+        // tenta limpar variações do nome para evitar problemas de acentuação/caso
+        let candidates = ["LANÇAMENTOS", "lançamentos", "LANCAMENTOS", "Lancamentos", "lancamentos"];
+        for c in candidates {
+            let p = imgs_dir.join(c);
+            if p.exists() && p.is_dir() {
+                let _ = std::fs::remove_dir_all(&p);
+            }
+        }
+        Ok(())
+    }
+
+    #[tauri::command]
+    pub fn list_launch_images(app: AppHandle) -> Result<Vec<String>, String> {
+        use std::path::PathBuf;
+        use walkdir::WalkDir;
+        let (_, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        let candidates = ["LANÇAMENTOS", "lançamentos", "LANCAMENTOS", "Lancamentos", "lancamentos"];
+        let mut launch_dir: Option<PathBuf> = None;
+        for c in candidates {
+            let p = imgs_dir.join(c);
+            if p.exists() && p.is_dir() { launch_dir = Some(p); break; }
+        }
+        let dir = match launch_dir {
+            Some(d) => d,
+            None => return Ok(vec![]),
+        };
+        let allow = ["jpg","jpeg","png","webp","gif","bmp"];
+        let mut files: Vec<String> = WalkDir::new(&dir)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .filter(|e| e.path().is_file())
+            .filter(|e| {
+                e.path().extension().and_then(|ex| ex.to_str()).map(|s| {
+                    let lower = s.to_ascii_lowercase();
+                    allow.contains(&lower.as_str())
+                }).unwrap_or(false)
+            })
+            .map(|e| e.path().to_string_lossy().to_string())
+            .collect();
+        files.sort();
+        Ok(files)
+    }
+
+    #[tauri::command]
+    pub fn open_path_cmd(path: String) -> Result<(), String> {
+        open::that(path).map_err(|e| e.to_string())
     }
 
     #[tauri::command]
@@ -629,7 +716,7 @@ mod core {
     pub async fn index_images_from_manifest(app: AppHandle, manifest_url: String) -> Result<ImageIndexResult, String> {
         let client = Client::builder().timeout(Duration::from_secs(20)).build().map_err(|e| e.to_string())?;
         let (_, dbf, _) = ensure_dirs(&app).map_err(|e| e.to_string())?;
-        let manifest: CatalogManifest = fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
+        let (manifest, _manifest_hash) = fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
         let files: Vec<String> = if let Some(imgs) = manifest.images {
             imgs.files.into_iter().map(|it| it.file).collect()
         } else { Vec::new() };
@@ -639,10 +726,13 @@ mod core {
     }
 
     // Tenta baixar manifest por HTTP; se falhar, usa seed do bundle (manifest.json em resources).
-    async fn fetch_or_seed_manifest(client: &Client, app: &AppHandle, manifest_url: &str) -> Result<CatalogManifest, String> {
+    async fn fetch_or_seed_manifest(client: &Client, app: &AppHandle, manifest_url: &str) -> Result<(CatalogManifest, String), String> {
         // Se não for http(s), tenta ler como arquivo local
         if !(manifest_url.starts_with("http://") || manifest_url.starts_with("https://")) {
-            return read_manifest_from_path(std::path::Path::new(manifest_url));
+            let txt = std::fs::read_to_string(manifest_url).map_err(|e| format!("Falha lendo manifest local: {}", e))?;
+            let h = hash_str(&txt);
+            let m: CatalogManifest = serde_json::from_str(&txt).map_err(|e| format!("Falha parse manifest local: {}", e))?;
+            return Ok((m, h));
         }
         let http_res = client
             .get(manifest_url)
@@ -652,15 +742,20 @@ mod core {
             .map_err(|e| e.to_string());
         match http_res {
             Ok(resp) => {
-                let m: CatalogManifest = resp.json().await.map_err(|e| e.to_string())?;
-                Ok(m)
+                let txt = resp.text().await.map_err(|e| e.to_string())?;
+                let h = hash_str(&txt);
+                let m: CatalogManifest = serde_json::from_str(&txt).map_err(|e| e.to_string())?;
+                Ok((m, h))
             }
             Err(_e) => {
                 // Fallback seed do bundle
                 if let Ok(res_dir) = app.path().resource_dir() {
                     let p = res_dir.join("manifest.json");
                     if p.exists() {
-                        return read_manifest_from_path(&p);
+                        let txt = std::fs::read_to_string(&p).map_err(|e| e.to_string())?;
+                        let h = hash_str(&txt);
+                        let m: CatalogManifest = serde_json::from_str(&txt).map_err(|e| e.to_string())?;
+                        return Ok((m, h));
                     }
                 }
                 Err("Falha ao obter manifest e sem seed local".to_string())
@@ -668,10 +763,11 @@ mod core {
         }
     }
 
-    fn read_manifest_from_path(path: &std::path::Path) -> Result<CatalogManifest, String> {
-        let txt = std::fs::read_to_string(path).map_err(|e| format!("Falha lendo manifest local: {}", e))?;
-        let m: CatalogManifest = serde_json::from_str(&txt).map_err(|e| format!("Falha parse manifest local: {}", e))?;
-        Ok(m)
+    fn hash_str(txt: &str) -> String {
+        let mut hasher = Sha256::new();
+        hasher.update(txt.as_bytes());
+        let out = hasher.finalize();
+        out.iter().map(|b| format!("{:02x}", b)).collect()
     }
 
     #[tauri::command]
@@ -913,9 +1009,11 @@ pub fn run() {
             core::get_product_details_cmd,
             core::sync_from_manifest,
             core::index_images_from_manifest,
+            core::list_launch_images,
             core::import_excel,
             core::index_images,
             core::export_db_to,
+            core::open_path_cmd,
             core::set_branding_image,
             core::gen_manifest_r2,
             core::read_image_base64
