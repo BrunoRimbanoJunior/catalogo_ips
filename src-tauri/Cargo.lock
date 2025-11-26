@@ -565,11 +565,13 @@ dependencies = [
  "anyhow",
  "base64 0.21.7",
  "calamine",
+ "open",
  "pathdiff",
  "reqwest",
  "rusqlite",
  "serde",
  "serde_json",
+ "sha2",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",
@@ -577,6 +579,7 @@ dependencies = [
  "tauri-plugin-opener",
  "tauri-plugin-store",
  "tokio",
+ "url",
  "walkdir",
 ]
 

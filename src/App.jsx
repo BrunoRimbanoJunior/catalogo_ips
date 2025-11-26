@@ -13,6 +13,8 @@ import {
   setBrandingImage,
   exportDbTo,
   genManifestR2,
+  listLaunchImages,
+  readImageBase64,
 } from "./lib/api";
 import { supabase, supabaseService, supabaseServiceKey, supabaseRestUrl } from "./lib/supabaseClient";
 import { open, save } from "@tauri-apps/plugin-dialog";
@@ -138,6 +140,8 @@ function App() {
   const [updateInfo, setUpdateInfo] = useState(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
   const [runtimeVersion, setRuntimeVersion] = useState(import.meta.env.VITE_APP_VERSION || "0.0.0");
+  const [launchImages, setLaunchImages] = useState([]);
+  const [launchModal, setLaunchModal] = useState({ open: false, index: 0, loading: false, error: "" });
 
   const instagramUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_INSTAGRAM || "", "link");
   const youtubeUrl = normalizeSocialLink(import.meta.env.VITE_SOCIAL_YOUTUBE || "", "link");
@@ -246,6 +250,46 @@ function App() {
   useEffect(() => {
     loadPendingProfiles();
   }, [isAdminDev]);
+
+  async function loadLaunches(autoOpen = false) {
+    setLaunchModal((m) => ({ ...m, loading: true, error: "" }));
+    try {
+      const files = await listLaunchImages();
+      if (!files || files.length === 0) {
+        setLaunchImages([]);
+        setLaunchModal((m) => ({ ...m, loading: false, error: "Nenhuma imagem de lançamento encontrada." }));
+        return;
+      }
+      const outs = [];
+      for (const f of files) {
+        try {
+          const dataUrl = await readImageBase64(f);
+          outs.push(dataUrl);
+        } catch {}
+      }
+      setLaunchImages(outs);
+      if (outs.length > 0) {
+        setLaunchModal({ open: true, index: 0, loading: false, error: "" });
+      } else {
+        setLaunchModal((m) => ({ ...m, loading: false, error: "Nenhuma imagem de lançamento encontrada." }));
+      }
+    } catch (e) {
+      const msg = `Falha ao carregar lançamentos: ${e.message || e}`;
+      setLaunchModal((m) => ({ ...m, loading: false, error: msg }));
+    }
+  }
+
+  function shiftLaunch(delta) {
+    setLaunchModal((m) => {
+      if (!launchImages.length) return m;
+      const next = (m.index + delta + launchImages.length) % launchImages.length;
+      return { ...m, index: next };
+    });
+  }
+
+  useEffect(() => {
+    loadLaunches(true);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -460,7 +504,14 @@ function App() {
     return () => clearTimeout(t);
   }, [brandId, group, vehicleId, codeQuery]);
 
-  // Auto‑ocultar mensagens da barra de status
+  // Limpa seleção ao alterar filtros ou busca
+  useEffect(() => {
+    setSelected(null);
+    setImageUrls([]);
+    setPreview({ open: false, index: 0 });
+  }, [brandId, group, vehicleId, codeQuery]);
+
+  // Auto-ocultar mensagens da barra de status
   useEffect(() => {
     if (syncing) return; // não fecha enquanto estiver rodando
     if (!syncMsg && !importMsg) return;
@@ -469,6 +520,15 @@ function App() {
   }, [syncMsg, importMsg, syncing]);
 
   async function doSearch() {
+    const hasFilters =
+      (normalizedBrandId !== null && normalizedBrandId !== undefined) ||
+      (group && group.trim() !== "") ||
+      (vehicleId && String(vehicleId).trim() !== "") ||
+      (codeQuery && codeQuery.trim() !== "");
+    if (!hasFilters) {
+      setResults([]);
+      return;
+    }
     const params = {
       brand_id: normalizedBrandId,
       group: group || null,
@@ -516,7 +576,7 @@ function App() {
           try { outs.push(await readImageBase64(p)); }
           catch { outs.push(""); }
         }
-        setImageUrls(outs.filter(Boolean));
+        const uniq = []; const seenData = new Set(); for (const img of outs) { if (!img) continue; if (seenData.has(img)) continue; seenData.add(img); uniq.push(img); } setImageUrls(uniq);
       } catch {
         // fallback para asset:// caso invoke nÃ£o esteja disponÃ­vel
         const outs = files.map((f) => {
@@ -524,7 +584,7 @@ function App() {
           const trimmed = norm.startsWith("/") ? norm.slice(1) : norm;
           return `asset://localhost/${trimmed}`;
         });
-        setImageUrls(outs);
+        const uniq2 = []; const seenData2 = new Set(); for (const img of outs) { if (seenData2.has(img)) continue; seenData2.add(img); uniq2.push(img); } setImageUrls(uniq2);
       }
     })();
   }, [selected, imagesDir]);
@@ -686,15 +746,21 @@ function App() {
               <button className="ghost" onClick={() => setUpdateDismissed(true)}>Fechar</button>
             </div>
           )}
-          {socialLinks.length > 0 && (
-            <nav className="social-links">
-              {socialLinks.map((link) => (
-                <a key={link.key} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label}>
-                  {SOCIAL_ICONS[link.key]}
-                </a>
-              ))}
-            </nav>
-          )}
+          <div className="social-block">
+            {socialLinks.length > 0 && (
+              <nav className="social-links">
+                {socialLinks.map((link) => (
+                  <a key={link.key} href={link.url} target="_blank" rel="noreferrer" aria-label={link.label}>
+                    {SOCIAL_ICONS[link.key]}
+                  </a>
+                ))}
+              </nav>
+            )}
+            <button className="launch-button" onClick={() => loadLaunches(false)} disabled={launchModal.loading}>
+              {launchModal.loading ? "Carregando..." : "Lançamentos"}
+            </button>
+            {launchModal.error ? <span className="launch-error">{launchModal.error}</span> : null}
+          </div>
           {(syncMsg || importMsg) && !isDev ? (
             <span style={{ fontSize: 12, opacity: 0.85 }}>{syncMsg}{importMsg ? (syncMsg ? " | " : "") + importMsg : ""}</span>
           ) : null}
@@ -772,21 +838,25 @@ function App() {
             </select>
             <button onClick={doSearch}>Pesquisar</button>
           </div>
-          <h3 style={{ marginTop: 0 }}>Resultados ({results.length})</h3>
-          <ul className="list">
-            {results.map((p) => (
-              <li key={p.id} onClick={() => openDetails(p.id)} className="item">
-                <div style={{ display: "flex", flexDirection: "column", gap: 4, width: "100%" }}>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <span className="code">{p.code}</span>
-                    <span className="desc">{p.description}</span>
-                    <span className="brand">{p.brand}</span>
+          <h3 style={{ marginTop: 0 }}>Resultados</h3>
+          {results.length === 0 ? (
+            <p className="auth-muted small">Use os filtros para buscar produtos.</p>
+          ) : (
+            <ul className="list">
+              {results.map((p) => (
+                <li key={p.id} onClick={() => openDetails(p.id)} className="item">
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4, width: "100%" }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <span className="code">{p.code}</span>
+                      <span className="desc">{p.description}</span>
+                      <span className="brand">{p.brand}</span>
+                    </div>
+                    {p.vehicles && <div style={{ fontSize: 12, opacity: 0.9 }}>Aplicações: {p.vehicles}</div>}
                   </div>
-                  {p.vehicles && <div style={{ fontSize: 12, opacity: 0.9 }}>Aplicações: {p.vehicles}</div>}
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="panel">
@@ -833,6 +903,19 @@ function App() {
       <div className="modal-backdrop" onClick={()=>setPreview({open:false, index:0})}>
         <button className="modal-close" aria-label="Fechar" title="Fechar" onClick={(e)=>{ e.stopPropagation(); setPreview({open:false, index:0}); }}>X</button>
         <img className="modal-image" src={imageUrls[preview.index]} alt="preview" onClick={(e)=>{ e.stopPropagation(); setPreview(p=>({ open:true, index:(p.index+1)%imageUrls.length })); }} />
+      </div>
+    )}
+    {launchModal.open && launchImages.length > 0 && (
+      <div className="launch-modal" onClick={() => setLaunchModal((m) => ({ ...m, open: false }))}>
+        <div className="launch-modal-body" onClick={(e) => e.stopPropagation()}>
+          <button className="launch-close" onClick={() => setLaunchModal((m) => ({ ...m, open: false }))}>X</button>
+          <div className="launch-carousel">
+            <button className="launch-arrow" onClick={() => shiftLaunch(-1)} aria-label="Anterior">‹</button>
+            <img src={launchImages[launchModal.index]} alt="Lançamento" />
+            <button className="launch-arrow" onClick={() => shiftLaunch(1)} aria-label="Próximo">›</button>
+          </div>
+          <div className="launch-counter">{launchModal.index + 1} / {launchImages.length}</div>
+        </div>
       </div>
     )}
     {blockAccess && (
@@ -965,5 +1048,9 @@ function App() {
 }
 
 export default App;
+
+
+
+
 
 

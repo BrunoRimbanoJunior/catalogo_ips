@@ -72,6 +72,10 @@ export async function readImageBase64(pathOrRel) {
   return await invoke("read_image_base64", { pathOrRel });
 }
 
+export async function listLaunchImages() {
+  return await invoke("list_launch_images");
+}
+
 export async function genManifestR2(params) {
   // params: { version, dbUrl, outPath, r2: { account_id, bucket, access_key_id, secret_access_key, endpoint?, public_base_url? } }
   return await invoke("gen_manifest_r2", {
