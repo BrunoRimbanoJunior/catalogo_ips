@@ -46,6 +46,7 @@ async function main() {
     console.error('Uso: node scripts/gen-manifest.mjs --version 3 --db-url https://raw.githubusercontent.com/user/repo/main/data/catalog.db --images-base-url https://raw.githubusercontent.com/user/repo/main/images/ [--images-dir data/images] [--out manifest.json]');
     process.exit(2);
   }
+  const computedDownload = appDownloadUrl || (appVersion ? `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/tag/v${appVersion}` : null);
   const all = await listFiles(imagesDir);
   const files = (await Promise.all(
     all
@@ -56,7 +57,7 @@ async function main() {
   ));
   const manifest = {
     appVersion: appVersion || undefined,
-    appDownloadUrl: appDownloadUrl || undefined,
+    appDownloadUrl: computedDownload || undefined,
     db: { version, url: dbUrl },
     images: { base_url: imagesBase.endsWith('/') ? imagesBase : imagesBase + '/', files },
   };
