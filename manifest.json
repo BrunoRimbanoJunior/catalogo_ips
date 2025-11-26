@@ -2,7 +2,7 @@
   "appVersion": "1.0.8",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.0.8/installer.exe",
   "db": {
-    "version": 26112512,
+    "version": 26112513,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
     "sha256": null
   },
@@ -4708,6 +4708,34 @@
       {
         "file": "KIT CORRENTE/8175900214.png",
         "sha256": "0d2eb57b18f1251d491a93116da6d65f"
+      },
+      {
+        "file": "LANÇAMENTOS/7156426010.png",
+        "sha256": "c6618f8cc7a36b61b048fc9f06ec32b4"
+      },
+      {
+        "file": "LANÇAMENTOS/7156906610.png",
+        "sha256": "daa4ca1be037e45467a74579cabfaa54"
+      },
+      {
+        "file": "LANÇAMENTOS/7163206610.png",
+        "sha256": "5cb65e2f12616622c569123797093a5e"
+      },
+      {
+        "file": "LANÇAMENTOS/7163226610.png",
+        "sha256": "72b3f02fc0b0125e65377820d6285162"
+      },
+      {
+        "file": "LANÇAMENTOS/7163286600.png",
+        "sha256": "34f2cd0ae386b23db14a2da04900a641"
+      },
+      {
+        "file": "LANÇAMENTOS/7163286610.png",
+        "sha256": "7453688b7705ffa57cbc06fa606664ac"
+      },
+      {
+        "file": "LANÇAMENTOS/SEMI-EIXOS.png",
+        "sha256": "f27d6dd659ee059a85450e85b0f8df08"
       },
       {
         "file": "LATARIA/3111821201.png",
