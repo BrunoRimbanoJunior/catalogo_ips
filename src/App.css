@@ -21,13 +21,26 @@
   -webkit-text-size-adjust: 100%;
 }
 
+html, body, #root {
+  height: 100%;
+  min-height: 100%;
+}
+
 .container {
   margin: 0;
   padding-top: 0; /* remove top gap under title bar */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-start; /* fixa conteúdo no topo */
+  gap: 12px;
+  padding: 12px;
+  box-sizing: border-box;
   text-align: center;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .logo {
@@ -116,7 +129,7 @@ button {
 }
 
 /* Catálogo custom */
-.appbar { position: sticky; top: 0; z-index: 10; background: #f9f9f9; color: #060606; padding: 8px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: grid; grid-template-columns: 70px 1fr auto; align-items: center; gap: 12px; }
+.appbar { position: sticky; top: 0; z-index: 10; background: #f9f9f9; color: #060606; padding: 8px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: grid; grid-template-columns: 70px 1fr auto; align-items: center; gap: 12px; width: 100%; max-width: 1280px; margin: 0 auto; }
 .appbar h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.3px; text-align: center; }
 .appbar .logo { height: 80px; width: auto; object-fit: contain; }
 .appbar span { font-weight: 700; }
@@ -137,7 +150,7 @@ button {
 .tools details { margin-left: auto; }
 .tools summary { cursor: pointer; padding: 8px 12px; background: #c62828; border-radius: 6px; color: #fff; font-weight: 700; }
 
-.layout { display: grid; grid-template-columns: 260px minmax(0, 1fr) 420px; gap: 16px; margin-top: 12px; align-items: start; }
+.layout { display: grid; grid-template-columns: 260px minmax(0, 1fr) 420px; gap: 16px; margin-top: 4px; align-items: start; width: 100%; max-width: 1280px; }
 .sidebar { background: #ffffff; border: 1px solid #e6e6e6; border-radius: 8px; padding: 10px; }
 .sidebar h3 { margin-top: 0; }
 .sidebar, .panel { color: #111; }

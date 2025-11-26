@@ -46,7 +46,9 @@ async function main() {
     console.error('Uso: node scripts/gen-manifest.mjs --version 3 --db-url https://raw.githubusercontent.com/user/repo/main/data/catalog.db --images-base-url https://raw.githubusercontent.com/user/repo/main/images/ [--images-dir data/images] [--out manifest.json]');
     process.exit(2);
   }
-  const computedDownload = appDownloadUrl || (appVersion ? `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/tag/v${appVersion}` : null);
+  const computedDownload =
+    appDownloadUrl ||
+    (appVersion ? `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v${appVersion}/catalogo_ips_${appVersion}_x64-setup.exe` : null);
   const all = await listFiles(imagesDir);
   const files = (await Promise.all(
     all
