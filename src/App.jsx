@@ -212,6 +212,9 @@ function App() {
         setStatusMsg(`Falha ao carregar catálogos: ${e}`);
       }
 
+      // Libera UI assim que dados base carregam; sync/branding continuam em paralelo
+      setReady(true);
+
       if (manifestUrl) {
         try {
           const manifest = await fetch(manifestUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null);
@@ -252,8 +255,6 @@ function App() {
       } catch (_) {
         /* ignore */
       }
-
-      setReady(true);
     })();
   }, [manifestUrl]);
 
