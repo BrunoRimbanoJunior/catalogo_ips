@@ -673,7 +673,7 @@ function App() {
                 <button
                   onClick={async () => {
                     try {
-                      const { open } = await import("@tauri-apps/api/shell");
+                      const { open } = await import("@tauri-apps/plugin-opener");
                       await open(updateInfo.downloadUrl);
                     } catch {
                       window.open(updateInfo.downloadUrl, "_blank");
