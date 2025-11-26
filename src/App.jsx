@@ -110,6 +110,22 @@ function App() {
   const [adminError, setAdminError] = useState("");
   const [pendingProfiles, setPendingProfiles] = useState([]);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const cachedProfile = (() => {
+    try {
+      const raw = localStorage.getItem("profile.cached");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  function cacheProfileIfApproved(p) {
+    try {
+      if (p && p.status === "approved") {
+        localStorage.setItem("profile.cached", JSON.stringify(p));
+      }
+    } catch {}
+  }
 
   // Estado básico
   const [ready, setReady] = useState(true);
@@ -733,8 +749,14 @@ function App() {
                 <button
                   onClick={async () => {
                     try {
-                      const { open } = await import("@tauri-apps/plugin-opener");
-                      await open(updateInfo.downloadUrl);
+                      const mod = await import("@tauri-apps/plugin-opener");
+                      if (mod?.openPath) {
+                        await mod.openPath(updateInfo.downloadUrl);
+                      } else if (mod?.open) {
+                        await mod.open(updateInfo.downloadUrl);
+                      } else {
+                        window.open(updateInfo.downloadUrl, "_blank");
+                      }
                     } catch {
                       window.open(updateInfo.downloadUrl, "_blank");
                     }
@@ -1048,6 +1070,9 @@ function App() {
 }
 
 export default App;
+
+
+
 
 
 
