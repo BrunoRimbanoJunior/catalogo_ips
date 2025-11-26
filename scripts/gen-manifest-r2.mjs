@@ -119,7 +119,9 @@ async function main() {
   console.log(`Encontrados ${objects.length} arquivos.`);
 
   const files = objects.map(o => ({ file: o.key, sha256: o.etag || null }));
-  const computedDownload = appDownloadUrl || (appVersion ? `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/tag/v${appVersion}` : null);
+  const computedDownload =
+    appDownloadUrl ||
+    (appVersion ? `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v${appVersion}/catalogo_ips_${appVersion}_x64-setup.exe` : null);
   const manifest = {
     appVersion: appVersion || undefined,
     appDownloadUrl: computedDownload || undefined,
