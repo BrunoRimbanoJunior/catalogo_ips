@@ -1007,20 +1007,23 @@ mod core {
             let conn_cache = open_db(&dbf).map_err(|e| e.to_string())?;
             for item in imgs.files.iter() {
                 let local_path = imgs_dir.join(&item.file);
-                let mut need = false;
-                if !local_path.exists() {
-                    need = true;
-                } else if let Some(ref man_sha) = item.sha256 {
-                    // compara com cache
-                    let cached: Option<String> = conn_cache
-                        .query_row(
-                            "SELECT sha256 FROM images_cache WHERE filename=?1",
-                            params![&item.file],
-                            |row| row.get(0),
-                        )
-                        .optional()
-                        .unwrap_or(None);
-                    if cached.as_deref() != Some(man_sha.as_str()) {
+                let mut need = !local_path.exists();
+                if !need {
+                    if let Some(ref man_sha) = item.sha256 {
+                        // compara com cache
+                        let cached: Option<String> = conn_cache
+                            .query_row(
+                                "SELECT sha256 FROM images_cache WHERE filename=?1",
+                                params![&item.file],
+                                |row| row.get(0),
+                            )
+                            .optional()
+                            .unwrap_or(None);
+                        if cached.as_deref() != Some(man_sha.as_str()) {
+                            need = true;
+                        }
+                    } else if manifest_changed {
+                        // Sem hash no manifest: se o manifest mudou, força rebaixar
                         need = true;
                     }
                 }
