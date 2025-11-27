@@ -1,4 +1,6 @@
 {
+  "appVersion": "1.1.3",
+  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.1.3/catalogo_ips_1.1.3_x64-setup.exe",
   "db": {
     "version": 26112520,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",

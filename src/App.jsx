@@ -16,10 +16,14 @@ import {
   importExcel,
   exportDbTo,
   setBrandingImage,
+  setHeaderLogos as setHeaderLogosApi,
 } from "./lib/api";
 import { supabase, supabaseService, supabaseServiceKey } from "./lib/supabaseClient";
 import "./App.css";
 
+const DEFAULT_LOGO = "/images/logo.png";
+const DEFAULT_BACKGROUND = "/images/bg.png";
+const HEADER_LOGO_PREFIX = "/images";
 const REG_DEFAULT = {
   person_type: "pf",
   country: "Brasil",
@@ -40,6 +44,38 @@ function safeParseProfile(raw) {
   }
 }
 
+function sanitizeStoredPath(raw, fallback = "") {
+  const trimmed = (raw || "").trim();
+  if (!trimmed) return fallback;
+  const lower = trimmed.toLowerCase();
+  if (lower === "null" || lower === "undefined") return fallback;
+  return trimmed;
+}
+
+function parseStoredArray(raw) {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.filter((s) => typeof s === "string" && s.trim()).map((s) => s.trim());
+  } catch (_) {
+    /* ignore */
+  }
+  return [];
+}
+
+function toHeaderLogoPath(name) {
+  if (!name) return "";
+  if (name.startsWith("http://") || name.startsWith("https://")) return name;
+  if (name.startsWith("/")) {
+    return name
+      .split("/")
+      .map((p, idx) => (idx === 0 ? p : encodeURIComponent(p)))
+      .join("/");
+  }
+  const clean = name.replace(/^\.?\/?images\/?/i, "");
+  return `${HEADER_LOGO_PREFIX}/${clean}`.replace(/\\/g, "/");
+}
+
 function normalizePath(base, maybeRelative) {
   if (!maybeRelative) return base;
   const absolute = maybeRelative.startsWith("/") || /^[A-Za-z]:\\/.test(maybeRelative);
@@ -51,10 +87,15 @@ function normalizePath(base, maybeRelative) {
 function toDisplaySrc(path) {
   if (!path) return "";
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  if (path.startsWith("/")) return path; // asset servido pelo front
-  // Se for caminho absoluto de arquivo, usa convertFileSrc; senão assume arquivo em /images
+  if (path.startsWith("/")) {
+    const parts = path.split("/").map((p, idx) => (idx === 0 ? p : encodeURIComponent(p)));
+    return parts.join("/");
+  } // asset servido pelo front
+  // Se for caminho absoluto de arquivo, usa convertFileSrc; senao assume arquivo em /images
   if (/^[A-Za-z]:\\/.test(path) || path.startsWith("\\\\")) return convertFileSrc(path);
-  return `/images/${path.replace(/^\.?\/?images\/?/i, "")}`;
+  const clean = path.replace(/^\.?\/?images\/?/i, "");
+  const encoded = clean.split("/").map((p) => encodeURIComponent(p)).join("/");
+  return `/images/${encoded}`;
 }
 
 function compareVersions(a = "0.0.0", b = "0.0.0") {
@@ -127,8 +168,9 @@ function App() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [imageModal, setImageModal] = useState({ open: false, index: 0 });
 
-  const [logoPath, setLogoPath] = useState(localStorage.getItem("ui.logoPath") || "");
-  const [bgPath, setBgPath] = useState(localStorage.getItem("ui.bgPath") || "");
+  const [logoPath, setLogoPath] = useState(() => sanitizeStoredPath(localStorage.getItem("ui.logoPath"), DEFAULT_LOGO));
+  const [bgPath, setBgPath] = useState(() => sanitizeStoredPath(localStorage.getItem("ui.bgPath"), DEFAULT_BACKGROUND));
+  const [headerLogos, setHeaderLogos] = useState(() => parseStoredArray(localStorage.getItem("ui.headerLogos")));
 
   const [statusMsg, setStatusMsg] = useState("");
   const [secondaryStatus, setSecondaryStatus] = useState("");
@@ -154,6 +196,7 @@ function App() {
   const [form, setForm] = useState({ ...REG_DEFAULT, email: registrationEmail });
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [sentOnce, setSentOnce] = useState(false);
+  const [allowAfterDelay, setAllowAfterDelay] = useState(false);
 
   const [adminError, setAdminError] = useState("");
   const [pendingProfiles, setPendingProfiles] = useState([]);
@@ -174,14 +217,72 @@ function App() {
   const blockAccess = useMemo(() => {
     if (isDev) return false; // Em desenvolvimento não bloquear pela aprovação
     if (!supabaseConfigured) return false;
-    if (cachedProfile?.status === "approved") return false;
-    if (profile?.status === "approved") return false;
+    if (cachedProfile?.status === "block" || profile?.status === "block") return true;
+    if (allowAfterDelay) return false;
+    if (cachedProfile?.status === "approved" || profile?.status === "approved") return false;
     return true;
-  }, [isDev, supabaseConfigured, cachedProfile, profile]);
+  }, [isDev, supabaseConfigured, cachedProfile, profile, allowAfterDelay]);
 
   useEffect(() => {
     localStorage.setItem("registration.email", registrationEmail || "");
   }, [registrationEmail]);
+
+  useEffect(() => {
+    if (logoPath) localStorage.setItem("ui.logoPath", logoPath);
+  }, [logoPath]);
+
+  useEffect(() => {
+    if (bgPath) localStorage.setItem("ui.bgPath", bgPath);
+  }, [bgPath]);
+
+  useEffect(() => {
+    localStorage.setItem("ui.headerLogos", JSON.stringify(headerLogos || []));
+  }, [headerLogos]);
+
+  useEffect(() => {
+    if (!supabaseConfigured) return;
+    if (profile?.status === "block" || cachedProfile?.status === "block") {
+      setAllowAfterDelay(false);
+      return;
+    }
+    if (profile?.status === "approved" || cachedProfile?.status === "approved") {
+      setAllowAfterDelay(true);
+      return;
+    }
+    if (sentOnce) setAllowAfterDelay(false);
+  }, [supabaseConfigured, profile, cachedProfile, sentOnce]);
+
+  useEffect(() => {
+    const src = toDisplaySrc(logoPath || DEFAULT_LOGO);
+    if (!src) return;
+    const img = new Image();
+    img.onerror = () => {
+      if (logoPath !== DEFAULT_LOGO) {
+        setLogoPath(DEFAULT_LOGO);
+        localStorage.setItem("ui.logoPath", DEFAULT_LOGO);
+      }
+    };
+    img.src = src;
+    return () => {
+      img.onerror = null;
+    };
+  }, [logoPath]);
+
+  useEffect(() => {
+    const src = toDisplaySrc(bgPath || DEFAULT_BACKGROUND);
+    if (!src) return;
+    const img = new Image();
+    img.onerror = () => {
+      if (bgPath !== DEFAULT_BACKGROUND) {
+        setBgPath(DEFAULT_BACKGROUND);
+        localStorage.setItem("ui.bgPath", DEFAULT_BACKGROUND);
+      }
+    };
+    img.src = src;
+    return () => {
+      img.onerror = null;
+    };
+  }, [bgPath]);
 
   useEffect(() => {
     (async () => {
@@ -250,8 +351,26 @@ function App() {
 
       try {
         const branding = await fetch("/images/branding.json").then((r) => (r.ok ? r.json() : null)).catch(() => null);
-        if (branding?.logo && !logoPath) setLogoPath(`/images/${branding.logo}`);
-        if (branding?.background && !bgPath) setBgPath(`/images/${branding.background}`);
+        const brandingLogo = branding?.logo ? `/images/${branding.logo}` : null;
+        const brandingBg = branding?.background ? `/images/${branding.background}` : null;
+        const brandingHeaders = Array.isArray(branding?.headerLogos)
+          ? branding.headerLogos
+              .map((n) => toHeaderLogoPath(n))
+              .filter((p) => p && typeof p === "string")
+          : [];
+
+        if (brandingLogo && (logoPath === DEFAULT_LOGO || !logoPath)) {
+          setLogoPath(brandingLogo);
+          localStorage.setItem("ui.logoPath", brandingLogo);
+        }
+        if (brandingBg && (bgPath === DEFAULT_BACKGROUND || !bgPath)) {
+          setBgPath(brandingBg);
+          localStorage.setItem("ui.bgPath", brandingBg);
+        }
+        if (brandingHeaders.length && headerLogos.length === 0) {
+          setHeaderLogos(brandingHeaders);
+          localStorage.setItem("ui.headerLogos", JSON.stringify(brandingHeaders));
+        }
       } catch (_) {
         /* ignore */
       }
@@ -359,6 +478,7 @@ function App() {
     loadLaunches(true);
   }, [imagesDir]);
 
+
   async function submitRegistration(ev) {
     ev?.preventDefault();
     setAuthSuccess("");
@@ -374,16 +494,21 @@ function App() {
       const payload = {
         ...form,
         email: form.email || registrationEmail || "",
-        status: "pending",
+        status: "approved",
         device_fingerprint: profile?.device_fingerprint || fingerprint,
         id: profileId || undefined,
       };
       const { data, error } = await supabase.from("profiles").upsert(payload, { onConflict: "email" }).select().maybeSingle();
       if (error) throw error;
-      setProfile(data);
-      setAuthSuccess("Cadastro enviado. Aguarde aprovação do time.");
+      const resolved = data ? { ...data, status: "approved" } : null;
+      if (resolved) {
+        setProfile(resolved);
+        localStorage.setItem("profile.cached", JSON.stringify(resolved));
+      }
+      setAuthSuccess("Cadastro enviado. Aguarde aprovação.");
       setSentOnce(true);
-      if (data?.status === "approved") localStorage.setItem("profile.cached", JSON.stringify(data));
+      setAllowAfterDelay(false);
+      setTimeout(() => setAllowAfterDelay(true), 3000);
     } catch (e) {
       setAuthError(`Falha ao salvar cadastro: ${e.message || e}`);
     } finally {
@@ -576,6 +701,38 @@ function App() {
     }
   }
 
+  async function runSetHeaderLogos() {
+    try {
+      const picked = await openDialog({ multiple: true, filters: [{ name: "Imagens", extensions: ["png", "jpg", "jpeg", "webp"] }] });
+      if (!picked || (Array.isArray(picked) && picked.length === 0)) return;
+      const listRaw = Array.isArray(picked) ? picked : [picked];
+      const unique = [];
+      for (const p of listRaw) {
+        const clean = sanitizeStoredPath(p);
+        if (clean) {
+          const normalized = toHeaderLogoPath(clean);
+          if (normalized && !unique.includes(normalized)) unique.push(normalized);
+        }
+      }
+      let finalList = unique;
+      try {
+        const res = await setHeaderLogosApi(listRaw);
+        const returned = res?.header_logos || res?.headerLogos || [];
+        if (Array.isArray(returned) && returned.length) finalList = returned.map((r) => toHeaderLogoPath(r));
+      } catch (_) {
+        /* fallback to local-only */
+      }
+      setHeaderLogos(finalList);
+      setToolsMsg(`Logos atualizadas (${finalList.length}).`);
+    } catch (e) {
+      setToolsMsg(`Falha ao aplicar logos: ${e}`);
+    }
+  }
+
+  function handleHeaderLogoError(path) {
+    setHeaderLogos((prev) => prev.filter((p) => p !== path));
+  }
+
   function cycleLaunch(delta) {
     if (!launchImages.length) return;
     setLaunchState((s) => ({ ...s, open: true, index: (s.index + delta + launchImages.length) % launchImages.length }));
@@ -584,6 +741,8 @@ function App() {
   const headerBgStyle = bgPath
     ? { backgroundImage: `url(${toDisplaySrc(bgPath)})`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }
     : undefined;
+
+  const displayLogos = headerLogos.filter(Boolean);
 
   if (!ready) {
     return (
@@ -597,13 +756,35 @@ function App() {
     <>
       <main className={`container ${blockAccess ? "app-blocked" : ""}`} style={headerBgStyle}>
         <div className="appbar">
-          <div>{logoPath ? <img className="logo" src={toDisplaySrc(logoPath)} alt="Logo" /> : null}</div>
-          <h1>Catálogo IPS</h1>
+          <div className="appbar-logo">
+            {logoPath ? (
+              <a href="https://www.ipsbrasil.com.br" target="_blank" rel="noreferrer">
+                <img className="logo brand-logo" src={toDisplaySrc(logoPath)} alt="Logo" />
+              </a>
+            ) : null}
+          </div>
+          <div className="appbar-title">
+            <h1>Catálogo IPS</h1>
+            {displayLogos.length ? (
+              <div className="logo-strip" role="list">
+                {displayLogos.map((src, idx) => (
+                  <img
+                    key={idx}
+                    role="listitem"
+                    className="logo-strip-item"
+                    src={toDisplaySrc(src)}
+                    alt={`Logo ${idx + 1}`}
+                    onError={() => handleHeaderLogoError(src)}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {updateInfo && !updateDismissed && (
               <div className="update-banner">
                 <span>
-                  Nova versão disponível: {updateInfo.availableVersion} (atual {appVersion})
+                  Nova vers\u00e3o dispon\u00edvel: {updateInfo.availableVersion} (atual {appVersion})
                 </span>
                 {updateInfo.downloadUrl ? (
                   <button onClick={() => openExternal(updateInfo.downloadUrl)}>Baixar/Atualizar</button>
@@ -626,13 +807,12 @@ function App() {
                 </a>
               </nav>
               <button className="launch-button" onClick={() => loadLaunches(false)} disabled={launchState.loading}>
-                {launchState.loading ? "Carregando..." : "Lançamentos"}
+                {launchState.loading ? "Carregando..." : "Lan\u00e7amentos"}
               </button>
               {launchState.error ? <span className="launch-error">{launchState.error}</span> : null}
             </div>
           </div>
         </div>
-
         {isDev && (
           <div className="tools" style={{ width: "100%", maxWidth: 1280, margin: "0 auto" }}>
             <details>
@@ -659,6 +839,9 @@ function App() {
                   {logoInput ? <span style={{ fontSize: 12, color: "#555" }}>Atual: {logoInput}</span> : null}
                   <button onClick={() => runSetBranding("background")}>Aplicar fundo</button>
                   {bgInput ? <span style={{ fontSize: 12, color: "#555" }}>Atual: {bgInput}</span> : null}
+                  <button onClick={runSetHeaderLogos}>Carregar logos (appbar)</button>
+                  <button onClick={() => setHeaderLogos([])}>Limpar logos (appbar)</button>
+                  {headerLogos.length ? <span style={{ fontSize: 12, color: "#555" }}>Ativas: {headerLogos.length}</span> : null}
                 </div>
                 {toolsMsg && <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#444" }}>{toolsMsg}</span>}
               </div>
@@ -816,7 +999,7 @@ function App() {
               <div>
                 <p className="auth-kicker">Acesso restrito</p>
                 <h2>Meu Cadastro</h2>
-                <p className="auth-muted">Envie a ficha e aguarde aprovação. Enquanto o status não for aprovado, o catálogo fica bloqueado.</p>
+                <p className="auth-muted">Envie a ficha e Aguarde aprovação. Enquanto o status não for aprovado, o catálogo fica bloqueado.</p>
                 <p className="auth-status">Status atual: {profile?.status || "pending"}</p>
               </div>
               <div className="auth-brand">CATÁLOGO IPS</div>
@@ -909,6 +1092,11 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
 
 
 
