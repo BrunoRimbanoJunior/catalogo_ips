@@ -160,6 +160,7 @@ function App() {
   }, [brandId]);
 
   const manifestUrl = useMemo(() => localStorage.getItem("manifestUrl") || import.meta.env.VITE_DEFAULT_MANIFEST_URL || "", []);
+  const FIXED_DOWNLOAD = "https://1drv.ms/u/c/4e4e660955b19ef5/EdHos0VU9D5BihkzIiMhhUEB0skBGWNpeQvmVQhspQj-7g?e=Vm1ixV";
 
   const blockAccess = useMemo(() => {
     if (isDev) return false; // Em desenvolvimento nao bloquear pela aprovacao
@@ -268,7 +269,7 @@ function App() {
         try {
           const manifest = await fetch(manifestUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null);
           if (manifest?.appVersion && compareVersions(manifest.appVersion, appVersion || "0.0.0") > 0) {
-            setUpdateInfo({ availableVersion: manifest.appVersion, downloadUrl: manifest.appDownloadUrl || manifestUrl });
+            setUpdateInfo({ availableVersion: manifest.appVersion, downloadUrl: FIXED_DOWNLOAD });
             setUpdateDismissed(false);
           } else {
             setUpdateInfo(null);
@@ -748,9 +749,7 @@ function App() {
                 <span>
                   Nova vers\u00e3o dispon\u00edvel: {updateInfo.availableVersion} (atual {appVersion})
                 </span>
-                {updateInfo.downloadUrl ? (
-                  <button onClick={() => openExternal(updateInfo.downloadUrl)}>Baixar/Atualizar</button>
-                ) : null}
+                <button onClick={() => openExternal(updateInfo.downloadUrl || FIXED_DOWNLOAD)}>Baixar/Atualizar</button>
                 <button className="ghost" onClick={() => setUpdateDismissed(true)}>
                   Fechar
                 </button>
