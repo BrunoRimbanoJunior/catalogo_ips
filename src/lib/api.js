@@ -45,11 +45,17 @@ export async function fetchTypes(brandId) {
 }
 
 export async function fetchGroups(brandId, brandName) {
-  return await invoke("get_groups_cmd", { brand_id: brandId, brand_name: brandName });
+  const numericId = brandId === undefined || brandId === null || brandId === "" ? null : Number(brandId);
+  return await invoke("get_groups_cmd", {
+    brand_id: numericId,
+    brandId: numericId,
+    brand_name: brandName,
+    brandName,
+  });
 }
 
-export async function fetchVehiclesFiltered(brandId, group) {
-  return await invoke("get_vehicles_filtered_cmd", { brand_id: brandId, group });
+export async function fetchVehiclesFiltered(brandId, group, make) {
+  return await invoke("get_vehicles_filtered_cmd", { brand_id: brandId, group, make });
 }
 
 export async function fetchGroupsStats() {

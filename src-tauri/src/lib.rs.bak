@@ -2,8 +2,6 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
 
-mod desc;
-
 mod core {
     use super::*;
     use base64::Engine;
@@ -1279,17 +1277,6 @@ mod core {
             }
         };
 
-        let key_env = std::env::var("DESCRYPT_KEY").unwrap_or_default();
-        let try_decrypt = |data: Vec<u8>| -> Vec<u8> {
-            if key_env.trim().is_empty() {
-                return data;
-            }
-            match crate::desc::decrypt_image(&data, &key_env) {
-                Ok(p) => p,
-                Err(_) => data,
-            }
-        };
-
         // Funcao auxiliar para converter bytes em data URL
         fn to_data_url(path: &std::path::Path, bytes: Vec<u8>) -> String {
             let ext = path
@@ -1308,11 +1295,9 @@ mod core {
             format!("data:{};base64,{}", mime, encoded)
         }
 
+        // 1) Tenta ler exatamente o caminho resolvido
         match fs::read(&abs_try) {
-            Ok(mut bytes) => {
-                bytes = try_decrypt(bytes);
-                return Ok(to_data_url(&abs_try, bytes));
-            }
+            Ok(bytes) => return Ok(to_data_url(&abs_try, bytes)),
             Err(_) => {
                 // 2) Fallback: se o arquivo nao existir (ex.: DB antigo salvou so o nome sem subpasta),
                 // procura pelo basename em subdiretorios de images_dir
@@ -1322,8 +1307,7 @@ mod core {
                         if p.is_file() {
                             if let Some(base) = p.file_name().and_then(|s| s.to_str()) {
                                 if base.eq_ignore_ascii_case(name) {
-                                    if let Ok(mut bytes) = fs::read(p) {
-                                        bytes = try_decrypt(bytes);
+                                    if let Ok(bytes) = fs::read(p) {
                                         return Ok(to_data_url(p, bytes));
                                     }
                                 }
@@ -1331,7 +1315,10 @@ mod core {
                         }
                     }
                 }
-                return Err(format!("Falha ao ler imagem (nao encontrada): {}", abs_try.display()));
+                return Err(format!(
+                    "Falha ao ler imagem (não encontrada): {}",
+                    abs_try.display()
+                ));
             }
         }
     }

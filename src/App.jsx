@@ -1,13 +1,8 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import {
   initApp,
-  fetchBrands,
-  fetchVehicles,
-  fetchGroups,
-  fetchVehiclesFiltered,
-  searchProducts,
   getProductDetails,
   syncFromManifest,
   indexImagesFromManifest,
@@ -18,12 +13,23 @@ import {
   setBrandingImage,
   setHeaderLogos as setHeaderLogosApi,
 } from "./lib/api";
+import { loadInitialCatalog, loadGroups, loadVehiclesByFilters, searchWithFilters } from "./lib/catalogData";
+import {
+  DEFAULT_BACKGROUND,
+  DEFAULT_LOGO,
+  HEADER_LOGO_PREFIX,
+  compareVersions,
+  getAppVersion,
+  normalizePath,
+  parseStoredArray,
+  sanitizeStoredPath,
+  safeParseProfile,
+  toDisplaySrc,
+  toHeaderLogoPath,
+} from "./lib/catalogUtils";
 import { supabase, supabaseService, supabaseServiceKey } from "./lib/supabaseClient";
 import "./App.css";
 
-const DEFAULT_LOGO = "/images/logo.png";
-const DEFAULT_BACKGROUND = "/images/bg.png";
-const HEADER_LOGO_PREFIX = "/images";
 const REG_DEFAULT = {
   person_type: "pf",
   country: "Brasil",
@@ -35,91 +41,6 @@ const REG_DEFAULT = {
   phone_number: "",
   email: "",
 };
-
-function safeParseProfile(raw) {
-  try {
-    return raw ? JSON.parse(raw) : null;
-  } catch (_) {
-    return null;
-  }
-}
-
-function sanitizeStoredPath(raw, fallback = "") {
-  const trimmed = (raw || "").trim();
-  if (!trimmed) return fallback;
-  const lower = trimmed.toLowerCase();
-  if (lower === "null" || lower === "undefined") return fallback;
-  return trimmed;
-}
-
-function parseStoredArray(raw) {
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed.filter((s) => typeof s === "string" && s.trim()).map((s) => s.trim());
-  } catch (_) {
-    /* ignore */
-  }
-  return [];
-}
-
-function toHeaderLogoPath(name) {
-  if (!name) return "";
-  if (name.startsWith("http://") || name.startsWith("https://")) return name;
-  if (name.startsWith("/")) {
-    return name
-      .split("/")
-      .map((p, idx) => (idx === 0 ? p : encodeURIComponent(p)))
-      .join("/");
-  }
-  const clean = name.replace(/^\.?\/?images\/?/i, "");
-  return `${HEADER_LOGO_PREFIX}/${clean}`.replace(/\\/g, "/");
-}
-
-function normalizePath(base, maybeRelative) {
-  if (!maybeRelative) return base;
-  const absolute = maybeRelative.startsWith("/") || /^[A-Za-z]:\\/.test(maybeRelative);
-  if (absolute) return maybeRelative.replace(/\\/g, "/");
-  const sep = base.endsWith("/") || base.endsWith("\\") ? "" : "/";
-  return `${base}${sep}${maybeRelative}`.replace(/\\/g, "/");
-}
-
-function toDisplaySrc(path) {
-  if (!path) return "";
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  if (path.startsWith("/")) {
-    const parts = path.split("/").map((p, idx) => (idx === 0 ? p : encodeURIComponent(p)));
-    return parts.join("/");
-  } // asset servido pelo front
-  // Se for caminho absoluto de arquivo, usa convertFileSrc; senao assume arquivo em /images
-  if (/^[A-Za-z]:\\/.test(path) || path.startsWith("\\\\")) return convertFileSrc(path);
-  const clean = path.replace(/^\.?\/?images\/?/i, "");
-  const encoded = clean.split("/").map((p) => encodeURIComponent(p)).join("/");
-  return `/images/${encoded}`;
-}
-
-function compareVersions(a = "0.0.0", b = "0.0.0") {
-  const pa = String(a).split(".").map((n) => parseInt(n, 10) || 0);
-  const pb = String(b).split(".").map((n) => parseInt(n, 10) || 0);
-  const max = Math.max(pa.length, pb.length);
-  for (let i = 0; i < max; i++) {
-    const va = pa[i] || 0;
-    const vb = pb[i] || 0;
-    if (va > vb) return 1;
-    if (va < vb) return -1;
-  }
-  return 0;
-}
-
-async function getAppVersion() {
-  try {
-    const mod = await import("@tauri-apps/api/app");
-    if (mod?.getVersion) return await mod.getVersion();
-  } catch (_) {
-    /* ignore */
-  }
-  return import.meta.env.VITE_APP_VERSION || "0.0.0";
-}
 
 async function openExternal(path) {
   try {
@@ -156,11 +77,14 @@ function App() {
   const [appVersion, setAppVersion] = useState("0.0.0");
 
   const [brands, setBrands] = useState([]);
+  const [makes, setMakes] = useState([]);
   const [groups, setGroups] = useState([]);
   const [vehicles, setVehicles] = useState([]);
 
   const [brandId, setBrandId] = useState("");
+  const [brandName, setBrandName] = useState("");
   const [group, setGroup] = useState("");
+  const [make, setMake] = useState("");
   const [vehicleId, setVehicleId] = useState("");
   const [codeQuery, setCodeQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -171,6 +95,16 @@ function App() {
   const [logoPath, setLogoPath] = useState(() => sanitizeStoredPath(localStorage.getItem("ui.logoPath"), DEFAULT_LOGO));
   const [bgPath, setBgPath] = useState(() => sanitizeStoredPath(localStorage.getItem("ui.bgPath"), DEFAULT_BACKGROUND));
   const [headerLogos, setHeaderLogos] = useState(() => parseStoredArray(localStorage.getItem("ui.headerLogos")));
+
+  const loadGroupsFor = async (bid, bname) => {
+    try {
+      const coerced = bid === null || bid === undefined || bid === "" ? null : Number(bid);
+      const g = await fetchGroups(coerced, bname || null);
+      setGroups((g || []).filter(Boolean));
+    } catch (e) {
+      setStatusMsg(`Falha ao carregar grupos: ${e}`);
+    }
+  };
 
   const [statusMsg, setStatusMsg] = useState("");
   const [secondaryStatus, setSecondaryStatus] = useState("");
@@ -215,8 +149,7 @@ function App() {
   const manifestUrl = useMemo(() => localStorage.getItem("manifestUrl") || import.meta.env.VITE_DEFAULT_MANIFEST_URL || "", []);
 
   const blockAccess = useMemo(() => {
-    if (isDev) return false; // Em desenvolvimento não bloquear pela aprovação
-    if (!supabaseConfigured) return false;
+    if (isDev) return false; // Em desenvolvimento nao bloquear pela aprovacao
     if (cachedProfile?.status === "block" || profile?.status === "block") return true;
     if (allowAfterDelay) return false;
     if (cachedProfile?.status === "approved" || profile?.status === "approved") return false;
@@ -306,11 +239,13 @@ function App() {
       }
 
       try {
-        const [b, v] = await Promise.all([fetchBrands(), fetchVehicles()]);
-        setBrands(b || []);
-        setVehicles(v || []);
+        const { brands: b, vehicles: v, makes: mk } = await loadInitialCatalog();
+        setBrands(b);
+        setVehicles(v);
+        setMakes(mk);
+        await loadGroupsFor(null, null);
       } catch (e) {
-        setStatusMsg(`Falha ao carregar catálogos: ${e}`);
+        setStatusMsg(`Falha ao carregar catalogos: ${e}`);
       }
 
       // Libera UI assim que dados base carregam; sync/branding continuam em paralelo
@@ -449,19 +384,19 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
-        const g = await fetchGroups(numericBrandId, selectedBrand ? selectedBrand.name : null);
+        const g = await loadGroups(numericBrandId, selectedBrand ? selectedBrand.name : null);
         setGroups(g || []);
       } catch (e) {
         setStatusMsg(`Falha ao carregar grupos: ${e}`);
       }
       try {
-        const v = await fetchVehiclesFiltered(numericBrandId, group || null);
+        const v = await loadVehiclesByFilters(numericBrandId, group || null, make || null);
         setVehicles(v || []);
       } catch (_) {
         /* ignore */
       }
     })();
-  }, [numericBrandId, selectedBrand, group]);
+  }, [numericBrandId, selectedBrand, group, make]);
 
   useEffect(() => {
     setSelected(null);
@@ -471,7 +406,7 @@ function App() {
       doSearch();
     }, 250);
     return () => clearTimeout(t);
-  }, [numericBrandId, group, vehicleId, codeQuery]);
+  }, [numericBrandId, group, vehicleId, codeQuery, make]);
 
   useEffect(() => {
     if (!imagesDir) return;
@@ -485,7 +420,7 @@ function App() {
     setAuthError("");
     setFormSubmitting(true);
     try {
-      if (!supabase) throw new Error("Supabase não configurado.");
+      if (!supabase) throw new Error("Supabase nao configurado.");
       let profileId = profile?.id || null;
       if (!profileId && (form.email || registrationEmail)) {
         const { data } = await supabase.from("profiles").select("id").eq("email", form.email || registrationEmail).maybeSingle();
@@ -505,7 +440,7 @@ function App() {
         setProfile(resolved);
         localStorage.setItem("profile.cached", JSON.stringify(resolved));
       }
-      setAuthSuccess("Cadastro enviado. Aguarde aprovação.");
+      setAuthSuccess("Cadastro enviado. Aguarde aprovacao.");
       setSentOnce(true);
       setAllowAfterDelay(false);
       setTimeout(() => setAllowAfterDelay(true), 3000);
@@ -518,7 +453,7 @@ function App() {
 
   async function approveProfile(id) {
     if (!supabaseService || !supabaseServiceKey) {
-      setAdminError("Service role não configurado (apenas dev).");
+      setAdminError("Service role nao configurado (apenas dev).");
       return;
     }
     try {
@@ -537,11 +472,12 @@ function App() {
     }
     setStatusMsg("");
     try {
-      const res = await searchProducts({
-        brand_id: numericBrandId,
-        group: group || null,
-        vehicle_id: vehicleId ? Number(vehicleId) : null,
-        code_query: codeQuery || null,
+      const res = await searchWithFilters({
+        brandId: numericBrandId,
+        group,
+        vehicleId,
+        make,
+        codeQuery,
         limit: 200,
       });
       setResults(res || []);
@@ -586,13 +522,13 @@ function App() {
     setLaunchState((s) => ({ ...s, loading: true, error: "" }));
     try {
       if (!imagesDir) {
-        setLaunchState((s) => ({ ...s, loading: false, error: "Pasta de imagens não localizada." }));
+        setLaunchState((s) => ({ ...s, loading: false, error: "Pasta de imagens nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o localizada." }));
         return;
       }
       const files = await listLaunchImages();
       if (!files || files.length === 0) {
         setLaunchImages([]);
-        setLaunchState((s) => ({ ...s, loading: false, error: "Nenhuma imagem de lançamento encontrada." }));
+        setLaunchState((s) => ({ ...s, loading: false, error: "Nenhuma imagem de lanÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½amento encontrada." }));
         return;
       }
       const list = [];
@@ -614,11 +550,11 @@ function App() {
         }
       }
       setLaunchImages(list);
-      // Sempre abre o modal quando a lista é carregada manualmente; em auto-init também abrimos para exibir novidades
+      // Sempre abre o modal quando a lista ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ carregada manualmente; em auto-init tambÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½m abrimos para exibir novidades
       setLaunchState((s) => ({ ...s, loading: false, open: true, index: 0 }));
     } catch (e) {
       setLaunchImages([]);
-      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar Lançamentos: ${e.message || e}` });
+      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar LanÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½amentos: ${e.message || e}` });
     }
   }
 
@@ -632,7 +568,7 @@ function App() {
       setDbVersion(res?.db_version || res?.dbVersion || dbVersion);
       localStorage.setItem("manifestUrl", target);
       setStatusMsg(`Sincronizado: db v${res?.db_version || res?.dbVersion || "?"} | imgs +${res?.downloaded_images || res?.downloadedImages || 0}`);
-      setToolsMsg("Sync concluído.");
+      setToolsMsg("Sync concluÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½do.");
     } catch (e) {
       setToolsMsg(`Falha ao sincronizar: ${e}`);
     } finally {
@@ -659,7 +595,7 @@ function App() {
       setExcelPath(picked);
       setToolsMsg("Importando Excel...");
       const res = await importExcel(picked);
-      setToolsMsg(`Importado: linhas ${res?.processed_rows ?? "?"}, produtos ${res?.upserted_products ?? "?"}, versão db ${res?.new_db_version ?? "?"}`);
+      setToolsMsg(`Importado: linhas ${res?.processed_rows ?? "?"}, produtos ${res?.upserted_products ?? "?"}, versÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o db ${res?.new_db_version ?? "?"}`);
     } catch (e) {
       setToolsMsg(`Falha ao importar Excel: ${e}`);
     }
@@ -768,7 +704,7 @@ function App() {
             ) : null}
           </div>
           <div className="appbar-title">
-            <h1>Catálogo IPS</h1>
+            <h1>Catalogo IPS</h1>
             {displayLogos.length ? (
               <div className="logo-strip" role="list">
                 {displayLogos.map((src, idx) => (
@@ -831,14 +767,14 @@ function App() {
                     Indexar imagens (manifest)
                   </button>
                   <button onClick={() => loadLaunches(true)} disabled={launchState.loading}>
-                    Abrir lançamentos
+                    Abrir lanÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½amentos
                   </button>
                 </div>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={runImportExcel}>Importar Excel</button>
-                  {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>Último: {excelPath}</span> : null}
+                  {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ltimo: {excelPath}</span> : null}
                   <button onClick={runExportDb}>Exportar DB</button>
-                  {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>Último: {exportPath}</span> : null}
+                  {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ltimo: {exportPath}</span> : null}
                   <button onClick={() => runSetBranding("logo")}>Aplicar logo</button>
                   {logoInput ? <span style={{ fontSize: 12, color: "#555" }}>Atual: {logoInput}</span> : null}
                   <button onClick={() => runSetBranding("background")}>Aplicar fundo</button>
@@ -866,13 +802,57 @@ function App() {
         <div className="layout">
           <aside className="sidebar">
             <h3>Fabricantes</h3>
-            <div className="chips">
-              <div className={`chip ${!brandId ? "active" : ""}`} onClick={() => { setBrandId(""); setGroup(""); setVehicleId(""); }}>
+                        <div className="chips">
+              <div className={`chip ${!brandId ? "active" : ""}`} onClick={() => { setBrandId(""); setBrandName(""); setGroup(""); setMake(""); setVehicleId(""); loadGroupsFor(null, null); }}>
                 Todos
               </div>
               {brands.map((b) => (
-                <div key={b.id} className={`chip ${String(brandId) === String(b.id) ? "active" : ""}`} onClick={() => { setBrandId(b.id); setGroup(""); setVehicleId(""); }}>
-                  {b.name}
+                <div
+                  key={b.id}
+                  className={`chip ${String(brandId) === String(b.id) ? "active" : ""}`}
+                  onClick={() => {
+                    if (String(brandId) === String(b.id)) {
+                      setBrandId("");
+                      setBrandName("");
+                      setGroup("");
+                      setMake("");
+                      setVehicleId("");
+                      loadGroupsFor(null, null);
+                    } else {
+                      setBrandId(b.id);
+                      setBrandName(b.name || "");
+                      setGroup("");
+                      setMake("");
+                      setVehicleId("");
+                      loadGroupsFor(b.id, b.name);
+                    }
+                  }}
+                >
+                  <div className="chip-row">
+                    <span>{b.name}</span>
+                    {String(brandId) === String(b.id) ? <span className="chip-chevron">v</span> : null}
+                  </div>
+                  {String(brandId) === String(b.id) && groups.length ? (
+                    <div className="chip-groups">
+                      <button
+                        type="button"
+                        className={`chip-group-item ${!group ? "selected" : ""}`}
+                        onClick={(e) => { e.stopPropagation(); setGroup(""); }}
+                      >
+                        Todos
+                      </button>
+                      {groups.map((g) => (
+                        <button
+                          type="button"
+                          key={g}
+                          className={`chip-group-item ${group === g ? "selected" : ""}`}
+                          onClick={(e) => { e.stopPropagation(); setGroup(g); }}
+                        >
+                          {g}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -880,7 +860,7 @@ function App() {
 
           <section className="panel">
             <div className="filters" style={{ flexWrap: "wrap" }}>
-              <input className="filter-code" placeholder="Pesquisar por código ou veículo (produto/OEM/Similar/Veículo)" value={codeQuery} onChange={(e) => setCodeQuery(e.target.value)} />
+              <input className="filter-code" placeholder="Pesquisar por codigo ou veiculo (produto/OEM/Similar/Veiculo)" value={codeQuery} onChange={(e) => setCodeQuery(e.target.value)} />
               <select value={group} onChange={(e) => { setGroup(e.target.value); setVehicleId(""); }}>
                 <option value="">Grupo (todos)</option>
                 {groups.map((g) => (
@@ -889,8 +869,16 @@ function App() {
                   </option>
                 ))}
               </select>
+              <select value={make} onChange={(e) => { setMake(e.target.value); setVehicleId(""); }}>
+                <option value="">Montadora (todas)</option>
+                {makes.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
               <select value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}>
-                <option value="">Veículo (todos)</option>
+                <option value="">Veiculo (todos)</option>
                 {vehicles.map((v) => (
                   <option key={v.id} value={v.id}>
                     {v.name}
@@ -912,7 +900,7 @@ function App() {
                         <span className="desc">{p.description}</span>
                         <span className="brand">{p.brand}</span>
                       </div>
-                      {p.vehicles ? <div style={{ fontSize: 12, opacity: 0.9 }}>Aplicações: {p.vehicles}</div> : null}
+                      {p.vehicles ? <div style={{ fontSize: 12, opacity: 0.9 }}>Aplicacoes: {p.vehicles}</div> : null}
                     </div>
                   </li>
                 ))}
@@ -937,7 +925,7 @@ function App() {
                 <div className="sep" />
                 {selected.application && (
                   <div className="compat">
-                    <div className="subtitle">Compatível com:</div>
+                    <div className="subtitle">CompatÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½vel com:</div>
                     <div className="compat-list">{selected.application}</div>
                   </div>
                 )}
@@ -986,8 +974,8 @@ function App() {
               <button className="launch-arrow" onClick={() => cycleLaunch(-1)} aria-label="Anterior">
                 &lt;
               </button>
-              <img src={launchImages[launchState.index]} alt="lançamento" />
-              <button className="launch-arrow" onClick={() => cycleLaunch(1)} aria-label="Próximo">
+              <img src={launchImages[launchState.index]} alt="lanÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½amento" />
+              <button className="launch-arrow" onClick={() => cycleLaunch(1)} aria-label="PrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ximo">
                 &gt;
               </button>
             </div>
@@ -1006,7 +994,7 @@ function App() {
                 <p className="auth-muted">Envie a ficha e Aguarde aprovação. Enquanto o status não for aprovado, o catálogo fica bloqueado.</p>
                 <p className="auth-status">Status atual: {profile?.status || "pending"}</p>
               </div>
-              <div className="auth-brand">CATÁLOGO IPS</div>
+              <div className="auth-brand">Catálogo IPS</div>
             </div>
 
             {supabaseConfigured ? (
@@ -1017,23 +1005,23 @@ function App() {
 
                   {sentOnce ? (
                     <div className="auth-wait">
-                      <p><strong>Cadastro enviado.</strong> Aguarde aprovação do time.</p>
+                      <p><strong>Cadastro enviado.</strong> Aguarde aprovacao do time.</p>
                       <p className="auth-muted small">Se precisar corrigir algo, reabra a ficha e reenvie.</p>
                     </div>
                   ) : (
                     <form className="auth-grid" onSubmit={submitRegistration}>
                       <div className="auth-radio">
                         <label>
-                          <input type="radio" name="personType" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa Jurídica
+                          <input type="radio" name="personType" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa JurÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½dica
                         </label>
                         <label>
-                          <input type="radio" name="personType" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa Física
+                          <input type="radio" name="personType" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½sica
                         </label>
                       </div>
 
                       <label className="auth-field wide">
-                        Nome/Razão social
-                        <input value={form.full_name} onChange={(e) => setForm((s) => ({ ...s, full_name: e.target.value }))} placeholder="Nome completo ou razão social" />
+                        Nome/Razao Social
+                        <input value={form.full_name} onChange={(e) => setForm((s) => ({ ...s, full_name: e.target.value }))} placeholder="Nome completo ou razÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o social" />
                       </label>
                       <label className="auth-field wide">
                         CPF/CNPJ
@@ -1041,7 +1029,7 @@ function App() {
                       </label>
 
                       <label className="auth-field">
-                        País
+                        Pais
                         <input value={form.country} onChange={(e) => setForm((s) => ({ ...s, country: e.target.value }))} placeholder="Brasil" />
                       </label>
                       <label className="auth-field">
@@ -1070,7 +1058,7 @@ function App() {
                       </label>
 
                       <div className="auth-meta">
-                        <span>Código do cadastro: {profile?.id || "aguardando"}</span>
+                        <span>Codigo do cadastro: {profile?.id || "aguardando.."}</span>
                         <span>Dispositivo vinculado: {profile?.device_fingerprint || fingerprint}</span>
                       </div>
 
@@ -1096,9 +1084,6 @@ function App() {
 }
 
 export default App;
-
-
-
 
 
 
