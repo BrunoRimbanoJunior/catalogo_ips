@@ -64,6 +64,19 @@ function useFingerprint() {
   }, []);
 }
 
+// Apenas para exibir no dropdown: remove tokens com dígitos (anos/códigos) mantendo nome base.
+function vehicleLabel(name = "") {
+  const parts = String(name).split(/\s+/);
+  const kept = [];
+  for (const p of parts) {
+    if (!p) continue;
+    if (/\d/.test(p) || p.includes("(")) break;
+    kept.push(p);
+  }
+  const out = kept.join(" ").trim();
+  return out || name;
+}
+
 function App() {
   const fingerprint = useFingerprint();
   const cachedProfile = useMemo(() => safeParseProfile(localStorage.getItem("profile.cached")), []);
@@ -494,9 +507,18 @@ function App() {
         setSelectedImages([]);
         return;
       }
+      const codeStr = detail?.code ? String(detail.code) : "";
+      const listFiltered =
+        codeStr && Array.isArray(detail.images) && detail.images.length
+          ? detail.images.filter((img) => {
+              const lower = String(img || "").toLowerCase();
+              return lower.includes(codeStr.toLowerCase());
+            })
+          : detail.images;
+      const imagesList = listFiltered && listFiltered.length ? listFiltered : detail.images;
       const unique = new Set();
       const imgs = [];
-      for (const img of detail.images) {
+      for (const img of imagesList) {
         const normalized = normalizePath(imagesDir, img);
         try {
           const b64 = await readImageBase64(normalized);
@@ -522,13 +544,13 @@ function App() {
     setLaunchState((s) => ({ ...s, loading: true, error: "" }));
     try {
       if (!imagesDir) {
-        setLaunchState((s) => ({ ...s, loading: false, error: "Pasta de imagens nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o localizada." }));
+        setLaunchState((s) => ({ ...s, loading: false, error: "Pasta de imagens nao localizada." }));
         return;
       }
       const files = await listLaunchImages();
       if (!files || files.length === 0) {
         setLaunchImages([]);
-        setLaunchState((s) => ({ ...s, loading: false, error: "Nenhuma imagem de lanÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½amento encontrada." }));
+        setLaunchState((s) => ({ ...s, loading: false, error: "Nenhuma imagem de lancamento encontrada." }));
         return;
       }
       const list = [];
@@ -554,7 +576,7 @@ function App() {
       setLaunchState((s) => ({ ...s, loading: false, open: true, index: 0 }));
     } catch (e) {
       setLaunchImages([]);
-      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar LanÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½amentos: ${e.message || e}` });
+      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar lancamentos: ${e.message || e}` });
     }
   }
 
@@ -743,7 +765,7 @@ function App() {
                 </a>
               </nav>
               <button className="launch-button" onClick={() => loadLaunches(false)} disabled={launchState.loading}>
-                {launchState.loading ? "Carregando..." : "Lan\u00e7amentos"}
+                {launchState.loading ? "Carregando..." : "Lançamentos"}
               </button>
               {launchState.error ? <span className="launch-error">{launchState.error}</span> : null}
             </div>
@@ -753,7 +775,7 @@ function App() {
           <div className="tools" style={{ width: "100%", maxWidth: 1280, margin: "0 auto" }}>
             <details>
               <summary>Ferramentas (dev)</summary>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, marginTop: 8, alignItems: "center" }}>
+              <div className="tools-panel" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, marginTop: 8, alignItems: "center" }}>
                 <input placeholder="URL do manifest" value={manifestInput} onChange={(e) => setManifestInput(e.target.value)} />
                 <button disabled={syncing || !manifestInput} onClick={() => runSync(manifestInput)}>
                   {syncing ? "Sincronizando..." : "Sincronizar"}
@@ -763,7 +785,7 @@ function App() {
                     Indexar imagens (manifest)
                   </button>
                   <button onClick={() => loadLaunches(true)} disabled={launchState.loading}>
-                    Abrir lanÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½amentos
+                    Abrir lancamentos
                   </button>
                 </div>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -875,9 +897,16 @@ function App() {
               </select>
               <select value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}>
                 <option value="">Veiculo (todos)</option>
-                {vehicles.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
+                {Array.from(
+                  new Map(
+                    vehicles.map((v) => {
+                      const label = vehicleLabel(v.name);
+                      return [label, v.id];
+                    })
+                  ).entries()
+                ).map(([label, id]) => (
+                  <option key={id} value={id}>
+                    {label}
                   </option>
                 ))}
               </select>
@@ -921,7 +950,7 @@ function App() {
                 <div className="sep" />
                 {selected.application && (
                   <div className="compat">
-                    <div className="subtitle">CompatÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½vel com:</div>
+                    <div className="subtitle">Compativel com:</div>
                     <div className="compat-list">{selected.application}</div>
                   </div>
                 )}
@@ -970,8 +999,8 @@ function App() {
               <button className="launch-arrow" onClick={() => cycleLaunch(-1)} aria-label="Anterior">
                 &lt;
               </button>
-              <img src={launchImages[launchState.index]} alt="lanÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½amento" />
-              <button className="launch-arrow" onClick={() => cycleLaunch(1)} aria-label="PrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ximo">
+              <img src={launchImages[launchState.index]} alt="lancamento" />
+              <button className="launch-arrow" onClick={() => cycleLaunch(1)} aria-label="Proximo">
                 &gt;
               </button>
             </div>
@@ -1080,6 +1109,8 @@ function App() {
 }
 
 export default App;
+
+
 
 
 
