@@ -154,6 +154,7 @@ button {
 .launch-error { font-size: 11px; color: #a91f1f; text-align: center; max-width: 200px; }
 .tools details { margin-left: auto; }
 .tools summary { cursor: pointer; padding: 8px 12px; background: #c62828; border-radius: 6px; color: #fff; font-weight: 700; }
+.tools-panel { background: #222; padding: 12px; border-radius: 8px; }
 
 .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr) 420px; gap: 16px; margin-top: 4px; align-items: start; width: 100%; max-width: 1280px; }
 .sidebar { background: #ffffff; border: 1px solid #e6e6e6; border-radius: 8px; padding: 10px; }

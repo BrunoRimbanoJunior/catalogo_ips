@@ -2,25 +2,23 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
 
+mod db;
+mod importer;
 mod desc;
 
 mod core {
     use super::*;
     use base64::Engine;
-    use calamine::{open_workbook_auto, Reader};
     use reqwest::Client;
     use rusqlite::{params, Connection, OptionalExtension};
     use sha2::{Digest, Sha256};
     use std::fs;
-    use std::path::{Path, PathBuf};
+    use std::path::Path;
     use std::time::Duration;
     use tauri::AppHandle;
     use walkdir::WalkDir;
+    use crate::db::{db_path, ensure_dirs, open_db, META_DB_VERSION_KEY, META_MANIFEST_HASH_KEY};
 
-    pub const DB_FILE_NAME: &str = "catalog.db";
-    pub const IMAGES_DIR_NAME: &str = "images";
-    pub const META_DB_VERSION_KEY: &str = "db_version";
-    pub const META_MANIFEST_HASH_KEY: &str = "manifest_hash";
     const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
 
     #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -99,13 +97,6 @@ mod core {
     }
 
     #[derive(Debug, Serialize, Deserialize)]
-    pub struct ImportResult {
-        pub processed_rows: usize,
-        pub upserted_products: usize,
-        pub linked_vehicles: usize,
-        pub new_db_version: i64,
-    }
-    #[derive(Debug, Serialize, Deserialize)]
     pub struct ImageIndexResult {
         pub scanned: usize,
         pub matched: usize,
@@ -134,32 +125,7 @@ mod core {
         pub public_base_url: Option<String>,
     }
 
-    fn app_data_dir(app: &AppHandle) -> Result<PathBuf> {
-        Ok(app.path().app_local_data_dir()?)
-    }
-    fn db_path(app: &AppHandle) -> Result<PathBuf> {
-        Ok(app_data_dir(app)?.join(DB_FILE_NAME))
-    }
-
-    fn ensure_dirs(app: &AppHandle) -> Result<(PathBuf, PathBuf, PathBuf)> {
-        let data = app_data_dir(app)?;
-        if !data.exists() {
-            fs::create_dir_all(&data)?;
-        }
-        let db = data.join(DB_FILE_NAME);
-        let imgs = data.join(IMAGES_DIR_NAME);
-        if !imgs.exists() {
-            fs::create_dir_all(&imgs)?;
-        }
-        Ok((data, db, imgs))
-    }
-    fn open_db(path: &Path) -> Result<Connection> {
-        let conn = Connection::open(path)?;
-        // Evita falhas "database is locked" quando outra operacao ainda esta finalizando.
-        conn.busy_timeout(Duration::from_secs(30))?;
-        Ok(conn)
-    }
-    fn migrate(conn: &Connection) -> Result<()> {
+    pub(crate) fn migrate(conn: &Connection) -> Result<()> {
         conn.execute_batch(
             r#"
             PRAGMA journal_mode=WAL;
@@ -177,6 +143,13 @@ mod core {
               id INTEGER PRIMARY KEY, brand_id INTEGER NOT NULL, code TEXT NOT NULL UNIQUE,
               description TEXT NOT NULL, application TEXT, details TEXT, oem TEXT, similar TEXT, pgroup TEXT,
               FOREIGN KEY(brand_id) REFERENCES brands(id)
+            );
+            CREATE TABLE IF NOT EXISTS vehicle_makes (
+              vehicle_id INTEGER NOT NULL,
+              make_id INTEGER NOT NULL,
+              PRIMARY KEY (vehicle_id, make_id),
+              FOREIGN KEY(vehicle_id) REFERENCES vehicles(id),
+              FOREIGN KEY(make_id) REFERENCES makes(id)
             );
             CREATE TABLE IF NOT EXISTS product_vehicles (
               product_id INTEGER NOT NULL, vehicle_id INTEGER NOT NULL,
@@ -220,6 +193,10 @@ mod core {
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []);
         let _ = conn.execute(
+            "CREATE TABLE IF NOT EXISTS vehicle_makes (vehicle_id INTEGER NOT NULL, make_id INTEGER NOT NULL, PRIMARY KEY(vehicle_id, make_id))",
+            [],
+        );
+        let _ = conn.execute(
             "CREATE TABLE IF NOT EXISTS makes (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE)",
             [],
         );
@@ -235,17 +212,21 @@ mod core {
             "UPDATE vehicles SET make_id = (SELECT id FROM makes m WHERE UPPER(TRIM(m.name)) = UPPER(TRIM(COALESCE(vehicles.make,'')))) WHERE make_id IS NULL AND TRIM(COALESCE(make,'')) <> ''",
             [],
         );
+        let _ = conn.execute(
+            "INSERT OR IGNORE INTO vehicle_makes(vehicle_id, make_id) SELECT v.id, m.id FROM vehicles v JOIN makes m ON UPPER(TRIM(m.name)) = UPPER(TRIM(COALESCE(v.make,''))) WHERE TRIM(COALESCE(v.make,'')) <> ''",
+            [],
+        );
         let _ = seed_brand_groups(conn);
         Ok(())
     }
-    fn get_db_version(conn: &Connection) -> Result<i64> {
+    pub(crate) fn get_db_version(conn: &Connection) -> Result<i64> {
         Ok(conn.query_row(
             "SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?1",
             params![META_DB_VERSION_KEY],
             |row| row.get(0),
         )?)
     }
-    fn set_db_version(conn: &Connection, v: i64) -> Result<()> {
+    pub(crate) fn set_db_version(conn: &Connection, v: i64) -> Result<()> {
         conn.execute(
             "INSERT OR REPLACE INTO meta(key,value) VALUES(?1, ?2)",
             params![META_DB_VERSION_KEY, v.to_string()],
@@ -547,7 +528,7 @@ mod core {
         format!("{} AS {}", GROUP_EXPR_SQL, alias)
     }
 
-    fn seed_brand_groups(conn: &Connection) -> Result<()> {
+    pub(crate) fn seed_brand_groups(conn: &Connection) -> Result<()> {
         conn.execute("DELETE FROM brand_groups", [])?;
         let sql = format!(
             "INSERT INTO brand_groups(brand_id, name)
@@ -1128,8 +1109,8 @@ mod core {
     fn clear_launches_dir(imgs_dir: &std::path::Path) -> std::io::Result<()> {
         // tenta limpar variacoes do nome para evitar problemas de acentuacao/caso
         let candidates = [
-            "LANÃ‡AMENTOS",
-            "lanÃ§amentos",
+            "LANÇAAMENTOS",
+            "lançamentos",
             "LANCAMENTOS",
             "Lancamentos",
             "lancamentos",
@@ -1149,8 +1130,8 @@ mod core {
         use walkdir::WalkDir;
         let (_, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
         let candidates = [
-            "LANÃ‡AMENTOS",
-            "lanÃ§amentos",
+            "LANÇAAMENTOS",
+            "lançamentos",
             "LANCAMENTOS",
             "Lancamentos",
             "lancamentos",
@@ -1429,270 +1410,13 @@ mod core {
             output: dest_path,
         })
     }
-    fn norm(s: &str) -> String {
-        let s = s.trim();
-        let up = s.to_ascii_uppercase();
-        up.chars()
-            .map(|c| match c {
-                'Á' | 'À' | 'Ã' | 'Â' | 'Ä' => 'A',
-                'É' | 'Ê' | 'È' | 'Ë' => 'E',
-                'Í' | 'Ì' | 'Î' | 'Ï' => 'I',
-                'Ó' | 'Ò' | 'Õ' | 'Ô' | 'Ö' => 'O',
-                'Ú' | 'Ù' | 'Û' | 'Ü' => 'U',
-                'Ç' => 'C',
-                other => other,
-            })
-            .collect()
-    }
-
-    fn header_key(s: &str) -> &'static str {
-        let n = norm(s);
-        if ["FABRICANTE", "MARCA"].contains(&n.as_str()) {
-            "brand"
-        } else if ["CODIGO", "CÓDIGO", "COD", "REFERENCIA", "REF"].contains(&n.as_str()) {
-            "code"
-        } else if ["DESCRICAO", "DESCRIÇÃO"].contains(&n.as_str()) {
-            "description"
-        } else if ["GRUPO", "GRUPO DE PRODUTOS", "CATEGORIA"].contains(&n.as_str()) {
-            "group"
-        } else if ["APLICACAO", "APLICAÇÃO"].contains(&n.as_str()) {
-            "application"
-        } else if ["MONTADORA", "MONTADORA/S"].contains(&n.as_str()) {
-            "make"
-        } else if ["OEM"].contains(&n.as_str()) {
-            "oem"
-        } else if ["SIMILAR"].contains(&n.as_str()) {
-            "similar"
-        } else if ["ANO", "LINK", "FOTO", "FOTOS"].contains(&n.as_str()) {
-            "ignore"
-        } else {
-            "ignore"
-        }
-    }
+    
 
     #[tauri::command]
-    pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String> {
-        let (_, dbf, _) = ensure_dirs(&app).map_err(|e| e.to_string())?;
-        let mut wb = open_workbook_auto(&path).map_err(|e| format!("Falha abrindo XLSX: {e}"))?;
-        let sheet_names = wb.sheet_names().to_vec();
-        let sheet = sheet_names
-            .get(0)
-            .ok_or_else(|| "Planilha vazia".to_string())?
-            .to_string();
-        let range = wb.worksheet_range(&sheet).map_err(|e| e.to_string())?;
-
-        let mut rows = range.rows();
-        let header = rows.next().ok_or("XLSX sem cabecalho")?;
-        let mut idx = (
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-        );
-        let mut idx_details: usize = usize::MAX;
-        let mut idx_make: usize = usize::MAX;
-        // order: brand, code, description, group, application, vehicles, oem, similar
-        for (i, cell) in header.iter().enumerate() {
-            let key = header_key(&cell.to_string());
-            match key {
-                "brand" if idx.0 == usize::MAX => idx.0 = i,
-                "code" if idx.1 == usize::MAX => idx.1 = i,
-                "description" if idx.2 == usize::MAX => idx.2 = i,
-                "group" if idx.3 == usize::MAX => idx.3 = i,
-                "application" if idx.4 == usize::MAX => idx.4 = i,
-                "vehicles" if idx.5 == usize::MAX => idx.5 = i,
-                "oem" if idx.6 == usize::MAX => idx.6 = i,
-                "similar" if idx.7 == usize::MAX => idx.7 = i,
-                "make" if idx_make == usize::MAX => idx_make = i,
-                _ => {}
-            }
-            let t = cell.to_string().to_ascii_uppercase();
-            if idx_details == usize::MAX
-                && (t.contains("DETAL") || t.contains("OBSERV") || t == "OBS" || t.contains("NOTA"))
-            {
-                idx_details = i;
-            }
-        }
-        if idx.1 == usize::MAX || idx.2 == usize::MAX {
-            return Err("CabeÃ§alhos mÃ­nimos ausentes (cÃ³digo/descriÃ§Ã£o)".into());
-        }
-
-        let mut conn = open_db(&dbf).map_err(|e| e.to_string())?;
-        migrate(&conn).map_err(|e| e.to_string())?;
-        let tx = conn.transaction().map_err(|e| e.to_string())?;
-
-        let mut processed = 0usize;
-        let mut upserted = 0usize;
-        let mut linked = 0usize;
-        // Se a planilha traz coluna de montadora, garante estrutura e limpa dados antigos para evitar sujeira de aplica��es
-        if idx_make != usize::MAX {
-            tx.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []).ok();
-            tx.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []).ok();
-            tx.execute("CREATE TABLE IF NOT EXISTS makes (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE)", []).ok();
-            tx.execute("DELETE FROM product_vehicles", []).ok();
-            tx.execute("DELETE FROM vehicles", []).ok();
-            tx.execute("DELETE FROM makes", []).ok();
-        }
-        for row in rows {
-            processed += 1;
-            let cell = |i: usize| -> String {
-                if i == usize::MAX {
-                    return String::new();
-                }
-                row.get(i)
-                    .map(|c| c.to_string())
-                    .unwrap_or_default()
-                    .trim()
-                    .to_string()
-            };
-            let brand_name = cell(idx.0);
-            let code = cell(idx.1);
-            if code.is_empty() {
-                continue;
-            }
-            let description = cell(idx.2);
-            let pgroup = cell(idx.3);
-            let application = cell(idx.4);
-            let make_val = if idx_make != usize::MAX { cell(idx_make) } else { String::new() };
-            let details = if idx_details != usize::MAX {
-                cell(idx_details)
-            } else {
-                String::new()
-            };
-            // veÃ­culos: se nÃ£o existir coluna dedicada, derivamos da aplicaÃ§Ã£o
-            let vehicles_raw = if idx.5 != usize::MAX {
-                cell(idx.5)
-            } else {
-                application.clone()
-            };
-            let oem = cell(idx.6);
-            let similar = cell(idx.7);
-
-            // brand (normaliza para evitar duplicatas por caixa/espaÃ§o)
-            let brand_id: i64 = if !brand_name.is_empty() {
-                // tenta localizar por comparaÃ§Ã£o case-insensitive e trim
-                let found: Option<i64> = tx
-                    .query_row(
-                        "SELECT id FROM brands WHERE UPPER(TRIM(name)) = UPPER(TRIM(?1))",
-                        params![brand_name],
-                        |r| r.get(0),
-                    )
-                    .optional()
-                    .unwrap_or(None);
-                if let Some(id) = found {
-                    id
-                } else {
-                    tx.execute(
-                        "INSERT INTO brands(name) VALUES(TRIM(?1))",
-                        params![brand_name],
-                    )
-                    .ok();
-                    tx.query_row(
-                        "SELECT id FROM brands WHERE UPPER(TRIM(name)) = UPPER(TRIM(?1))",
-                        params![brand_name],
-                        |r| r.get(0),
-                    )
-                    .unwrap_or(1)
-                }
-            } else {
-                1
-            };
-
-            // product upsert
-            tx.execute(
-                "INSERT INTO products(brand_id, code, description, pgroup, application, oem, similar) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7)
-                 ON CONFLICT(code) DO UPDATE SET brand_id=excluded.brand_id, description=excluded.description, pgroup=excluded.pgroup, application=excluded.application, oem=excluded.oem, similar=excluded.similar",
-                params![
-                    brand_id,
-                    code,
-                    description,
-                    if pgroup.is_empty() { None::<String> } else { Some(pgroup.clone()) },
-                    if application.is_empty() { None::<String> } else { Some(application.clone()) },
-                    if oem.is_empty() { None::<String> } else { Some(oem) },
-                    if similar.is_empty() { None::<String> } else { Some(similar) }
-                ],
-            ).map_err(|e| e.to_string())?;
-            upserted += 1;
-            let pid: i64 = tx
-                .query_row(
-                    "SELECT id FROM products WHERE code=?1",
-                    params![code],
-                    |r| r.get(0),
-                )
-                .map_err(|e| e.to_string())?;
-            if !details.is_empty() {
-                tx.execute(
-                    "UPDATE products SET details=?1 WHERE id=?2",
-                    params![details, pid],
-                )
-                .ok();
-            }
-            // vehicles (split por ; , | e quebras de linha) - não usar "/"
-            if !vehicles_raw.is_empty() {
-                tx.execute(
-                    "DELETE FROM product_vehicles WHERE product_id=?1",
-                    params![pid],
-                )
-                .ok();
-                for v in vehicles_raw
-                    .split(|c| c == ';' || c == ',' || c == '|' || c == '\n' || c == '\r')
-                {
-                    let v = v.trim();
-                    if v.is_empty() {
-                        continue;
-                    }
-                    let make_final = if !make_val.is_empty() {
-                        Some(make_val.to_ascii_uppercase())
-                    } else {
-                        None
-                    };
-                    let mut make_id: Option<i64> = None;
-                    if let Some(mf) = make_final.as_ref() {
-                        tx.execute("INSERT OR IGNORE INTO makes(name) VALUES(?)", params![mf.clone()]).ok();
-                        make_id = tx
-                            .query_row("SELECT id FROM makes WHERE name=?1", params![mf], |r| r.get(0))
-                            .optional()
-                            .unwrap_or(None);
-                    }
-                    tx.execute(
-                        "INSERT INTO vehicles(name, make, make_id) VALUES(?, ?, ?) ON CONFLICT(name) DO UPDATE SET make=COALESCE(NULLIF(excluded.make,''), vehicles.make), make_id=COALESCE(excluded.make_id, vehicles.make_id)",
-                        params![v, if make_val.is_empty() { None::<String> } else { Some(make_val.clone()) }, make_id],
-                    )
-                    .ok();
-                    let vid: i64 = tx
-                        .query_row("SELECT id FROM vehicles WHERE name=?1", params![v], |r| {
-                            r.get(0)
-                        })
-                        .unwrap_or_else(|_| 0);
-                    if vid != 0 {
-                        tx.execute(
-                            "INSERT OR IGNORE INTO product_vehicles(product_id, vehicle_id) VALUES(?1,?2)",
-                            params![pid, vid],
-                        )
-                        .ok();
-                        linked += 1;
-                    }
-                }
-            }
-        }
-        tx.commit().map_err(|e| e.to_string())?;
-        seed_brand_groups(&conn).map_err(|e| e.to_string())?;
-        // bump version
-        let v = get_db_version(&conn).unwrap_or(0) + 1;
-        set_db_version(&conn, v).ok();
-        Ok(ImportResult {
-            processed_rows: processed,
-            upserted_products: upserted,
-            linked_vehicles: linked,
-            new_db_version: v,
-        })
+    pub fn import_excel(app: AppHandle, path: String) -> Result<crate::importer::ImportResult, String> {
+        crate::importer::import_excel(app, path)
     }
-
-    fn candidate_codes(stem: &str) -> Vec<String> {
+fn candidate_codes(stem: &str) -> Vec<String> {
         use std::collections::HashSet;
         let s = stem.trim();
         let up = s.to_ascii_uppercase();
@@ -1833,4 +1557,8 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+
+
+
 
