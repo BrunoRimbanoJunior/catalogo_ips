@@ -806,7 +806,7 @@ function App() {
           </div>
         )}
 
-        {(statusMsg || secondaryStatus || syncing) && (
+        {isDev && (statusMsg || secondaryStatus || syncing) && (
           <div className="statusbar">
             <div className="small">{syncing ? "Sincronizando... " : ""}{statusMsg}</div>
             {secondaryStatus ? <div className="small">{secondaryStatus}</div> : null}
@@ -922,9 +922,12 @@ function App() {
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                         <span className="code">{p.code}</span>
                         <span className="desc">{p.description}</span>
-                        <span className="brand">{p.brand}</span>
                       </div>
-                      {p.vehicles ? <div style={{ fontSize: 12, opacity: 0.9 }}>Aplicacoes: {p.vehicles}</div> : null}
+                      {p.vehicles ? (
+                        <div style={{ fontSize: 14, opacity: 0.9 }}>
+                          <strong>Aplicacoes:</strong> {p.vehicles}
+                        </div>
+                      ) : null}
                     </div>
                   </li>
                 ))}
