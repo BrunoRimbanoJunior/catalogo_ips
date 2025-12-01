@@ -746,7 +746,7 @@ function App() {
 
   if (!ready) {
     return (
-      <main className="container" style={headerBgStyle}>
+      <main className="container" style={headerBgStyle} onContextMenu={(e) => e.preventDefault()}>
         Carregando...
       </main>
     );
@@ -754,7 +754,11 @@ function App() {
 
   return (
     <>
-      <main className={`container ${blockAccess ? "app-blocked" : ""}`} style={headerBgStyle}>
+      <main
+        className={`container ${blockAccess ? "app-blocked" : ""}`}
+        style={headerBgStyle}
+        onContextMenu={(e) => e.preventDefault()}
+      >
         <div className="appbar">
           <div className="appbar-logo">
             {logoPath ? (

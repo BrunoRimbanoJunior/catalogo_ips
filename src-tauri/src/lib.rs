@@ -2,6 +2,8 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
 
+mod desc;
+
 mod core {
     use super::*;
     use base64::Engine;
@@ -913,7 +915,7 @@ mod core {
         let mut copied: Vec<String> = Vec::new();
         for p in paths.iter() {
             let src = std::path::Path::new(p);
-            let ext = src.extension().and_then(|e| e.to_str()).unwrap_or("png");
+            let _ext = src.extension().and_then(|e| e.to_str()).unwrap_or("png");
             let name = src.file_name().and_then(|n| n.to_str()).unwrap_or("logo");
             let safe_name = name.replace(|c: char| c == '"' || c == '\'', "_");
             let dest = logos_dir.join(&safe_name);
@@ -1227,7 +1229,17 @@ mod core {
             }
         };
 
-        // Função auxiliar para converter bytes em data URL
+        let key_env = std::env::var("DESCRYPT_KEY").unwrap_or_default();
+        let try_decrypt = |data: Vec<u8>| -> Vec<u8> {
+            if key_env.trim().is_empty() {
+                return data;
+            }
+            match crate::desc::decrypt_image(&data, &key_env) {
+                Ok(p) => p,
+                Err(_) => data,
+            }
+        };
+
         fn to_data_url(path: &std::path::Path, bytes: Vec<u8>) -> String {
             let ext = path
                 .extension()
@@ -1245,19 +1257,20 @@ mod core {
             format!("data:{};base64,{}", mime, encoded)
         }
 
-        // 1) Tenta ler exatamente o caminho resolvido
         match fs::read(&abs_try) {
-            Ok(bytes) => return Ok(to_data_url(&abs_try, bytes)),
+            Ok(mut bytes) => {
+                bytes = try_decrypt(bytes);
+                return Ok(to_data_url(&abs_try, bytes));
+            }
             Err(_) => {
-                // 2) Fallback: se o arquivo não existir (ex.: DB antigo salvou só o nome sem subpasta),
-                // procura pelo basename em subdiretórios de images_dir
                 if let Some(name) = abs_try.file_name().and_then(|s| s.to_str()) {
                     for entry in WalkDir::new(&imgs_dir).into_iter().filter_map(|e| e.ok()) {
                         let p = entry.path();
                         if p.is_file() {
                             if let Some(base) = p.file_name().and_then(|s| s.to_str()) {
                                 if base.eq_ignore_ascii_case(name) {
-                                    if let Ok(bytes) = fs::read(p) {
+                                    if let Ok(mut bytes) = fs::read(p) {
+                                        bytes = try_decrypt(bytes);
                                         return Ok(to_data_url(p, bytes));
                                     }
                                 }
@@ -1265,15 +1278,10 @@ mod core {
                         }
                     }
                 }
-                return Err(format!(
-                    "Falha ao ler imagem (não encontrada): {}",
-                    abs_try.display()
-                ));
+                return Err(format!("Falha ao ler imagem (nao encontrada): {}", abs_try.display()));
             }
         }
-    }
-
-    #[tauri::command]
+    }    #[tauri::command]
     pub async fn index_images_from_manifest(
         app: AppHandle,
         manifest_url: String,
