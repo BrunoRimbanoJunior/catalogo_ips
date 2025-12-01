@@ -91,7 +91,9 @@ jobs:
             --out manifest.json
 
       - name: Commit and push manifest
-        if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/'))
+        # Commit tanto em pushes quanto em execuções disparadas por tags ou workflow_run/cron,
+        # desde que estejamos no main ou em ref de tag.
+        if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/')
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "ci: update manifest.json"
