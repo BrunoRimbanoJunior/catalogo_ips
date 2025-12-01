@@ -747,9 +747,17 @@ function App() {
             {updateInfo && !updateDismissed && (
               <div className="update-banner">
                 <span>
-                  Nova vers\u00e3o dispon\u00edvel: {updateInfo.availableVersion} (atual {appVersion})
+                  Nova versao disponivel: {updateInfo.availableVersion} (atual {appVersion})
                 </span>
-                <button onClick={() => openExternal(updateInfo.downloadUrl || FIXED_DOWNLOAD)}>Baixar/Atualizar</button>
+                <a
+                  className="launch-button"
+                  href={updateInfo.downloadUrl || FIXED_DOWNLOAD}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ textDecoration: "none", padding: "6px 10px" }}
+                >
+                  Baixar/Atualizar
+                </a>
                 <button className="ghost" onClick={() => setUpdateDismissed(true)}>
                   Fechar
                 </button>
