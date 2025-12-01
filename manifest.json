@@ -1,10 +1,8 @@
 {
-  "appVersion": "1.1.4",
-  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.1.4/catalogo_ips_1.1.4_x64-setup.exe",
   "db": {
-    "version": 26112520,
+    "version": 1764014360,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": null
+    "sha256": "3f0fb35a6765e39dc98cad6a1ddcbdce9c44f2fd592820dec8b0c02c8f78a49b"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -2182,10 +2180,6 @@
         "sha256": "a6fb9e1369a680562f411739742530d6"
       },
       {
-        "file": "CAIXA_DIRECAO/7111766010-1.png",
-        "sha256": "1a24e746383336c20ba1ff7640391ba1"
-      },
-      {
         "file": "CAIXA_DIRECAO/7111766010.png",
         "sha256": "d7c1134a6e9145941b8fcb737eb02029"
       },
@@ -2220,14 +2214,6 @@
       {
         "file": "CAIXA_DIRECAO/7113596010.png",
         "sha256": "f99521735661d7f9306bb1898e6c3077"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7113596010_1.png",
-        "sha256": "9281744095794b5690314e07b2758e33"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7113596010_2.png",
-        "sha256": "f31e839e873612dcc15b240c7adf200a"
       },
       {
         "file": "CAIXA_DIRECAO/7113596020.png",
@@ -2350,10 +2336,6 @@
         "sha256": "bc88bc184ae917ef575d397558f84deb"
       },
       {
-        "file": "CAIXA_DIRECAO/7134205710-1.png",
-        "sha256": "29d456b91630187e7abfd568af22a4d3"
-      },
-      {
         "file": "CAIXA_DIRECAO/7134205710.png",
         "sha256": "65e8d883a73058e58ee378079024cc70"
       },
@@ -2366,28 +2348,12 @@
         "sha256": "b4ddcd607899ffc64fe3066c2cf9b3dc"
       },
       {
-        "file": "CAIXA_DIRECAO/7134455920-1.png",
-        "sha256": "8aaa513b26b69cc97b8225bc873986cd"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7134455920-2.png",
-        "sha256": "e9def78aeff0016a2ace8a65186d8086"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7134455920-3.png",
-        "sha256": "c8deaa3c449e7ba84347cb30c71be368"
-      },
-      {
         "file": "CAIXA_DIRECAO/7134455920.png",
         "sha256": "6119a9a9f7ca8409c35928ed1dd9f58d"
       },
       {
         "file": "CAIXA_DIRECAO/7134486001.png",
         "sha256": "0a207142aeb8fe659922b0c7878378b7"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7134535910-1.png",
-        "sha256": "933c36ddafce8644440d151d7328c0e5"
       },
       {
         "file": "CAIXA_DIRECAO/7134535910.png",
@@ -2406,10 +2372,6 @@
         "sha256": "9e0c7b53bb00aab9bfc98ceb749fb739"
       },
       {
-        "file": "CAIXA_DIRECAO/71348055910.png",
-        "sha256": "01964d3ee89039dc749310dd726bf65a"
-      },
-      {
         "file": "CAIXA_DIRECAO/7134805910 (2).png",
         "sha256": "d1a6bf372058ba3903057386b0496dc6"
       },
@@ -2418,28 +2380,12 @@
         "sha256": "d608cac7e6367f662a116ba4976e5344"
       },
       {
-        "file": "CAIXA_DIRECAO/7134805910_1.png",
-        "sha256": "09161e177b190890a883d8c86d186cb3"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7134806000-1.png",
-        "sha256": "223f1e0639497d39533526ad2b5e8216"
-      },
-      {
         "file": "CAIXA_DIRECAO/7134806000.png",
         "sha256": "05249659bc9cce29bea7165f35aa7a43"
       },
       {
-        "file": "CAIXA_DIRECAO/7134806010-1.png",
-        "sha256": "041423edc1685f0b042f7b0cf5ecb48b"
-      },
-      {
         "file": "CAIXA_DIRECAO/7134806010.png",
         "sha256": "a3f772f420ea6adaa23d6b5d312c6a73"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7134806020-1.png",
-        "sha256": "90378c122d228bc6ad93b8182147444e"
       },
       {
         "file": "CAIXA_DIRECAO/7134806020.png",
@@ -2448,10 +2394,6 @@
       {
         "file": "CAIXA_DIRECAO/7134836010.png",
         "sha256": "7a088499f742cb9f30efcbf6f279d246"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7134906000-1.png",
-        "sha256": "1d259f5aec200f20c08eeedd9c0a7164"
       },
       {
         "file": "CAIXA_DIRECAO/7134906000.png",
@@ -2470,16 +2412,8 @@
         "sha256": "dea0aa54091a7709f7471f06d96602cd"
       },
       {
-        "file": "CAIXA_DIRECAO/7136165710-1.png",
-        "sha256": "8d52b05e37342da09e89e07278cdf015"
-      },
-      {
         "file": "CAIXA_DIRECAO/7136165710.png",
         "sha256": "936a91862095d877f1d9edfa58793a5f"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7136176010-1.png",
-        "sha256": "30446c20d8ba17dc4d818cec52c30752"
       },
       {
         "file": "CAIXA_DIRECAO/7136176010.png",
@@ -2492,10 +2426,6 @@
       {
         "file": "CAIXA_DIRECAO/7136705701.png",
         "sha256": "f9892fcd40f9a42c984de6739db407c2"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7136756010-1.png",
-        "sha256": "af61a90640b0efbe7d06a29480e73a79"
       },
       {
         "file": "CAIXA_DIRECAO/7136756010.png",
@@ -2526,24 +2456,12 @@
         "sha256": "c5e07f3e610fe81aed291f74006079e4"
       },
       {
-        "file": "CAIXA_DIRECAO/7136825710-1.png",
-        "sha256": "a50c4f69760504ca5d7b0d1864cf1d34"
-      },
-      {
         "file": "CAIXA_DIRECAO/7136825710.png",
         "sha256": "4528b510046ce699621f5c15158c57d6"
       },
       {
-        "file": "CAIXA_DIRECAO/7136825720-1.png",
-        "sha256": "bb90f631f59d4b4fe65ff5268ff3c163"
-      },
-      {
         "file": "CAIXA_DIRECAO/7136825720.png",
         "sha256": "8c6c4e7a5be795c350208bea90bb3fa1"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7138106010-1.png",
-        "sha256": "521d4c5bdbc160aefc6b26fc28dcb4a3"
       },
       {
         "file": "CAIXA_DIRECAO/7138106010.png",
@@ -2566,44 +2484,12 @@
         "sha256": "8c3facb1f8c9c4242c748a1889c2f6e0"
       },
       {
-        "file": "CAIXA_DIRECAO/7144216010-1.png",
-        "sha256": "d7154917c8a02160ee2c68779aafd8a1"
-      },
-      {
         "file": "CAIXA_DIRECAO/7144216010.png",
         "sha256": "8181436280e1444f01a3149f7e81787f"
       },
       {
-        "file": "CAIXA_DIRECAO/7145386010-1.png",
-        "sha256": "00c9acf0891e003431d2771c6c01cc85"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7145386010-2.png",
-        "sha256": "8df75b0a2aab673ed8674d0600f6d807"
-      },
-      {
         "file": "CAIXA_DIRECAO/7145386010.png",
         "sha256": "f6b706416d88361a12d22acf4771fc7a"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7145386010_1.png",
-        "sha256": "8df75b0a2aab673ed8674d0600f6d807"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7145386010_2.png",
-        "sha256": "8df75b0a2aab673ed8674d0600f6d807"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7145386010_3.png",
-        "sha256": "00c9acf0891e003431d2771c6c01cc85"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7145386010_4.png",
-        "sha256": "00c9acf0891e003431d2771c6c01cc85"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7145506001.png",
-        "sha256": "ab3bf0763b64bdd830cfcbfde0786a86"
       },
       {
         "file": "CAIXA_DIRECAO/7146045900.png",
@@ -2614,24 +2500,8 @@
         "sha256": "24ac20360a3ce472a53669aae13f9f16"
       },
       {
-        "file": "CAIXA_DIRECAO/7146306010_1.png",
-        "sha256": "64f321e9797899baa825e282bfc7583b"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7146306010_2.png",
-        "sha256": "8a2e572ba502235f5e8916004234eaff"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7146336010-1.png",
-        "sha256": "b49062c179ea1fe6c4781d3ac1f62f86"
-      },
-      {
         "file": "CAIXA_DIRECAO/7146336010.png",
         "sha256": "e945a30269c4a14bf5b173d83fe68ce7"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7146336011-1.png",
-        "sha256": "b7759149ee0cf907a243ffc8882c0589"
       },
       {
         "file": "CAIXA_DIRECAO/7146336011.png",
@@ -2654,10 +2524,6 @@
         "sha256": "88768839a3045b7ea802805f0aad5698"
       },
       {
-        "file": "CAIXA_DIRECAO/7146505900-1.png",
-        "sha256": "9b775259887a4529f3a0a075998b1f43"
-      },
-      {
         "file": "CAIXA_DIRECAO/7146505900.png",
         "sha256": "d01b191f80ca9412694eb219dbfbc957"
       },
@@ -2678,10 +2544,6 @@
         "sha256": "90b79eaee63045803dee69179c6cddf1"
       },
       {
-        "file": "CAIXA_DIRECAO/7146905900-1.png",
-        "sha256": "41929368f90d32d997d0c911d0c2f380"
-      },
-      {
         "file": "CAIXA_DIRECAO/7146905900.png",
         "sha256": "77de495925c79a10736baeded077da00"
       },
@@ -2690,20 +2552,8 @@
         "sha256": "3aa6fde7fd797748d22cb483e0171da5"
       },
       {
-        "file": "CAIXA_DIRECAO/7146905910_1.png",
-        "sha256": "3a7650582ea8017e15e8e5609030fe7e"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7146905920-1.png",
-        "sha256": "47fcfcf07ff78e10037fe84bcce7f951"
-      },
-      {
         "file": "CAIXA_DIRECAO/7146905920.png",
         "sha256": "835e22f12b2cbb1d636a29317c3eb36d"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7147016010-1.png",
-        "sha256": "67acef64aae69eb7ed99082472627787"
       },
       {
         "file": "CAIXA_DIRECAO/7147016010.png",
@@ -2732,14 +2582,6 @@
       {
         "file": "CAIXA_DIRECAO/71483860010.png",
         "sha256": "fe4dfc4405341c3eef37d8d3eb59d2a2"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7148386010-1.png",
-        "sha256": "73897606617b0c69a4ed5f46fd0594c0"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7148386010-2.png",
-        "sha256": "d02ad468ca6d2cd7b6a320e43f00b263"
       },
       {
         "file": "CAIXA_DIRECAO/7148386010.png",
@@ -2790,16 +2632,8 @@
         "sha256": "bd721ef3bff71b9fa5c2bf4a99c04834"
       },
       {
-        "file": "CAIXA_DIRECAO/7150615900-1.png",
-        "sha256": "5c14edfadcf1c7215d83a486a2c5c1e4"
-      },
-      {
         "file": "CAIXA_DIRECAO/7150615900.png",
         "sha256": "bd1331d444738b46553883a5f1d2df95"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7150616000-1.png",
-        "sha256": "6d4918794eb051c890319b64336e5efd"
       },
       {
         "file": "CAIXA_DIRECAO/7150616000.png",
@@ -2810,24 +2644,12 @@
         "sha256": "9f0db96a2e7ffa8361f5799e11fd5bd5"
       },
       {
-        "file": "CAIXA_DIRECAO/7150646010-1.png",
-        "sha256": "1038dc1f7a5d190977814181493c2771"
-      },
-      {
         "file": "CAIXA_DIRECAO/7150646010.png",
         "sha256": "cbd659dc325d3256d9e850ad9f96af9d"
       },
       {
-        "file": "CAIXA_DIRECAO/7150646020-1.png",
-        "sha256": "43b0136ca671e0b454d80bdb7c7ed1c0"
-      },
-      {
         "file": "CAIXA_DIRECAO/7150646020.png",
         "sha256": "f8a3167f6b9f709a51bc6adf22a51608"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7150685900-1.png",
-        "sha256": "fc6ced956b27e3855f76a247909295dc"
       },
       {
         "file": "CAIXA_DIRECAO/7150685900.png",
@@ -2838,24 +2660,12 @@
         "sha256": "497aec75ad374e9549765d892dbc02af"
       },
       {
-        "file": "CAIXA_DIRECAO/7156045900-1.png",
-        "sha256": "b93e8aeedeba5dd6ac32e362c881bc53"
-      },
-      {
         "file": "CAIXA_DIRECAO/7156045900.png",
         "sha256": "ef40966088b030199665db6bbda36290"
       },
       {
         "file": "CAIXA_DIRECAO/7156106000.png",
         "sha256": "45cb9a03c62f0156930a7e9359606752"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156106000_1.png",
-        "sha256": "eba6278fa2b7d8bff6d5f3b94a7a6cc5"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156106000_2.png",
-        "sha256": "35e08be823b7b2277632a21115b73013"
       },
       {
         "file": "CAIXA_DIRECAO/7156305911.png",
@@ -2868,14 +2678,6 @@
       {
         "file": "CAIXA_DIRECAO/7156306002.png",
         "sha256": "60aaa9141a99c4abac1671855a10408c"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156425900.png",
-        "sha256": "4e2f565bc6d82daa52c3e94b76e41b49"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156425900_1.png",
-        "sha256": "5134abdc2df1b80e605e15e9db98c9aa"
       },
       {
         "file": "CAIXA_DIRECAO/7156425910.png",
@@ -2894,32 +2696,8 @@
         "sha256": "31fd4149eaec6416caf87e7aae4da31f"
       },
       {
-        "file": "CAIXA_DIRECAO/7156446000-1.png",
-        "sha256": "43e4a89797b5a0891c84c4cdd89f84e6"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156446000-2.png",
-        "sha256": "18faec63c6cc43bf07812fe5e1e5d3d6"
-      },
-      {
         "file": "CAIXA_DIRECAO/7156446000.png",
         "sha256": "9ce1725c086966821b6349c1aec6817e"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156446610-1.png",
-        "sha256": "ee1a1714b9d9f39fef0e4ca6b2c24373"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156446610-2.png",
-        "sha256": "ebd9fe21289d10646fd8f92f1042c21c"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156446610-3.png",
-        "sha256": "4f145fcf1c9c23ccf712c32a08ac23ea"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156446610.png",
-        "sha256": "a78d17bbaefaa996e89606e4ad9ca1fc"
       },
       {
         "file": "CAIXA_DIRECAO/7156506000.png",
@@ -2928,10 +2706,6 @@
       {
         "file": "CAIXA_DIRECAO/7156726000.png",
         "sha256": "5561b53029b09ac38fb0b21bd1957298"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7156745900-1.png",
-        "sha256": "f931f0606ba4deae9ac13eded5c8c758"
       },
       {
         "file": "CAIXA_DIRECAO/7156745900.png",
@@ -2999,7 +2773,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7163286010.png",
-        "sha256": "4bc3697ee7c2e82df8e592149c95cebd"
+        "sha256": "4d1cecbea3de0a6bc037f9208b377e07"
       },
       {
         "file": "CAIXA_DIRECAO/7163286600.png",
@@ -3044,10 +2818,6 @@
       {
         "file": "CAIXA_DIRECAO/7169766000.png",
         "sha256": "cf204c13e1d39a094d3c2f3091a154db"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7170105900-1.png",
-        "sha256": "1ed7b8dd39a227885de209ee024837eb"
       },
       {
         "file": "CAIXA_DIRECAO/7170105900.png",
@@ -3102,14 +2872,6 @@
         "sha256": "9d250276b4d118bcc7de8f701fc70838"
       },
       {
-        "file": "CAIXA_DIRECAO/7170865911-1.png",
-        "sha256": "5e5a2d6cb4ce0f3c2d9432a2588ab417"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7170865911-2.png",
-        "sha256": "58a3b4ac10b5efd34cd2f7048d56318b"
-      },
-      {
         "file": "CAIXA_DIRECAO/7170865911.png",
         "sha256": "43dbf36511c87cd8136f584a37cc00c5"
       },
@@ -3136,10 +2898,6 @@
       {
         "file": "CAIXA_DIRECAO/7175265910.png",
         "sha256": "84e677e90625e43f6a74d53ea8900cb9"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7175265920-1.png",
-        "sha256": "7fe8533465594a5bd7d011a7d0f5defc"
       },
       {
         "file": "CAIXA_DIRECAO/7175265920.png",
@@ -3170,10 +2928,6 @@
         "sha256": "a37caa236bf5d656afd0f500ad260cb4"
       },
       {
-        "file": "CAIXA_DIRECAO/7175805910-1.png",
-        "sha256": "2753b8e01ae5147d16f723fd30ca4949"
-      },
-      {
         "file": "CAIXA_DIRECAO/7175805910.png",
         "sha256": "8e444bce0057b7058db16097de7cc8f5"
       },
@@ -3190,16 +2944,8 @@
         "sha256": "26647c409b526a84d08b26542454f32d"
       },
       {
-        "file": "CAIXA_DIRECAO/7175865920-1.png",
-        "sha256": "5275c173f47e1c10163482e02bc70cb3"
-      },
-      {
         "file": "CAIXA_DIRECAO/7175865920.png",
         "sha256": "b16ca30032e26c77cfdf406c9cb64ae7"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7175875910-1.png",
-        "sha256": "5d4853f7d193a4bbd3f5afd94b2a22ec"
       },
       {
         "file": "CAIXA_DIRECAO/7175875910.png",
@@ -3255,599 +3001,499 @@
       },
       {
         "file": "ELETROVENTILADOR/4111041501.png",
-        "sha256": "8cc0953e1d17025ee305d6dd08cc7f19"
+        "sha256": "645a7069412b8a789f013e6ce515a1da"
       },
       {
-        "file": "ELETROVENTILADOR/4111041502.JPG",
-        "sha256": "430c19af91d19eb3056b59ffc8f8f52d"
+        "file": "ELETROVENTILADOR/4111041502.png",
+        "sha256": "fff90badc69b8d7b0fb0b6337141951d"
       },
       {
-        "file": "ELETROVENTILADOR/4111341501.JPG",
-        "sha256": "16977d86a2112de8876bb30c676188ea"
+        "file": "ELETROVENTILADOR/4111341501.png",
+        "sha256": "4ca3934963655df17cee9e07f6dd93c4"
       },
       {
-        "file": "ELETROVENTILADOR/4111341511.JPG",
-        "sha256": "0c5ea6d3ac1d21cc8937674b2a7cdd97"
+        "file": "ELETROVENTILADOR/4111341511.png",
+        "sha256": "853b9c5df708e55de64c38e4e7e6bb53"
       },
       {
-        "file": "ELETROVENTILADOR/4111441501.JPG",
-        "sha256": "32e29b11c62523c3b86b4c9083e96fa5"
+        "file": "ELETROVENTILADOR/4111441501.png",
+        "sha256": "02f7f8c99c2a885ddec0b96843d2587b"
       },
       {
-        "file": "ELETROVENTILADOR/4111441502.JPG",
-        "sha256": "48c4a0566ca1f029a3c1dd72a0cbb512"
+        "file": "ELETROVENTILADOR/4111441502.png",
+        "sha256": "0490d9ab4a96252e3d47a007b6647396"
       },
       {
-        "file": "ELETROVENTILADOR/4111441503.JPG",
-        "sha256": "8437d619cd21e507f55b3552fcb1858e"
+        "file": "ELETROVENTILADOR/4111441503.png",
+        "sha256": "d0241f685543574a5d15954998a44a94"
       },
       {
-        "file": "ELETROVENTILADOR/4111441504.JPG",
-        "sha256": "df3461f34ab8280e7b29e9d4954c6b18"
+        "file": "ELETROVENTILADOR/4111441504.png",
+        "sha256": "2ec5495c1eeadaf11a0795db373a94b7"
       },
       {
-        "file": "ELETROVENTILADOR/4111441505.JPG",
-        "sha256": "f043de6ef3ff95a26234d87c6c82826a"
+        "file": "ELETROVENTILADOR/4111441505.png",
+        "sha256": "53d474bbebceb6055b720248c6ef9845"
       },
       {
-        "file": "ELETROVENTILADOR/4111441506.JPG",
-        "sha256": "e3db21107c4ba0a5f354f1f4b0378ce9"
+        "file": "ELETROVENTILADOR/4111441506.png",
+        "sha256": "e8219a714500b4ac621f7920f13e27a7"
       },
       {
-        "file": "ELETROVENTILADOR/4111481501.JPG",
-        "sha256": "8021335dd1e2622778c9a0866abd884f"
+        "file": "ELETROVENTILADOR/4111481501.png",
+        "sha256": "da1a6a8e46db6065ec9f11c3f26c974c"
       },
       {
-        "file": "ELETROVENTILADOR/4111481511.JPG",
-        "sha256": "912fe8e31b14b5ecc050183f4d66daa2"
+        "file": "ELETROVENTILADOR/4111481511.png",
+        "sha256": "f55064f9deb34bf21650b390243c8a61"
       },
       {
-        "file": "ELETROVENTILADOR/4111481512.JPG",
-        "sha256": "6a889664fabd8e62adc73e6306a3c8c5"
+        "file": "ELETROVENTILADOR/4111481512.png",
+        "sha256": "80349a526f3564c606c9aa6cc85fee97"
       },
       {
-        "file": "ELETROVENTILADOR/4111761501.JPG",
-        "sha256": "cd390f4449586b9755249514f83efcc2"
+        "file": "ELETROVENTILADOR/4111761502.png",
+        "sha256": "c29b53c8e98a8123a397376a6676ea4f"
       },
       {
-        "file": "ELETROVENTILADOR/4111761502.JPG",
-        "sha256": "d2c2979654567783f63b21702cc81b79"
+        "file": "ELETROVENTILADOR/4111761511.png",
+        "sha256": "3dcf88d8f95f09401161972b73cee638"
       },
       {
-        "file": "ELETROVENTILADOR/4111761511.JPG",
-        "sha256": "31b7981442b490c1829fea6c503c94c7"
-      },
-      {
-        "file": "ELETROVENTILADOR/4111761512.JPG",
-        "sha256": "14d71295b48a94b5f6ade5c6e2eb8a8a"
-      },
-      {
-        "file": "ELETROVENTILADOR/4111821501-1.png",
-        "sha256": "191e0e2c52fa47fe281d7f7b1c0ce4b6"
-      },
-      {
-        "file": "ELETROVENTILADOR/4111821501-2.png",
-        "sha256": "507f9b7f60ec5ded108c0d18f39b5a9d"
-      },
-      {
-        "file": "ELETROVENTILADOR/4111821501-3.png",
-        "sha256": "ec78259d449d43a9dce0c070894cf930"
-      },
-      {
-        "file": "ELETROVENTILADOR/4111821501.JPG",
-        "sha256": "67dd78c3907f3a9b40e699366ec62d03"
+        "file": "ELETROVENTILADOR/4111761512.png",
+        "sha256": "ccf5de008e4340d202a49a72414ee595"
       },
       {
         "file": "ELETROVENTILADOR/4111821501.png",
-        "sha256": "675c469cf5228cd0eb3312d3633983de"
+        "sha256": "c0742558ced7eb68b992b0901ee3bd06"
       },
       {
-        "file": "ELETROVENTILADOR/4111901501.JPG",
-        "sha256": "4e1f38e481c63b29b98a8d8dfdbed60e"
+        "file": "ELETROVENTILADOR/4111901501.png",
+        "sha256": "7cc1c4cd5dd0cae19654389770d09a17"
       },
       {
-        "file": "ELETROVENTILADOR/4115501501.JPG",
-        "sha256": "f4291a09919b3c1d886b8eae495b8c68"
+        "file": "ELETROVENTILADOR/4115501501.png",
+        "sha256": "fe8701373f907d3634de14cb21769ab4"
       },
       {
-        "file": "ELETROVENTILADOR/4115501511.JPG",
-        "sha256": "b8a0b29baaca699adc12a598a8e9182e"
+        "file": "ELETROVENTILADOR/4115501511.png",
+        "sha256": "4a0061532ee462f9465af87d358bedbf"
       },
       {
-        "file": "ELETROVENTILADOR/4115501521.JPG",
-        "sha256": "de162e0e04f55eb75d90409604a6a968"
+        "file": "ELETROVENTILADOR/4115501521.png",
+        "sha256": "94b586fd600e453ccc29abfebaf2568f"
       },
       {
-        "file": "ELETROVENTILADOR/4115501522.JPG",
-        "sha256": "33b616633d3172bceadad970d631e577"
+        "file": "ELETROVENTILADOR/4115501522.png",
+        "sha256": "0a2d92cf074546cfc9991c2bd041461e"
       },
       {
-        "file": "ELETROVENTILADOR/4115501532.JPG",
-        "sha256": "23c962b9d9b82a585460ddfb53bab6e0"
+        "file": "ELETROVENTILADOR/4115501532.png",
+        "sha256": "bf41648187fdf88693e159c3c3e97cfd"
       },
       {
-        "file": "ELETROVENTILADOR/4115501533.JPG",
-        "sha256": "e0382dac5a1e7aa92d5be23d22553822"
+        "file": "ELETROVENTILADOR/4115501533.png",
+        "sha256": "ba3d314c900a4c6697566540998e68aa"
       },
       {
-        "file": "ELETROVENTILADOR/4115541501.JPG",
-        "sha256": "661bcc1ab42bcfeae295795b3e770c71"
+        "file": "ELETROVENTILADOR/4115541501.png",
+        "sha256": "55319d17c9b6c1dbf645c9a1cc2c0d42"
       },
       {
-        "file": "ELETROVENTILADOR/4115541502.JPG",
-        "sha256": "c2799b0f4cf8a192aa74956d518fce9e"
+        "file": "ELETROVENTILADOR/4115541502.png",
+        "sha256": "d5499a0934137feddec7129459512004"
       },
       {
-        "file": "ELETROVENTILADOR/4115881511.JPG",
-        "sha256": "0e5cb21da791be3abba91a8d9f994434"
+        "file": "ELETROVENTILADOR/4115881511.png",
+        "sha256": "04caaf4b8de8e826dab50eb05c270411"
       },
       {
-        "file": "ELETROVENTILADOR/4123011502.JPG",
-        "sha256": "74550e09cc0169ac4549e92d0394a36d"
+        "file": "ELETROVENTILADOR/4123011501.png",
+        "sha256": "b106bac6a8fb6ddb2a33d72c9b40067e"
       },
       {
-        "file": "ELETROVENTILADOR/4123021501.JPG",
-        "sha256": "49d786e1da4e8a8d4669d590bb6155a9"
+        "file": "ELETROVENTILADOR/4123011502.png",
+        "sha256": "228c737c5c91715a6be551a968db5170"
       },
       {
-        "file": "ELETROVENTILADOR/4123021502.JPG",
-        "sha256": "a0c5a2358708036d05247c9b3834adc5"
+        "file": "ELETROVENTILADOR/4123021501.png",
+        "sha256": "acf445380544cfdcaf424e060b7d7d89"
       },
       {
-        "file": "ELETROVENTILADOR/4123031501.JPG",
-        "sha256": "4e48843ed03fda4773857a7ae3ae49a8"
+        "file": "ELETROVENTILADOR/4123021502.png",
+        "sha256": "74d4b3e39b98c48960b5207746fc8ac4"
       },
       {
-        "file": "ELETROVENTILADOR/4128011501.JPG",
-        "sha256": "771822b25fdd89d52ba30adb2da85537"
+        "file": "ELETROVENTILADOR/4123031501.png",
+        "sha256": "bd3f4c663cb3c7d7457fd57ea4b6f46e"
       },
       {
-        "file": "ELETROVENTILADOR/4134011501.JPG",
-        "sha256": "5a8accfdf8b25bada60bd2ed34c4d32c"
+        "file": "ELETROVENTILADOR/4128011501.png",
+        "sha256": "228b2e764a6bd023828f2ac03d3529b6"
       },
       {
-        "file": "ELETROVENTILADOR/4134011511.JPG",
-        "sha256": "8a88951eca64eed01484b8e26a84db38"
+        "file": "ELETROVENTILADOR/4134011501.png",
+        "sha256": "013945fa9b8c5f6ee245c2e0ce10e95c"
       },
       {
-        "file": "ELETROVENTILADOR/4134431501.JPG",
-        "sha256": "c27f6a006bd39a1b1f1dba0769dd5e88"
+        "file": "ELETROVENTILADOR/4134011511.png",
+        "sha256": "ca2a7136dc464828cfd418592829d8f7"
       },
       {
-        "file": "ELETROVENTILADOR/4134531501.JPG",
-        "sha256": "b3507b5be6812bee2f8ebd1d22f87781"
+        "file": "ELETROVENTILADOR/4134431501.png",
+        "sha256": "a45f1d38b33ae5c2dc08752996ca5f11"
       },
       {
         "file": "ELETROVENTILADOR/4134531501.png",
-        "sha256": "5efa6dddc736f29e39d7cbf5074add8f"
+        "sha256": "b6c31d16f8885049ba5a8fefe77d1f2e"
       },
       {
-        "file": "ELETROVENTILADOR/4134901501.JPG",
-        "sha256": "06f5f008fd63563a1770abbe76b35a7b"
+        "file": "ELETROVENTILADOR/4134831502.png",
+        "sha256": "d9d585d00031a5b98839a7f366875e72"
       },
       {
-        "file": "ELETROVENTILADOR/4144011501.JPG",
-        "sha256": "5ef9af1c42437ce43c5a85b239be5d3e"
+        "file": "ELETROVENTILADOR/4134831503.png",
+        "sha256": "9271dba3bb6e8b236961a60003f4c4ed"
       },
       {
-        "file": "ELETROVENTILADOR/4144031501.JPG",
-        "sha256": "c82cac81f2320c5fb691bae94cf426da"
+        "file": "ELETROVENTILADOR/4134901501.png",
+        "sha256": "4882525bb3426c9daf79c2b7f23ea69e"
       },
       {
-        "file": "ELETROVENTILADOR/4144901501.JPG",
-        "sha256": "633876fa7d046753ee231c4039b6758f"
+        "file": "ELETROVENTILADOR/4144011501.png",
+        "sha256": "98904b250ba3ccfeb68532abcc619c15"
       },
       {
-        "file": "ELETROVENTILADOR/4145011501.JPG",
-        "sha256": "0736dde8779f01cca5a715b8eed9d2a2"
+        "file": "ELETROVENTILADOR/4144031501.png",
+        "sha256": "95bb26b018158fb0ebe41fcde87585a7"
       },
       {
-        "file": "ELETROVENTILADOR/4146301511.JPG",
-        "sha256": "6cee6def23977a352230a80250e91d7a"
+        "file": "ELETROVENTILADOR/4144901501.png",
+        "sha256": "1bda334453000f0d8e87eb143181f60e"
       },
       {
-        "file": "ELETROVENTILADOR/4146501501.JPG",
-        "sha256": "9b6f4f3e87c4daa51593ab0dacd765ef"
+        "file": "ELETROVENTILADOR/4145011501.png",
+        "sha256": "07c60ef0ca184d8772b6c6b1bee5c6dc"
       },
       {
-        "file": "ELETROVENTILADOR/4146501511.JPG",
-        "sha256": "78c1b4c5a28d35ba9e7dd4a332f0c69e"
+        "file": "ELETROVENTILADOR/4145011502.png",
+        "sha256": "fa6cdc1e74140e22562a551f56a04b1d"
       },
       {
-        "file": "ELETROVENTILADOR/4146501521.JPG",
-        "sha256": "1f0c9cf8dd7162884b7da5d52192d233"
+        "file": "ELETROVENTILADOR/4146301511.png",
+        "sha256": "aace4965a4c00cdfaa0e429a845bfc31"
       },
       {
-        "file": "ELETROVENTILADOR/4146501522.JPG",
-        "sha256": "efe33846298e32260759632fd91df1d2"
+        "file": "ELETROVENTILADOR/4146501501.png",
+        "sha256": "c3311524738e48d910358d9b9f492867"
       },
       {
-        "file": "ELETROVENTILADOR/4146501523.JPG",
-        "sha256": "b3bc540e2ec5a707c0019c5977d7eb8a"
+        "file": "ELETROVENTILADOR/4146501511.png",
+        "sha256": "530c125cf54ba92c0dfa717f9ee1fb46"
       },
       {
-        "file": "ELETROVENTILADOR/4146901511.JPG",
-        "sha256": "93698b1d63b07cf0802d76ce5e006ed7"
+        "file": "ELETROVENTILADOR/4146501521.png",
+        "sha256": "a333b2fe5976d7077076caac054470db"
       },
       {
-        "file": "ELETROVENTILADOR/4148261511.JPG",
-        "sha256": "5dbe4cdb1947c624fbfe1f6757c16180"
+        "file": "ELETROVENTILADOR/4146501522.png",
+        "sha256": "2bf372d7ccdcb34a8e7933072029610d"
       },
       {
-        "file": "ELETROVENTILADOR/4148261512.JPG",
-        "sha256": "c79925521534aea960bc3c0e0783c7af"
+        "file": "ELETROVENTILADOR/4146501523.png",
+        "sha256": "28c183deda275056e095dbde29ba00b5"
       },
       {
-        "file": "ELETROVENTILADOR/4148261513.JPG",
-        "sha256": "0e0778dbcaeadf94107f96005254ee7b"
+        "file": "ELETROVENTILADOR/4146501524.png",
+        "sha256": "5e65a58b3da75448ce6b08705315c00d"
       },
       {
-        "file": "ELETROVENTILADOR/4148261515.JPG",
-        "sha256": "56019881b49837418a311e399ea4f925"
+        "file": "ELETROVENTILADOR/4146901511.png",
+        "sha256": "65ace5c85840082669ac372cfd1c9ea0"
       },
       {
-        "file": "ELETROVENTILADOR/4148361511.JPG",
-        "sha256": "dbe33e27174bdd8e1b8c43d0773fb939"
+        "file": "ELETROVENTILADOR/4148261511.png",
+        "sha256": "47c7911300d1e97c73ada5cfe99505f2"
       },
       {
-        "file": "ELETROVENTILADOR/4148601501.JPG",
-        "sha256": "9d442ab27bb3f3f85e6f5f876900005b"
+        "file": "ELETROVENTILADOR/4148261512.png",
+        "sha256": "891dab9df655390b8c609bbd791c5e12"
+      },
+      {
+        "file": "ELETROVENTILADOR/4148261513.png",
+        "sha256": "018d7bde71b5dc9a577f264a56b9e1f0"
+      },
+      {
+        "file": "ELETROVENTILADOR/4148261514.png",
+        "sha256": "b4aadcc8db9af7c239d9d73514cc45fb"
+      },
+      {
+        "file": "ELETROVENTILADOR/4148261515.png",
+        "sha256": "449268937e98b0b07525b633fc40e516"
+      },
+      {
+        "file": "ELETROVENTILADOR/4148361511.png",
+        "sha256": "78f12f0595e416789b3fa962d881bf78"
       },
       {
         "file": "ELETROVENTILADOR/4148601501.png",
-        "sha256": "58a4dcc775085c16fc77c3ec52b3d742"
+        "sha256": "5f1af11044ffdf822dd1ef40e7b01123"
       },
       {
-        "file": "ELETROVENTILADOR/4150301501.JPG",
-        "sha256": "2810588850c9fa5dc4aa2b150e22212f"
+        "file": "ELETROVENTILADOR/4150301501.png",
+        "sha256": "f2a5e4bf29b1e13f27488ea8b3ee4611"
       },
       {
-        "file": "ELETROVENTILADOR/4150301504.JPG",
-        "sha256": "3fbf174068c67955b696bed78c8c3189"
+        "file": "ELETROVENTILADOR/4150301502.png",
+        "sha256": "ed7a75e59f262644d94238299db78778"
       },
       {
-        "file": "ELETROVENTILADOR/4150301505.JPG",
-        "sha256": "01173de76b991372e2d00577cb7b26e3"
+        "file": "ELETROVENTILADOR/4150301504.png",
+        "sha256": "4c0761c8eac23865ac2b4f89cab949cf"
       },
       {
-        "file": "ELETROVENTILADOR/4150301506.JPG",
-        "sha256": "69550ca6acda000c777df6236c723029"
+        "file": "ELETROVENTILADOR/4150301505.png",
+        "sha256": "1448ee2bc0d49c898c72645f8ff9d306"
       },
       {
-        "file": "ELETROVENTILADOR/4150301507.JPG",
-        "sha256": "f333087e99643e57edeb46ba0aa5f189"
+        "file": "ELETROVENTILADOR/4150301506.png",
+        "sha256": "1fa6b094217f086b527d153ed3220525"
       },
       {
-        "file": "ELETROVENTILADOR/4150301511.JPG",
-        "sha256": "c718085412a9042b4f56f02a45ab7803"
+        "file": "ELETROVENTILADOR/4150301507.png",
+        "sha256": "93cedfd05155f2817d6a6afd8317c188"
       },
       {
-        "file": "ELETROVENTILADOR/4150361501.JPG",
-        "sha256": "177903d21623da17875384c7da62e597"
+        "file": "ELETROVENTILADOR/4150301511.png",
+        "sha256": "7421f28b5f1a41caaa99e38c19211ce4"
       },
       {
-        "file": "ELETROVENTILADOR/4150361502.JPG",
-        "sha256": "41d91657231269389fda5ff9aaff6c9f"
+        "file": "ELETROVENTILADOR/4150361501.png",
+        "sha256": "8237a22b1dd29c5111512aa086d1580f"
       },
       {
-        "file": "ELETROVENTILADOR/4150611501.JPG",
-        "sha256": "25094b106599ab8a08e994a8c73d3929"
+        "file": "ELETROVENTILADOR/4150361502.png",
+        "sha256": "49153c2caec4985eea03e95568ca6f22"
       },
       {
-        "file": "ELETROVENTILADOR/4150611502.JPG",
-        "sha256": "f6090d2d03e06d793e15ac2c90d985b4"
+        "file": "ELETROVENTILADOR/4150611501.png",
+        "sha256": "05de5591d1496417b90bfb61a00ad184"
       },
       {
         "file": "ELETROVENTILADOR/4150611502.png",
-        "sha256": "28f8fe50ff6f36248b7466aded877cc5"
+        "sha256": "0ba2c9dc237b11a91dd253ec45c389fc"
       },
       {
-        "file": "ELETROVENTILADOR/4150611503.JPG",
-        "sha256": "d2352c93851c77f086c0d549c177b80f"
-      },
-      {
-        "file": "ELETROVENTILADOR/4150611504.JPG",
-        "sha256": "66c58bb2334bdfc0323917473d10930b"
+        "file": "ELETROVENTILADOR/4150611503.png",
+        "sha256": "9f339b971063a7d1869bcd2136e3f798"
       },
       {
         "file": "ELETROVENTILADOR/4150611504.png",
-        "sha256": "2dc6deba0a628b8e4d15bcb788f86984"
+        "sha256": "9b59b1c4fdeb738ebaa699e56df45a58"
       },
       {
-        "file": "ELETROVENTILADOR/4150641511.JPG",
-        "sha256": "ddd32223e18d817a55693aa0711c1a82"
+        "file": "ELETROVENTILADOR/4150641511.png",
+        "sha256": "9a3d8b2f8efafa40682c6b633b745e5f"
       },
       {
-        "file": "ELETROVENTILADOR/4150681501.JPG",
-        "sha256": "e784e8651989624a8992b525e960aac3"
+        "file": "ELETROVENTILADOR/4150681501.png",
+        "sha256": "b178ae1314cdab9570d30ef726861f02"
       },
       {
-        "file": "ELETROVENTILADOR/4150901501.JPG",
-        "sha256": "783745c8a1fb95ba1241778c68a8c915"
+        "file": "ELETROVENTILADOR/4150901501.png",
+        "sha256": "deb3f52e26790d26237d06cdd6abcf59"
       },
       {
-        "file": "ELETROVENTILADOR/4156021501.JPG",
-        "sha256": "d36173168195a3868ec5c612bd839d46"
+        "file": "ELETROVENTILADOR/4156021501.png",
+        "sha256": "56d8d725a991f9a20b8666943099e515"
       },
       {
-        "file": "ELETROVENTILADOR/4156301501.JPG",
-        "sha256": "7799c079f1b3dc1ac77531ff812f5e1d"
+        "file": "ELETROVENTILADOR/4156301501.png",
+        "sha256": "8e1b5262f587e0dbef6ad79fbbf70759"
       },
       {
-        "file": "ELETROVENTILADOR/4156421501.JPG",
-        "sha256": "dd70521286464996b17a753a826b52be"
+        "file": "ELETROVENTILADOR/4156301502.png",
+        "sha256": "6de36444b22d9166fdd983ae68b85d0a"
       },
       {
-        "file": "ELETROVENTILADOR/4156421511.JPG",
-        "sha256": "6c14a8d3598aa20a5c55225236a1ce0e"
+        "file": "ELETROVENTILADOR/4156421501.png",
+        "sha256": "0c6ee19a307df2dbcf6d1c4a85b674bf"
       },
       {
-        "file": "ELETROVENTILADOR/4156421513.JPG",
-        "sha256": "1ab91d441557b9f2066a56c132c33d11"
+        "file": "ELETROVENTILADOR/4156421511.png",
+        "sha256": "b618ef633d16f95237b32adb48478f84"
       },
       {
-        "file": "ELETROVENTILADOR/4156421514.JPG",
-        "sha256": "d869b5253b84ba20e61a32ce69c4214e"
+        "file": "ELETROVENTILADOR/4156421512.png",
+        "sha256": "7efe3608ced22d0b7d5fa88e9935ac2b"
       },
       {
-        "file": "ELETROVENTILADOR/4156421521.JPG",
-        "sha256": "cbdda3ae82aab816a37e1ebbb7602342"
+        "file": "ELETROVENTILADOR/4156421513.png",
+        "sha256": "550d1eb3702a2bb03e67834652779e60"
       },
       {
-        "file": "ELETROVENTILADOR/4156441501.JPG",
-        "sha256": "9983248c88228c5f40882dbc34d44893"
+        "file": "ELETROVENTILADOR/4156421514.png",
+        "sha256": "b85f7926c06f29f83bb373c4cb5a627c"
       },
       {
-        "file": "ELETROVENTILADOR/4156441502-1.JPG",
-        "sha256": "551692ffd5c53179ae303aca1e3fcf5e"
+        "file": "ELETROVENTILADOR/4156421521.png",
+        "sha256": "1f299c45bc8f8611bfa6465c2e2579b9"
       },
       {
-        "file": "ELETROVENTILADOR/4156441502-2.JPG",
-        "sha256": "f03db4b64b05e557fe37ed7a101ed67e"
-      },
-      {
-        "file": "ELETROVENTILADOR/4156441502.JPG",
-        "sha256": "9b9d8eab6bcdc0cc00f55bd249c50001"
+        "file": "ELETROVENTILADOR/4156441501.png",
+        "sha256": "2a07e60f7d0d2cec4f677b0e09682fbe"
       },
       {
         "file": "ELETROVENTILADOR/4156441502.png",
-        "sha256": "6a93522abea2cf7e89bf27a8088c4859"
+        "sha256": "624f36a12ce6af015dbdcd86f58f5fef"
       },
       {
-        "file": "ELETROVENTILADOR/4156741501.JPG",
-        "sha256": "1f5ad6f90bee545c5460bbf24a984555"
+        "file": "ELETROVENTILADOR/4156761501.png",
+        "sha256": "c5ca53a63fe35bacf9d75a143a29899e"
       },
       {
-        "file": "ELETROVENTILADOR/4156761501.JPG",
-        "sha256": "3a48eeb8451ecb9b4c63c3bc0e20b735"
+        "file": "ELETROVENTILADOR/4156761502.png",
+        "sha256": "78d6046a7e8176b6b36b4a60e5fc759e"
       },
       {
-        "file": "ELETROVENTILADOR/4156761511.JPG",
-        "sha256": "1d804ac259527174b4e8865923220ee6"
+        "file": "ELETROVENTILADOR/4156761511.png",
+        "sha256": "7fc45a23256bc450ce4bb68db9ecc5ee"
       },
       {
-        "file": "ELETROVENTILADOR/4156761512.JPG",
-        "sha256": "f87991ebe73df5b94e09a56c847af435"
+        "file": "ELETROVENTILADOR/4156761512.png",
+        "sha256": "29569765d9be4361dde970f69a7b8524"
       },
       {
-        "file": "ELETROVENTILADOR/4156901501.JPG",
-        "sha256": "3e3ea2b164ac4d151df3fd94b4324db0"
+        "file": "ELETROVENTILADOR/4156901501.png",
+        "sha256": "2df75e65dc57331e7ac85763d7c4788d"
       },
       {
-        "file": "ELETROVENTILADOR/4156901502.JPG",
-        "sha256": "679f7054b21beb05aac70b35c5142a02"
+        "file": "ELETROVENTILADOR/4156901502.png",
+        "sha256": "62111c619e092e82d5f287b092a2d7ca"
       },
       {
-        "file": "ELETROVENTILADOR/4156981501.JPG",
-        "sha256": "60f8b817279b92eda16fb06e271e5cfc"
+        "file": "ELETROVENTILADOR/4156981501.png",
+        "sha256": "e9a193121386bada86f2ce1643b0da8e"
       },
       {
-        "file": "ELETROVENTILADOR/4156981502.JPG",
-        "sha256": "736bb03c9dca7aa1e80375cd183d7c4b"
+        "file": "ELETROVENTILADOR/4156981502.png",
+        "sha256": "3cfbacf6b52c11df1ce57c84d2aee54b"
       },
       {
-        "file": "ELETROVENTILADOR/4156981503.JPG",
-        "sha256": "c12f8237441d29ddcbc336ed1a6a5448"
+        "file": "ELETROVENTILADOR/4156981503.png",
+        "sha256": "2c7024e8028df182cb7d9ee1f7e4c5af"
       },
       {
-        "file": "ELETROVENTILADOR/4163201501.JPG",
-        "sha256": "8f81dfd8d56a7ef6c72c53f3d83c7b23"
+        "file": "ELETROVENTILADOR/4163201501.png",
+        "sha256": "46cc6ad9abddce98f1593c18ec7acf65"
       },
       {
-        "file": "ELETROVENTILADOR/4163201502.JPG",
-        "sha256": "2a2244f4e295416c2a4af44383618099"
+        "file": "ELETROVENTILADOR/4163201502.png",
+        "sha256": "e33796cc40b02314440f12f383e8ad6e"
       },
       {
-        "file": "ELETROVENTILADOR/4163221521.JPG",
-        "sha256": "ec2a6e40385be841435fc57cf0e98d2b"
+        "file": "ELETROVENTILADOR/4163221521.png",
+        "sha256": "0ce48b5ca096783f4a5bb7e77f7e21e0"
       },
       {
-        "file": "ELETROVENTILADOR/4163221541.JPG",
-        "sha256": "15143ead175fb37dac2b68aa9ffe523f"
+        "file": "ELETROVENTILADOR/4163221541.png",
+        "sha256": "8c7ca404836f589fb12c927d6240b5a8"
       },
       {
-        "file": "ELETROVENTILADOR/4163221561.JPG",
-        "sha256": "59b3e45ce16c0973d7501adeb8f64676"
+        "file": "ELETROVENTILADOR/4163221561.png",
+        "sha256": "36c10a0bbb0358efdbfab73d197b51c7"
       },
       {
-        "file": "ELETROVENTILADOR/4169761501.JPG",
-        "sha256": "def9999aedda0fc0fa1f80dd0c8a83b3"
+        "file": "ELETROVENTILADOR/4169761501.png",
+        "sha256": "32271b7e050a7cf3792e37858e8e0413"
       },
       {
-        "file": "ELETROVENTILADOR/4170601522.JPG",
-        "sha256": "da5367cd93fa746cb80e14ead2242ef8"
+        "file": "ELETROVENTILADOR/4170601521.png",
+        "sha256": "fd94063d8872e0c2eb3488e1e6eff90c"
       },
       {
-        "file": "ELETROVENTILADOR/4170701501.JPG",
-        "sha256": "efba49c3fdbfefe9b1a3a045f7bea7ab"
+        "file": "ELETROVENTILADOR/4170601522.png",
+        "sha256": "d11515b00d8d8497c5428caa0885bb9f"
       },
       {
-        "file": "ELETROVENTILADOR/4170701502.JPG",
-        "sha256": "24fdf1ffd2d699ea02f883d3a3c03197"
+        "file": "ELETROVENTILADOR/4170701501.png",
+        "sha256": "26e6cd01622e53077e6ac8b52b4f9fc9"
       },
       {
-        "file": "ELETROVENTILADOR/4170861501.JPG",
-        "sha256": "dfa5b5d468b84cb780ed67365e94c5be"
+        "file": "ELETROVENTILADOR/4170701502.png",
+        "sha256": "a2c3e70e5584821c63a9e9296501c2d6"
       },
       {
-        "file": "ELETROVENTILADOR/4170901501.JPG",
-        "sha256": "90d0a9901aa36cb1dc34c88c94bb8aae"
+        "file": "ELETROVENTILADOR/4170861501.png",
+        "sha256": "c908eba1ab2aa759294c0ffc82b18d51"
       },
       {
-        "file": "ELETROVENTILADOR/4170901502.JPG",
-        "sha256": "dad274e007a219d13a62d65badc1cad4"
+        "file": "ELETROVENTILADOR/4170901501.png",
+        "sha256": "a83074d19ab8aeaa7bb76f9c3e60c028"
       },
       {
-        "file": "ELETROVENTILADOR/4175261501.JPG",
-        "sha256": "7e571ea61efe30c4cc0ea9a4255d2119"
+        "file": "ELETROVENTILADOR/4170901502.png",
+        "sha256": "458180550a6fb8e169191de9baa88bd6"
       },
       {
-        "file": "ELETROVENTILADOR/4190901501.JPG",
-        "sha256": "ada6cdaebe8b790903204ae465588a64"
+        "file": "ELETROVENTILADOR/4175261501.png",
+        "sha256": "388df02de6d2827c24f3382534c4c7f9"
       },
       {
-        "file": "ELETROVENTILADOR/4190901502.JPG",
-        "sha256": "aa8aeade1b0a6b7f61340cf8d1b3ab93"
+        "file": "ELETROVENTILADOR/4175801501.png",
+        "sha256": "6efa20744a8ce02295bdca0c455d4a5e"
       },
       {
-        "file": "ELETROVENTILADOR/4190901503.JPG",
-        "sha256": "5d4468abd99b9005eff12403d0aedf85"
+        "file": "ELETROVENTILADOR/4175851501.png",
+        "sha256": "600b9deb1218b104e04374f170e6de14"
       },
       {
-        "file": "FAROIS/1211042102.JPG",
-        "sha256": "25fe42cb08f996e7354c989a2f8d7f27"
+        "file": "ELETROVENTILADOR/4190901501.png",
+        "sha256": "5f7812f0d9c0ff55cd90b8c8cbf58e30"
       },
       {
-        "file": "FAROIS/6111822241-1.JPG",
-        "sha256": "f9156f8f22a2a78472df67c7648f7c43"
+        "file": "ELETROVENTILADOR/4190901502.png",
+        "sha256": "8b1db1213e370fd4a3bbc75d927af195"
       },
       {
-        "file": "FAROIS/6111822241.JPG",
-        "sha256": "0602ef63191296e59ff87405db81000f"
+        "file": "ELETROVENTILADOR/4190901503.png",
+        "sha256": "6b57a3f6656cee923d7d94524b983fdf"
+      },
+      {
+        "file": "ELETROVENTILADOR/8275522640.png",
+        "sha256": "56ed7456d283067de9e048014a96dc51"
       },
       {
         "file": "FAROIS/6111822241.png",
         "sha256": "8a59916ae4b37db452e853f5c26699e0"
       },
       {
-        "file": "FAROIS/6111822242-1.JPG",
-        "sha256": "5e974c1d87556e27745c7a0a3b100545"
-      },
-      {
-        "file": "FAROIS/6111822242.JPG",
-        "sha256": "80b9190a2425c4ba4c737ab352ed31e7"
-      },
-      {
         "file": "FAROIS/6111822242.png",
         "sha256": "4f1b9a5d5749c223b7d2070275ccffb6"
-      },
-      {
-        "file": "FAROIS/6111822243 - Copia.JPG",
-        "sha256": "d5ab6d3f51c8ba4ad7261e5c16620d58"
-      },
-      {
-        "file": "FAROIS/6111822243-1.JPG",
-        "sha256": "4525600b64e7fca72d33f1cfc1ddecaa"
-      },
-      {
-        "file": "FAROIS/6111822243.JPG",
-        "sha256": "be890b6be5026f82b78e761f7e222e6b"
       },
       {
         "file": "FAROIS/6111822243.png",
         "sha256": "be2dcd8ba1a9a306f5184737b8b29469"
       },
       {
-        "file": "FAROIS/6111822244-1.JPG",
-        "sha256": "dd5b106cbcf16424c018eaa03b37115e"
-      },
-      {
-        "file": "FAROIS/6111822244.JPG",
-        "sha256": "88e06f57efb8f9cded0a070a84494f87"
-      },
-      {
         "file": "FAROIS/6111822244.png",
         "sha256": "9e157879adf4f70bb697a0927caa58cb"
-      },
-      {
-        "file": "FAROIS/6111822245-1.JPG",
-        "sha256": "4525600b64e7fca72d33f1cfc1ddecaa"
-      },
-      {
-        "file": "FAROIS/6111822245.JPG",
-        "sha256": "f843bf4932a47db30a1719fa07b47fa0"
       },
       {
         "file": "FAROIS/6111822245.png",
         "sha256": "f58dcb86254e8601ebe0f715d0eac7f6"
       },
       {
-        "file": "FAROIS/6111822246-1.JPG",
-        "sha256": "dd5b106cbcf16424c018eaa03b37115e"
-      },
-      {
-        "file": "FAROIS/6111822246.JPG",
-        "sha256": "15181d313413cc310f3f9b76129f1bab"
-      },
-      {
-        "file": "FAROIS/6111822251-1.JPG",
-        "sha256": "f9e180495e162481c4bddd01dad38d35"
-      },
-      {
-        "file": "FAROIS/6111822251.JPG",
-        "sha256": "c0a8f5e52a6dfb7ab47c838c3f1d4464"
-      },
-      {
         "file": "FAROIS/6111822251.png",
         "sha256": "f3bd81bdda127c8561dd13e01cbc4d75"
-      },
-      {
-        "file": "FAROIS/6111822252-1.JPG",
-        "sha256": "f1e09acbf830a33d5e1a2cde612e9a1b"
-      },
-      {
-        "file": "FAROIS/6111822252.JPG",
-        "sha256": "5f68c02b8ce07af8de9fc1c81689e8fc"
       },
       {
         "file": "FAROIS/6111822252.png",
         "sha256": "d8c1236aa6305abadbcf24a7e58123e5"
       },
       {
-        "file": "FAROIS/6111822253-1.JPG",
-        "sha256": "a2c721633183b0e5a69ed255626da726"
-      },
-      {
-        "file": "FAROIS/6111822253-3.JPG",
-        "sha256": "03d0ae74a13958846a54b8290773ef4d"
-      },
-      {
-        "file": "FAROIS/6111822253-4.JPG",
-        "sha256": "fcbc1de24f1341ee9229a6a5e9979207"
-      },
-      {
-        "file": "FAROIS/6111822253.JPG",
-        "sha256": "be00363b0c71b2034c4b797a4f396517"
-      },
-      {
         "file": "FAROIS/6111822253.png",
         "sha256": "9b0466ffb1dc6db75e4c80a53c573f3c"
-      },
-      {
-        "file": "FAROIS/6111822254-1.JPG",
-        "sha256": "a2c721633183b0e5a69ed255626da726"
-      },
-      {
-        "file": "FAROIS/6111822254-3.JPG",
-        "sha256": "03d0ae74a13958846a54b8290773ef4d"
-      },
-      {
-        "file": "FAROIS/6111822254-4.JPG",
-        "sha256": "fcbc1de24f1341ee9229a6a5e9979207"
-      },
-      {
-        "file": "FAROIS/6111822254.JPG",
-        "sha256": "be00363b0c71b2034c4b797a4f396517"
       },
       {
         "file": "FAROIS/6111822254.png",
@@ -3958,30 +3604,6 @@
         "sha256": "a0d77b2a356890d842becfa82b239a5d"
       },
       {
-        "file": "FAROIS/6170422211.JPG",
-        "sha256": "08bae0e2a1e5a55ce2a365a48738c64c"
-      },
-      {
-        "file": "FAROIS/6170422211_2.jpg",
-        "sha256": "da30a5c213c822ecfeb6e9ed65169905"
-      },
-      {
-        "file": "FAROIS/6170422211_3.jpg",
-        "sha256": "a1a66509525329cea49012b179b56344"
-      },
-      {
-        "file": "FAROIS/6170422213.jpg",
-        "sha256": "cee0b27e75a73bcb8dcec9bae96d530f"
-      },
-      {
-        "file": "FAROIS/6170422213_2.jpg",
-        "sha256": "b6b5981e94b916bac01508be838a66d2"
-      },
-      {
-        "file": "FAROIS/6170422213_3.jpg",
-        "sha256": "a1a66509525329cea49012b179b56344"
-      },
-      {
         "file": "FAROIS/6170502201.png",
         "sha256": "3392073c3af0c9723b7b312ba1cadc3e"
       },
@@ -4012,18 +3634,6 @@
       {
         "file": "FAROIS/6170602332.png",
         "sha256": "4ed7876ecf17f02bde57ef9fa3b910fb"
-      },
-      {
-        "file": "FAROIS/6170862201.JPG",
-        "sha256": "046aae82f0e46bdd445e4447fd5f9e4a"
-      },
-      {
-        "file": "FAROIS/6170862201_1.JPG",
-        "sha256": "b34c0d6964ac92d815783d77d858a56a"
-      },
-      {
-        "file": "FAROIS/6170862201_2.JPG",
-        "sha256": "65242ade7d352dc97dc1ee9e1557fcb9"
       },
       {
         "file": "FAROIS/6170862321.png",
@@ -4128,50 +3738,6 @@
       {
         "file": "FAROIS/6275852302.png",
         "sha256": "7606f807adc68e7a2efd8d5dd2960baa"
-      },
-      {
-        "file": "FAROIS/68930d3c-75fc-48b6-88a4-3470e4ffaa8d.png",
-        "sha256": "a2014334ff2de3c8121dee42ac0c88d9"
-      },
-      {
-        "file": "FAROIS/7146505801.JPG",
-        "sha256": "1c9df97e11cd23a093811df17019e1b1"
-      },
-      {
-        "file": "FAROIS/DIFORZA_FAROIS (2).png",
-        "sha256": "b46d15ecfedd85ffd78428a295e8834f"
-      },
-      {
-        "file": "FAROIS/DIFORZA_FAROIS (3).png",
-        "sha256": "538452f030e7815a5db7775c851113c5"
-      },
-      {
-        "file": "FAROIS/DIFORZA_FAROIS (4).png",
-        "sha256": "986e16edb2d7f718b9d0b29db83a701a"
-      },
-      {
-        "file": "FAROIS/DIFORZA_FAROIS (5).png",
-        "sha256": "4877eaf46714b69840961d49202bf747"
-      },
-      {
-        "file": "FAROIS/DIFORZA_FAROIS.png",
-        "sha256": "f5b83632689213e6b845a3cd52cf9ea9"
-      },
-      {
-        "file": "FAROIS/FAROL LED.png",
-        "sha256": "4fb9463bbb44fc5fd98beec8de555aae"
-      },
-      {
-        "file": "FAROIS/FAROL_KICKS (2).png",
-        "sha256": "984f1dc9cdad2298a00149d5ce2c6e0e"
-      },
-      {
-        "file": "FAROIS/FAROL_KICKS.png",
-        "sha256": "fd825a95a13fa165e197f95cb87d4cfa"
-      },
-      {
-        "file": "FAROIS/FAROL_NISSAN_KICKS.png",
-        "sha256": "d3dcf1a14401c85a6869377a820223e1"
       },
       {
         "file": "KIT CORRENTE/7142900204.png",
@@ -4710,31 +4276,31 @@
         "sha256": "0d2eb57b18f1251d491a93116da6d65f"
       },
       {
-        "file": "LANÇAMENTOS/7156426010.png",
+        "file": "LANCAMENTOS/7156426010.png",
         "sha256": "c6618f8cc7a36b61b048fc9f06ec32b4"
       },
       {
-        "file": "LANÇAMENTOS/7156906610.png",
+        "file": "LANCAMENTOS/7156906610.png",
         "sha256": "daa4ca1be037e45467a74579cabfaa54"
       },
       {
-        "file": "LANÇAMENTOS/7163206610.png",
+        "file": "LANCAMENTOS/7163206610.png",
         "sha256": "5cb65e2f12616622c569123797093a5e"
       },
       {
-        "file": "LANÇAMENTOS/7163226610.png",
+        "file": "LANCAMENTOS/7163226610.png",
         "sha256": "72b3f02fc0b0125e65377820d6285162"
       },
       {
-        "file": "LANÇAMENTOS/7163286600.png",
+        "file": "LANCAMENTOS/7163286600.png",
         "sha256": "34f2cd0ae386b23db14a2da04900a641"
       },
       {
-        "file": "LANÇAMENTOS/7163286610.png",
+        "file": "LANCAMENTOS/7163286610.png",
         "sha256": "7453688b7705ffa57cbc06fa606664ac"
       },
       {
-        "file": "LANÇAMENTOS/SEMI-EIXOS.png",
+        "file": "LANCAMENTOS/SEMI-EIXOS.png",
         "sha256": "f27d6dd659ee059a85450e85b0f8df08"
       },
       {
@@ -7931,519 +7497,519 @@
       },
       {
         "file": "RETROVISORES/1211042101.png",
-        "sha256": "490027e23ea63c619602da29d6ce0513"
+        "sha256": "fddbf0416309e54aef1a6e6a852f28a7"
       },
       {
         "file": "RETROVISORES/1211042102.png",
-        "sha256": "3fc475e016d97221bd106989651df206"
+        "sha256": "ae40e83199674c0b11b5b6f6ec02932b"
       },
       {
         "file": "RETROVISORES/1211822101.png",
-        "sha256": "2e919ee8f73edcc9eb6dd52090d11a4c"
+        "sha256": "1e35dd7f368dea748823f18714fa4ceb"
       },
       {
         "file": "RETROVISORES/1211822102.png",
-        "sha256": "e29d1ae12aa137d7665d82cac5c9f8af"
+        "sha256": "9126a2196d79037a081babd1ed6e213e"
       },
       {
         "file": "RETROVISORES/1211822121.png",
-        "sha256": "01a4aab7aff82a976e20f11edfb838f3"
+        "sha256": "99ed8e4ec9bb047f918a394a1bd7d390"
       },
       {
         "file": "RETROVISORES/1211822122.png",
-        "sha256": "846e3cc414d3bea94be5607d29d898cd"
+        "sha256": "726e2d84ec9dcff66c1ee293f8339ed3"
       },
       {
         "file": "RETROVISORES/1211932101.png",
-        "sha256": "221ed2b5ac77a5b6fcc1906ce5df4233"
+        "sha256": "9d2408700f15ee8c9811f82485660535"
       },
       {
         "file": "RETROVISORES/1211932102.png",
-        "sha256": "57c1fced9ee19342767a5fea7edc9b1d"
+        "sha256": "6529ded5b00949b365410892cfe1a6c0"
       },
       {
         "file": "RETROVISORES/1211962101.png",
-        "sha256": "db77114e4e6dd0a5cef0a5d129372697"
+        "sha256": "ea762ebf9ddc1aa22346b4ffa252b748"
       },
       {
         "file": "RETROVISORES/1211962102.png",
-        "sha256": "2f39f084bf810dbc8d975b853ba0c13e"
+        "sha256": "f507a18983ecf4e987b9256f88899b1d"
       },
       {
         "file": "RETROVISORES/1215802101.png",
-        "sha256": "c8d7d3f1f18b61f68e3dd7cc9fbe5481"
+        "sha256": "b0043f8374cb7abe83c25031e9963f7a"
       },
       {
         "file": "RETROVISORES/1215802102.png",
-        "sha256": "7ab94fb16beb83c0e24225ca799e2996"
+        "sha256": "59b4a4efa69a9914d6e01db9e2711979"
       },
       {
         "file": "RETROVISORES/1215802103.png",
-        "sha256": "e4fa871ad85128c39b309574c8defd59"
+        "sha256": "3c772251a366373513b699d5546adc3e"
       },
       {
         "file": "RETROVISORES/1215802104.png",
-        "sha256": "9d893f5c57110d86d75fa2e064fdb8a8"
+        "sha256": "b40be8d158f4eff9c33f297b49a1ec23"
       },
       {
         "file": "RETROVISORES/1215802111.png",
-        "sha256": "6e94b73f5d5e9a273d6d4600a650753b"
+        "sha256": "e6506ae112cbba19b31f6291aaa61214"
       },
       {
         "file": "RETROVISORES/1215802112.png",
-        "sha256": "0796354e411794e938055b187a90fb42"
+        "sha256": "bb974eb7e208a5bae04358418ee0eb32"
       },
       {
         "file": "RETROVISORES/1215802113.png",
-        "sha256": "34e139a3c6442339c1dbbca59b28faee"
+        "sha256": "d4ac73cf050ff310831150de124749d7"
       },
       {
         "file": "RETROVISORES/1215802114.png",
-        "sha256": "7da0c57981e12a497d3aa009e0fc0ea1"
+        "sha256": "171c91789f225fa6b22f6b3446d43a42"
       },
       {
         "file": "RETROVISORES/1234202111.png",
-        "sha256": "fc2e22d777a85ea205efa90fc41ceea6"
+        "sha256": "dafe22ca73a7cec3bebfed4ea7af7c04"
       },
       {
         "file": "RETROVISORES/1234202112.png",
-        "sha256": "41ca570f63f960f57dc7952612aebdfd"
+        "sha256": "77943f14a250a0b3583429d279823208"
       },
       {
         "file": "RETROVISORES/1234552111.png",
-        "sha256": "043c22d4d12d65129629078148787998"
+        "sha256": "ff0e93228ddf66e5610434cc54966aa4"
       },
       {
         "file": "RETROVISORES/1234552112.png",
-        "sha256": "a8b0518e260d5ed27ad30f56a607003f"
+        "sha256": "ad163bde49cfba6a63d6329164cc044a"
       },
       {
         "file": "RETROVISORES/1234962101.png",
-        "sha256": "d71c2014e18c36a0c225f553dc8b1070"
+        "sha256": "6372ea9938e5befb89b1291568d26491"
       },
       {
         "file": "RETROVISORES/1234962102.png",
-        "sha256": "9df885c8acd544046b1a1a567f391f44"
+        "sha256": "e750e0f3a41f04895d95e244422c3bb9"
       },
       {
         "file": "RETROVISORES/1236702111.png",
-        "sha256": "d8fe2dc53b6d30d68230e15142707b89"
+        "sha256": "d57b9a983469f49da2c120e9c53f1605"
       },
       {
         "file": "RETROVISORES/1236702112.png",
-        "sha256": "7986c1f5c5c4f56dfa5bbc2298951239"
+        "sha256": "bb9b03b06901455a9f00459602d64f89"
       },
       {
         "file": "RETROVISORES/1236702113.png",
-        "sha256": "1eb362738c9046c743fe27a93351125c"
+        "sha256": "14691b3d97c569577942f6159b049064"
       },
       {
         "file": "RETROVISORES/1236702114.png",
-        "sha256": "cab6e693504b76883a5fa5bb7702010d"
+        "sha256": "20f36948c23473607d3ab234fd2a24b8"
       },
       {
         "file": "RETROVISORES/1249802111.png",
-        "sha256": "50636bf5a11837b9ac9a682bc84d4532"
+        "sha256": "9874bbb46a6a9b3f38415260baec1428"
       },
       {
         "file": "RETROVISORES/1249802112.png",
-        "sha256": "340d7c797e14ce61c5afb2864bf49db0"
+        "sha256": "bdba2e1943a39dd2aabb74e52f5b385e"
       },
       {
         "file": "RETROVISORES/1269382103.png",
-        "sha256": "e7af908f22b046e616255fc4c6dbb3c0"
+        "sha256": "25eac57b8a2938332cdcd2bad4c4781a"
       },
       {
         "file": "RETROVISORES/1269382104.png",
-        "sha256": "b02a7899522f8ba9bf3600519c724dc8"
+        "sha256": "09482baa13cc8ba165a5d260a0d55951"
       },
       {
         "file": "RETROVISORES/1269382105.png",
-        "sha256": "8e47ca625d86f368cc9d7738a12151c0"
+        "sha256": "d32f491f633cc767c60a973ee2fefbb0"
       },
       {
         "file": "RETROVISORES/1269382106.png",
-        "sha256": "5483e5abe517c31351187611cb91050f"
+        "sha256": "8586158094c861f6f2819525f1c02497"
       },
       {
         "file": "RETROVISORES/1269382107.png",
-        "sha256": "a7bf1218bb550cbf613fbe01ba16bd89"
+        "sha256": "40b576a58d109f8a95d49062d527fd23"
       },
       {
         "file": "RETROVISORES/1269382108.png",
-        "sha256": "1a5d50dbb217616fbfba886bd1e651c5"
+        "sha256": "7115f1d841586ea3db02343b149e1ef7"
       },
       {
         "file": "RETROVISORES/1269382109.png",
-        "sha256": "2c635cc6633efea8b97837902a9232ca"
+        "sha256": "3ea779409632943822ab61e3b47e5cfc"
       },
       {
         "file": "RETROVISORES/1269382110.png",
-        "sha256": "1a3b718cc76e3b1f16bff6d154493525"
+        "sha256": "dca820bfa76dc690928566894edf7a9e"
       },
       {
         "file": "RETROVISORES/1269382111.png",
-        "sha256": "6174d906b23f00bc60e45a26e71c3918"
+        "sha256": "7bc88c09d5222dcf37b763050f3af389"
       },
       {
         "file": "RETROVISORES/1269382112.png",
-        "sha256": "083fed5c15c732cb015f198a4ad9238c"
+        "sha256": "98dd082b7ff0dc9886ae2225fae4db95"
       },
       {
         "file": "RETROVISORES/1269382123.png",
-        "sha256": "ec497e1973eba9c206d40c41b2879912"
+        "sha256": "72ab118ef966f42d419234bea4a5c1c6"
       },
       {
         "file": "RETROVISORES/1269382124.png",
-        "sha256": "8126a84cc4651cbf3a737a2eecfb4249"
+        "sha256": "6b6e0b9e9d2cb5a65621442918cebb00"
       },
       {
         "file": "RETROVISORES/1269382125.png",
-        "sha256": "538e4fa76fb5f16a173f194e354a6681"
+        "sha256": "7851b95649bbabe92ee360c2f3df7c22"
       },
       {
         "file": "RETROVISORES/1269382126.png",
-        "sha256": "b289a8a34481dbb0ce1c64f489e238ca"
+        "sha256": "5cd1ef866885b6724fcaac4ed5e181f9"
       },
       {
         "file": "RETROVISORES/1269382127.png",
-        "sha256": "b7e5570c9012448e1ab219c794f18932"
+        "sha256": "00d6ce3252391813b62e21ffc044b097"
       },
       {
         "file": "RETROVISORES/1269382128.png",
-        "sha256": "ffffdf4e09ac60ab40ee9c21f3b3febc"
+        "sha256": "837ba9e946e42f90f8baccb628634faa"
       },
       {
         "file": "RETROVISORES/1269382129.png",
-        "sha256": "5c5fa662954f47fadfe692ff417e9adf"
+        "sha256": "3b15301cc0b8d15b6059554898e103bb"
       },
       {
         "file": "RETROVISORES/1269382130.png",
-        "sha256": "60b93c6eba35e9067061e87394c6c894"
+        "sha256": "fc4f1f3eb5dfba731d688c59ff8df229"
       },
       {
         "file": "RETROVISORES/1269382131.png",
-        "sha256": "353b853cc818d5ad95be579caf6ba900"
+        "sha256": "1555a41823406c53e21feb9ef43d648a"
       },
       {
         "file": "RETROVISORES/1269382132.png",
-        "sha256": "fcb20cafe6a62b52bd376e982d8ff3dd"
+        "sha256": "d94b54b5996a0193557713e124d29dd3"
       },
       {
         "file": "RETROVISORES/1269382135.png",
-        "sha256": "3417d3d579bea5a8d04783c8459ab3f3"
+        "sha256": "6505025e57f4102e8dfd1fa99b76aeef"
       },
       {
         "file": "RETROVISORES/1269382136.png",
-        "sha256": "288bd19cea472841f1d524698aa1a02f"
+        "sha256": "c6e26c3529435d64fe01e01e4ffc44b6"
       },
       {
         "file": "RETROVISORES/1269382141.png",
-        "sha256": "350a4ae31df780ae7d5bcbe579370d07"
+        "sha256": "770e8573f96b38c0a4a659917680dd04"
       },
       {
         "file": "RETROVISORES/1269382142.png",
-        "sha256": "7353308f1d623355eb7d67e152bb3394"
+        "sha256": "57149044202b4f7b3c465a7c2a562a07"
       },
       {
         "file": "RETROVISORES/1269382143.png",
-        "sha256": "cd6d72ea83904addbb339ece46388e6f"
+        "sha256": "882bcaa99fbb30dbcf7a49e3f5be886c"
       },
       {
         "file": "RETROVISORES/1269382144.png",
-        "sha256": "dd715ee8fe0acb87d48a0906bb5cdb7f"
+        "sha256": "961e21402979ee94cac3a1160e14657b"
       },
       {
         "file": "RETROVISORES/1269382145.png",
-        "sha256": "3fc354ff34a78f60987259184497f749"
+        "sha256": "e467c7c18cc477b2f679025799dc20e5"
       },
       {
         "file": "RETROVISORES/1269382146.png",
-        "sha256": "797273eaad64793a22870a49e33bde00"
+        "sha256": "ce6ca14736361586a6748c6d84de0ed8"
       },
       {
         "file": "RETROVISORES/1269382147.png",
-        "sha256": "e46227a487c0df6086c630293d9891f3"
+        "sha256": "8ab28336b1441116e510ce5d362443a3"
       },
       {
         "file": "RETROVISORES/1269382148.png",
-        "sha256": "fbb51682d6f4263c2c30d358c27b5283"
+        "sha256": "28ee152971d379e332e156655b4bc005"
       },
       {
         "file": "RETROVISORES/1270102101.png",
-        "sha256": "b4beabe8ce589c4f741895a6ff366966"
+        "sha256": "1f33fd598f83349b72e8ddefaebcaf89"
       },
       {
         "file": "RETROVISORES/1270102102.png",
-        "sha256": "f18bc2864b087e6c691679a8a6ec39e6"
+        "sha256": "d42f2ebd172218bac9856277ffcad831"
       },
       {
         "file": "RETROVISORES/1270102111.png",
-        "sha256": "1c1c170d090b4100d4037a5822bc7481"
+        "sha256": "51d909812cd12f9f6cc81dc5115b7886"
       },
       {
         "file": "RETROVISORES/1270102112.png",
-        "sha256": "d2306fa6fc6700532d96a12c429ab4fe"
+        "sha256": "984b0dff0526e64dc81ace4effc1afd5"
       },
       {
         "file": "RETROVISORES/1270202101.png",
-        "sha256": "b3231c0dbe28904cb05b7c8ad23ee343"
+        "sha256": "a25254f00e72dae9bfab218cac3a204f"
       },
       {
         "file": "RETROVISORES/1270202102.png",
-        "sha256": "4a4dba3ddfd1873efa9b740a1721b6b5"
+        "sha256": "48e77dddcef9eed13af642ea45cf30af"
       },
       {
         "file": "RETROVISORES/1270202103.png",
-        "sha256": "5cd9e0637a34cdaabcc394197fba55ec"
+        "sha256": "d512a9910e7c3cb40b843ad93d92a38a"
       },
       {
         "file": "RETROVISORES/1270202104.png",
-        "sha256": "52a356cb7851e716dfe52c27e03bff47"
+        "sha256": "397b99a2ebc33c072fb7f9aea8afe5d7"
       },
       {
         "file": "RETROVISORES/1270202111.png",
-        "sha256": "413e57df816fa044fef3e3e27af86876"
+        "sha256": "e087e93d0ab295a4c7388701a39983e9"
       },
       {
         "file": "RETROVISORES/1270202112.png",
-        "sha256": "2480708b8f1ad5fa2005efd2c548bcb3"
+        "sha256": "ec21f32fa5293efd044a63728f009f55"
       },
       {
         "file": "RETROVISORES/1270202113.png",
-        "sha256": "2d1a1b44ac66820ea45c7a20128c2c1b"
+        "sha256": "cb4de18cfd58cf7e331f0c5fc2fcc9c0"
       },
       {
         "file": "RETROVISORES/1270202114.png",
-        "sha256": "d5349caaaa2170916d45bce3e13eb89b"
+        "sha256": "d9c5759490a243f76f11f35bdd4920d8"
       },
       {
         "file": "RETROVISORES/1270202115.png",
-        "sha256": "a7ac14444261d5dd885eeb3815fb2444"
+        "sha256": "882fb09733674e38bf07b7012fad8190"
       },
       {
         "file": "RETROVISORES/1270202116.png",
-        "sha256": "86b8ec0f2050d8bfef2a630f0ecabd40"
+        "sha256": "32019ebe5bbb73fc1d0ab5a36708d244"
       },
       {
         "file": "RETROVISORES/1270422103.png",
-        "sha256": "76d57437ec0c6e000b6846a379c06ccb"
+        "sha256": "aa8c78e6b252c8ed3b55823592b54f42"
       },
       {
         "file": "RETROVISORES/1270422104.png",
-        "sha256": "baabe1cf68d5efc6fc93d71c5658afe5"
+        "sha256": "2915966eee07d73e2aab68d7eb57a988"
       },
       {
         "file": "RETROVISORES/1270422105.png",
-        "sha256": "7d2fe6e0823acdd57882b9bc8fd4d597"
+        "sha256": "f02860f8866f96e9b12fd5e8bca03c0b"
       },
       {
         "file": "RETROVISORES/1270422106.png",
-        "sha256": "4e38d4c5360736799738b3ee54644e26"
+        "sha256": "5d244ab3fc14250ac71339d91fb1bd34"
       },
       {
         "file": "RETROVISORES/1270422107.png",
-        "sha256": "2fdd412c2d9a0f9b5b4f6a9651008d13"
+        "sha256": "b5479b4f7f2e40c7ba6c1554722c8f46"
       },
       {
         "file": "RETROVISORES/1270422108.png",
-        "sha256": "1aafe0d326c487970200c43e96eb4b8d"
+        "sha256": "d99741acbde26d4a5840d28d327f9986"
       },
       {
         "file": "RETROVISORES/1270422111.png",
-        "sha256": "075f7e0ee5c9bf1765db7d7f4ea39a35"
+        "sha256": "a76d497fd7bff4cb8b62b550e6f0b874"
       },
       {
         "file": "RETROVISORES/1270422112.png",
-        "sha256": "c421a1c56b10d61728deed146728a9f1"
+        "sha256": "ba0b7c534a30439f68e3158f3ac405e5"
       },
       {
         "file": "RETROVISORES/1270502101.png",
-        "sha256": "646edb4915b8bd00f71ad1ea2f011abb"
+        "sha256": "66fd6fc945bc7935745e6f244c127dd6"
       },
       {
         "file": "RETROVISORES/1270502102.png",
-        "sha256": "23663564943234e3f0ef6042ac8edd52"
+        "sha256": "8c419beff76589ab66dfbf74d43b0f9d"
       },
       {
         "file": "RETROVISORES/1270502103.png",
-        "sha256": "fe943931bb8836f5a60a3782c3fb9581"
+        "sha256": "d26b18f7ada9a740b08b6942e34744d1"
       },
       {
         "file": "RETROVISORES/1270502104.png",
-        "sha256": "aecd2556d56bbb7c838f1cdab15e6561"
+        "sha256": "313287720a7b077c513c294d77b9a211"
       },
       {
         "file": "RETROVISORES/1270602101.png",
-        "sha256": "8e8c5df464a2cec1c7f6ed7efbf64ab0"
+        "sha256": "24de2d5b2a2f31254ccb9b53bb5ca7a4"
       },
       {
         "file": "RETROVISORES/1270602102.png",
-        "sha256": "6de8f8dd01acb22fab5106eaa4160849"
+        "sha256": "42331feb44ba36045eb419b238af0e4d"
       },
       {
         "file": "RETROVISORES/1270602111.png",
-        "sha256": "33ecc868fbb6058585551c8732cda61b"
+        "sha256": "d19c688358df47f23fd8a5a93b4d3097"
       },
       {
         "file": "RETROVISORES/1270602112.png",
-        "sha256": "bb92e7cf1e154d92e43e73dd7fbe73eb"
+        "sha256": "a58a863a7933243dd63dc3b9e3964945"
       },
       {
         "file": "RETROVISORES/1270602121.png",
-        "sha256": "e0f549360aba085776d7053e3d7ad0ec"
+        "sha256": "962cd69287514df8ac80350249f7a5fe"
       },
       {
         "file": "RETROVISORES/1270602122.png",
-        "sha256": "494bea075aa542f8ddb75dee9aa8ab4b"
+        "sha256": "52f7528b01f22c15a5cf9a06ca8ea993"
       },
       {
         "file": "RETROVISORES/1270602123.png",
-        "sha256": "781352f57b1826ce71dcbd64229e62ac"
+        "sha256": "a920ab712699cfe1d76a79b60f629a4f"
       },
       {
         "file": "RETROVISORES/1270602124.png",
-        "sha256": "9e3fb8dae74cc9e09b3d89f632376639"
+        "sha256": "9839cf6ad1372fce03e8c9f85188fe8a"
       },
       {
         "file": "RETROVISORES/1270702101.png",
-        "sha256": "d1117447d8aade9c9891b1879c441a8c"
+        "sha256": "98bdf5fc389ec984120595dfac17e9b9"
       },
       {
         "file": "RETROVISORES/1270702102.png",
-        "sha256": "3c1572629787dfc9005f3b56614e88dc"
+        "sha256": "0fa7b99ed094da990e1236652ae9577d"
       },
       {
         "file": "RETROVISORES/1270702103.png",
-        "sha256": "01d2d85d16359e80b4d4399b04535aba"
+        "sha256": "fb6d4465460be90882de9b44203d565b"
       },
       {
         "file": "RETROVISORES/1270702104.png",
-        "sha256": "b2637924cecc2b7424dd084886d0550c"
+        "sha256": "0a72089e36b844a020d19402b67b03a6"
       },
       {
         "file": "RETROVISORES/1270862111.png",
-        "sha256": "d8155b00336c7ffa95be0a7eee4698fa"
+        "sha256": "aa37f070cb5bc0ac27795cb4347baf1c"
       },
       {
         "file": "RETROVISORES/1270862112.png",
-        "sha256": "6ded2b66e7ec0f7bd9ff90e8985a2d6f"
+        "sha256": "92ea841ecd045049e21d24236524a625"
       },
       {
         "file": "RETROVISORES/1270862113.png",
-        "sha256": "7ee48f3a93208c016b3d0fe86305a8ff"
+        "sha256": "e476e2d886efaf623c215f303735ded4"
       },
       {
         "file": "RETROVISORES/1270862114.png",
-        "sha256": "f8c0b17446248dd4780d7a017bc465fe"
+        "sha256": "c95dd15a135c70a8f81e3c069e824bfe"
       },
       {
         "file": "RETROVISORES/1270862117.png",
-        "sha256": "b87974e2b86ac7e9f5f0937317129e5b"
+        "sha256": "cc541c1f852afcd53829224e9f3adee2"
       },
       {
         "file": "RETROVISORES/1270862118.png",
-        "sha256": "4de7dec92afcc246497d1d242649ab89"
+        "sha256": "e6f081103723428461d463e5a120c029"
       },
       {
         "file": "RETROVISORES/1275522101.png",
-        "sha256": "ba4703556b15e6bec0604d05c33fd2fb"
+        "sha256": "4417bb02c00872e4e70ff7b07a09fa4e"
       },
       {
         "file": "RETROVISORES/1275522102.png",
-        "sha256": "0718de3c46dbb489430e732bba5c7d6a"
+        "sha256": "0dc421374c53dd11583ee23997b5a46c"
       },
       {
         "file": "RETROVISORES/1275522111.png",
-        "sha256": "9eb5c3ed9e5730dca51aa3b9dac7a988"
+        "sha256": "21cd5b2ab11ee73652e6dd8dba0036be"
       },
       {
         "file": "RETROVISORES/1275522112.png",
-        "sha256": "78cec390812363075002769021668a35"
+        "sha256": "9e3253a1bef1b78116c8a8757f09c13c"
       },
       {
         "file": "RETROVISORES/1275522113.png",
-        "sha256": "8c9e743746f82fcceddd0cf291049890"
+        "sha256": "74aca36decf02171023869c56772078d"
       },
       {
         "file": "RETROVISORES/1275522114.png",
-        "sha256": "e5f0e8c8a8eccf588c294b980fc0d34e"
+        "sha256": "a4ad389865bc0f20892e1d1754a36479"
       },
       {
         "file": "RETROVISORES/1275522115.png",
-        "sha256": "05e72ea6446cd1e1eca37f51d6b0edcc"
+        "sha256": "a83a76abe8dff99241d4f055be821564"
       },
       {
         "file": "RETROVISORES/1275522116.png",
-        "sha256": "f8129e5bba20846606cf50f84bd0bb62"
+        "sha256": "806347be33b749021b4f5c0b85715939"
       },
       {
         "file": "RETROVISORES/1275522117.png",
-        "sha256": "aa82c49dbfbc36911cb5c0126289d034"
+        "sha256": "faebceb876e2c23517a7fc2d4b89c6bf"
       },
       {
         "file": "RETROVISORES/1275522118.png",
-        "sha256": "349d7cbdd41dcad49d8e9f43c1cd27c5"
+        "sha256": "1836671904c66c670faa378dbc8498be"
       },
       {
         "file": "RETROVISORES/1275522119.png",
-        "sha256": "80e31ef2e68ad7ce6a3949c3841e0dc8"
+        "sha256": "652141bb9b0d3135f9b70ed157025e87"
       },
       {
         "file": "RETROVISORES/1275522120.png",
-        "sha256": "af5d3167fcdb60dc1844a439c328faf3"
+        "sha256": "cd286711fc28a4f8084f579b91a629b6"
       },
       {
         "file": "RETROVISORES/1275522121.png",
-        "sha256": "bf9e2857d5ce9320b2501a357b832c9f"
+        "sha256": "b6f050e07bc5716d94726328b9748e06"
       },
       {
         "file": "RETROVISORES/1275522122.png",
-        "sha256": "f436702234b8b78cfddb60032215eb8a"
+        "sha256": "23cbc4249caff35e911091bfd3e8934d"
       },
       {
         "file": "RETROVISORES/1275522123.png",
-        "sha256": "883a4956381c06347a9cf4afb822111b"
+        "sha256": "505664b4b96bae73af07cb0f471bcce3"
       },
       {
         "file": "RETROVISORES/1275522124.png",
-        "sha256": "7407854895a7d491eaa6c3de00082ce3"
+        "sha256": "c58537f30386c109cec9df6bf8dacaf7"
       },
       {
         "file": "RETROVISORES/1275522125.png",
-        "sha256": "f57105720f4ec68e3315325bdb65b83f"
+        "sha256": "6907145226ef65a91255fedfcd3128f4"
       },
       {
         "file": "RETROVISORES/1275522126.png",
-        "sha256": "2777c082dc6b1513320192769fb025a5"
+        "sha256": "b51be6eb6307ce45f406c2683ce7464f"
       },
       {
         "file": "RETROVISORES/1275522127.png",
-        "sha256": "965f7203fad2afd916541ad2da44e09a"
+        "sha256": "6295032aeceb112b8065f67de41c3c47"
       },
       {
         "file": "RETROVISORES/1275522128.png",
-        "sha256": "8dfe50c59637e0e629116e8211991e15"
+        "sha256": "399162fe9f0fc26807bf7d582df234b6"
       },
       {
         "file": "RETROVISORES/1275522129.png",
-        "sha256": "0604b996fba553270c8d67e4915403bd"
+        "sha256": "e4d8c4ae7873c7a5d955dcc795ea8792"
       },
       {
         "file": "RETROVISORES/1275522130.png",
-        "sha256": "88cd15aa98619ef1938299ed4349f242"
+        "sha256": "e003afc8d2b15c8d2cc3563cea06bc0f"
       },
       {
         "file": "RETROVISORES/ISAKA_RETROVISOR (2).png",
-        "sha256": "4f9701b8f932f88ebaaa8fbe80e33aae"
+        "sha256": "aa728e275e8aa6dd66e6fc6f689d2d23"
       },
       {
         "file": "RETROVISORES/ISAKA_RETROVISOR.png",
-        "sha256": "30100b18ce0addd3673a6c40df29ad98"
+        "sha256": "0b0bfa63c4dfbae241426dfb7ba2f827"
       },
       {
         "file": "RETROVISORES/RETROV_HILUX.png",
-        "sha256": "89e3372ef12a4491a3af704a1b7c12e7"
+        "sha256": "f67c43978e392967ff5fb1ef18efb324"
       },
       {
         "file": "ROLAMENTOS/7175527343.png",
