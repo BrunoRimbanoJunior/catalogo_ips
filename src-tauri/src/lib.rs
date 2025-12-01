@@ -1,6 +1,8 @@
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
+
+mod desc;
 
 mod db;
 mod importer;
@@ -12,13 +14,123 @@ mod core {
     use rusqlite::{params, Connection, OptionalExtension};
     use sha2::{Digest, Sha256};
     use std::fs;
+    use std::fs::File;
+    use std::io::{self, copy};
     use std::path::Path;
+    use std::sync::OnceLock;
     use std::time::Duration;
     use tauri::AppHandle;
     use walkdir::WalkDir;
+    use zip::ZipArchive;
     use crate::db::{db_path, ensure_dirs, open_db, META_DB_VERSION_KEY, META_MANIFEST_HASH_KEY};
 
     const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
+    const SEED_ZIP_URLS: [&str; 2] = [
+        "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/img-pt1.zip",
+        "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/img-pt2.zip",
+    ];
+    const SEED_MARKER: &str = ".images_seeded";
+
+    fn load_env_key() -> Option<String> {
+        static KEY_CACHE: OnceLock<Option<String>> = OnceLock::new();
+        KEY_CACHE
+            .get_or_init(|| {
+                // 1) compile-time env (quando definido no build)
+                for k in [option_env!("DESCRYPT_KEY"), option_env!("DECRYPT_KEY")] {
+                    if let Some(val) = k {
+                        if !val.trim().is_empty() {
+                            return Some(val.to_string());
+                        }
+                    }
+                }
+                // 2) variavel de ambiente em runtime
+                for name in ["DESCRYPT_KEY", "DECRYPT_KEY"] {
+                    let direct = std::env::var(name).unwrap_or_default();
+                    if !direct.trim().is_empty() {
+                        return Some(direct);
+                    }
+                }
+                // 3) tenta carregar .env em dirs comuns (cwd e pai)
+                if let Ok(cwd) = std::env::current_dir() {
+                    let mut dirs = Vec::new();
+                    dirs.push(cwd.clone());
+                    if let Some(parent) = cwd.parent() {
+                        dirs.push(parent.to_path_buf());
+                    }
+                    dirs.dedup();
+                    let env_files = [".env.production", ".env", ".env.development"];
+                    for d in dirs {
+                        for f in env_files {
+                            let candidate = d.join(f);
+                            if candidate.exists() {
+                                let _ = dotenvy::from_path(&candidate);
+                            }
+                        }
+                    }
+                }
+                for name in ["DESCRYPT_KEY", "DECRYPT_KEY"] {
+                    let from_file = std::env::var(name).unwrap_or_default();
+                    if !from_file.trim().is_empty() {
+                        return Some(from_file);
+                    }
+                }
+                None
+            })
+            .clone()
+    }
+
+    fn resolve_key(data_dir: &Path) -> Option<String> {
+        if let Some(k) = load_env_key() {
+            return Some(k);
+        }
+        let key_file = data_dir.join("descrypt.key");
+        if key_file.exists() {
+            if let Ok(txt) = std::fs::read_to_string(&key_file) {
+                let t = txt.trim();
+                if !t.is_empty() {
+                    return Some(t.to_string());
+                }
+            }
+        }
+        None
+    }
+
+    fn guess_mime(path: &Path, bytes: &[u8]) -> &'static str {
+        if bytes.len() >= 8 {
+            // PNG magic
+            if bytes[0..8] == [0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A] {
+                return "image/png";
+            }
+        }
+        if bytes.len() >= 3 {
+            // JPEG magic
+            if bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF {
+                return "image/jpeg";
+            }
+        }
+        if bytes.len() >= 12 {
+            // WEBP "RIFF....WEBP"
+            if &bytes[0..4] == b"RIFF" && &bytes[8..12] == b"WEBP" {
+                return "image/webp";
+            }
+        }
+        if bytes.len() >= 2 && bytes[0] == b'B' && bytes[1] == b'M' {
+            return "image/bmp";
+        }
+        let ext = path
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .trim_start_matches('.')
+            .to_ascii_lowercase();
+        match ext.as_str() {
+            "jpg" | "jpeg" => "image/jpeg",
+            "png" => "image/png",
+            "webp" => "image/webp",
+            "bmp" => "image/bmp",
+            _ => "application/octet-stream",
+        }
+    }
 
     #[derive(Debug, Serialize, Deserialize, Clone)]
     pub struct InitInfo {
@@ -282,6 +394,9 @@ mod core {
         }
         let conn = open_db(&db_file).map_err(|e| e.to_string())?;
         migrate(&conn).map_err(|e| e.to_string())?;
+        if let Err(e) = ensure_seed_images(&data_dir, &imgs_dir) {
+            eprintln!("Falha ao semear imagens: {}", e);
+        }
         
 
         // Normaliza montadoras e coluna make em vehicles
@@ -537,6 +652,62 @@ mod core {
             expr = GROUP_EXPR_SQL
         );
         conn.execute(&sql, [])?;
+        Ok(())
+    }
+
+    fn download_zip_file(url: &str, dest: &Path) -> Result<()> {
+        let client = reqwest::blocking::Client::builder()
+            .timeout(Duration::from_secs(60))
+            .build()?;
+        let mut resp = client.get(url).send()?;
+        if !resp.status().is_success() {
+            return Err(anyhow::anyhow!("Falha ao baixar {}: status {}", url, resp.status()));
+        }
+        let mut file = File::create(dest)?;
+        resp.copy_to(&mut file)?;
+        Ok(())
+    }
+
+    fn extract_zip_to(zip_path: &Path, dest_dir: &Path) -> Result<()> {
+        let file = File::open(zip_path)?;
+        let mut archive = zip::ZipArchive::new(file)?;
+        for i in 0..archive.len() {
+            let mut entry = archive.by_index(i)?;
+            let outpath = dest_dir.join(entry.mangled_name());
+            if entry.name().ends_with('/') {
+                fs::create_dir_all(&outpath)?;
+            } else {
+                if let Some(parent) = outpath.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                let mut outfile = File::create(&outpath)?;
+                copy(&mut entry, &mut outfile)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn ensure_seed_images(data_dir: &Path, images_dir: &Path) -> Result<()> {
+        let marker = data_dir.join(SEED_MARKER);
+        if marker.exists() {
+            return Ok(());
+        }
+        // Se a pasta já tem arquivos, não sobrescreva
+        if images_dir.read_dir().ok().map(|mut d| d.next().is_some()).unwrap_or(false) {
+            let _ = fs::write(&marker, b"seeded");
+            return Ok(());
+        }
+        fs::create_dir_all(images_dir)?;
+        fs::create_dir_all(data_dir)?;
+
+        for url in SEED_ZIP_URLS.iter() {
+            let filename = url.split('/').last().unwrap_or("seed.zip");
+            let tmp_path = data_dir.join(filename);
+            download_zip_file(url, &tmp_path)?;
+            extract_zip_to(&tmp_path, images_dir)?;
+            let _ = fs::remove_file(&tmp_path);
+        }
+        let _ = fs::write(&marker, b"seeded");
         Ok(())
     }
 
@@ -943,6 +1114,7 @@ mod core {
         for p in paths.iter() {
             let src = std::path::Path::new(p);
             let _ext = src.extension().and_then(|e| e.to_str()).unwrap_or("png");
+            let _ext = src.extension().and_then(|e| e.to_str()).unwrap_or("png");
             let name = src.file_name().and_then(|n| n.to_str()).unwrap_or("logo");
             let safe_name = name.replace(|c: char| c == '"' || c == '\'', "_");
             let dest = logos_dir.join(&safe_name);
@@ -1249,7 +1421,7 @@ mod core {
     pub fn read_image_base64(app: AppHandle, path_or_rel: String) -> Result<String, String> {
         use std::fs;
         // monta caminho absoluto
-        let (_, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        let (data_dir, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
         let abs_try = {
             let p = std::path::PathBuf::from(&path_or_rel);
             if p.is_absolute() {
@@ -1259,30 +1431,37 @@ mod core {
             }
         };
 
-        // Funcao auxiliar para converter bytes em data URL
+        let key_env = resolve_key(&data_dir);
+        let try_decrypt = |data: Vec<u8>| -> Result<Vec<u8>, String> {
+            let encrypted = data.len() > 5 && &data[..4] == b"CIMG";
+            if !encrypted {
+                return Ok(data);
+            }
+            if key_env.is_none() {
+                eprintln!("decrypt_image: arquivo criptografado, mas DESCRYPT_KEY nao encontrado");
+            }
+            let key = key_env.as_ref().ok_or_else(|| "DESCRYPT_KEY nao definido para imagem criptografada".to_string())?;
+            match crate::desc::decrypt_image(&data, key) {
+                Ok(p) => Ok(p),
+                Err(e) => {
+                    eprintln!("decrypt_image: falha ao descriptografar {} ({} bytes): {}", abs_try.display(), data.len(), e);
+                    Err(format!("Falha ao descriptografar: {}", e))
+                }
+            }
+        };
+
         fn to_data_url(path: &std::path::Path, bytes: Vec<u8>) -> String {
-            let ext = path
-                .extension()
-                .and_then(|e| e.to_str())
-                .unwrap_or("")
-                .to_ascii_lowercase();
-            let mime = match ext.as_str() {
-                "jpg" | "jpeg" => "image/jpeg",
-                "png" => "image/png",
-                "webp" => "image/webp",
-                "bmp" => "image/bmp",
-                _ => "application/octet-stream",
-            };
+            let mime = guess_mime(path, &bytes);
             let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
             format!("data:{};base64,{}", mime, encoded)
         }
 
-        // 1) Tenta ler exatamente o caminho resolvido
         match fs::read(&abs_try) {
-            Ok(bytes) => return Ok(to_data_url(&abs_try, bytes)),
+            Ok(bytes) => {
+                let bytes = try_decrypt(bytes).map_err(|e| e.to_string())?;
+                return Ok(to_data_url(&abs_try, bytes));
+            }
             Err(_) => {
-                // 2) Fallback: se o arquivo nao existir (ex.: DB antigo salvou so o nome sem subpasta),
-                // procura pelo basename em subdiretorios de images_dir
                 if let Some(name) = abs_try.file_name().and_then(|s| s.to_str()) {
                     for entry in WalkDir::new(&imgs_dir).into_iter().filter_map(|e| e.ok()) {
                         let p = entry.path();
@@ -1290,6 +1469,7 @@ mod core {
                             if let Some(base) = p.file_name().and_then(|s| s.to_str()) {
                                 if base.eq_ignore_ascii_case(name) {
                                     if let Ok(bytes) = fs::read(p) {
+                                        let bytes = try_decrypt(bytes).map_err(|e| e.to_string())?;
                                         return Ok(to_data_url(p, bytes));
                                     }
                                 }
@@ -1297,10 +1477,8 @@ mod core {
                         }
                     }
                 }
-                return Err(format!(
-                    "Falha ao ler imagem (não encontrada): {}",
-                    abs_try.display()
-                ));
+                eprintln!("read_image_base64: arquivo nao encontrado {}", abs_try.display());
+                return Err(format!("Falha ao ler imagem (nao encontrada): {}", abs_try.display()));
             }
         }
     }
