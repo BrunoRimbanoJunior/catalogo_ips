@@ -52,14 +52,21 @@ jobs:
       - name: Compute version
         id: ver
         run: |
+          DB_PATH="data/catalog.db"
           DATE_VER=$(date +%d%m%y%H)
+          if [[ -f "$DB_PATH" ]]; then
+            DB_VER=$(sqlite3 "$DB_PATH" "SELECT value FROM meta WHERE key='db_version' LIMIT 1;" || echo "")
+            DB_SHA=$(sha256sum "$DB_PATH" | cut -d' ' -f1)
+          fi
+          DB_VER=${DB_VER:-$DATE_VER}
+          echo "version=${DB_VER}" >> $GITHUB_OUTPUT
+          echo "db_version=${DB_VER}" >> $GITHUB_OUTPUT
+          echo "db_sha=${DB_SHA}" >> $GITHUB_OUTPUT
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            echo "version=${DATE_VER}" >> $GITHUB_OUTPUT
             APP_VERSION="${GITHUB_REF_NAME#v}"
             echo "app_version=${APP_VERSION}" >> $GITHUB_OUTPUT
             echo "download_url=https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/catalogo_ips_${APP_VERSION}_x64-setup.exe" >> $GITHUB_OUTPUT
           else
-            echo "version=${DATE_VER}" >> $GITHUB_OUTPUT
             echo "app_version=" >> $GITHUB_OUTPUT
             echo "download_url=" >> $GITHUB_OUTPUT
           fi
@@ -76,6 +83,8 @@ jobs:
           DB_URL="https://raw.githubusercontent.com/${{ github.repository }}/main/data/catalog.db"
           node scripts/gen-manifest-r2.mjs \
             --version ${{ steps.ver.outputs.version }} \
+            --db-version ${{ steps.ver.outputs.db_version }} \
+            --db-sha "${{ steps.ver.outputs.db_sha }}" \
             --db-url "$DB_URL" \
             --app-version "${{ steps.ver.outputs.app_version }}" \
             --app-download-url "${{ steps.ver.outputs.download_url }}" \
