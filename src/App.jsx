@@ -159,7 +159,11 @@ function App() {
     return Number.isNaN(n) ? null : n;
   }, [brandId]);
 
-  const manifestUrl = useMemo(() => localStorage.getItem("manifestUrl") || import.meta.env.VITE_DEFAULT_MANIFEST_URL || "", []);
+  const DEFAULT_MANIFEST_URL = "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json";
+  const manifestUrl = useMemo(
+    () => localStorage.getItem("manifestUrl") || import.meta.env.VITE_DEFAULT_MANIFEST_URL || DEFAULT_MANIFEST_URL,
+    []
+  );
   const FIXED_DOWNLOAD = "https://1drv.ms/u/c/4e4e660955b19ef5/EdHos0VU9D5BihkzIiMhhUEB0skBGWNpeQvmVQhspQj-7g?e=Vm1ixV";
 
   const blockAccess = useMemo(() => {
