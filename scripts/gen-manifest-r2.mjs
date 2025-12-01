@@ -78,6 +78,8 @@ async function main() {
   await loadEnvFiles();
 
   const version = Number(arg('version'));
+  const dbVersion = Number(arg('db-version', version));
+  const dbSha = arg('db-sha', null);
   const dbUrl = arg('db-url');
   const outPath = arg('out', 'manifest.json');
   const appVersion = arg('app-version', process.env.APP_VERSION || null);
@@ -125,7 +127,7 @@ async function main() {
   const manifest = {
     appVersion: appVersion || undefined,
     appDownloadUrl: computedDownload || undefined,
-    db: { version, url: dbUrl, sha256: null },
+    db: { version: dbVersion || version, url: dbUrl, sha256: dbSha || null },
     images: { base_url: baseUrl, files },
   };
   Object.keys(manifest).forEach((k) => manifest[k] === undefined && delete manifest[k]);
