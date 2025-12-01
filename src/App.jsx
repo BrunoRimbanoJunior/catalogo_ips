@@ -12,6 +12,7 @@ import {
   exportDbTo,
   setBrandingImage,
   setHeaderLogos as setHeaderLogosApi,
+  fetchGroups,
 } from "./lib/api";
 import { loadInitialCatalog, loadGroups, loadVehiclesByFilters, searchWithFilters } from "./lib/catalogData";
 import {
@@ -64,7 +65,7 @@ function useFingerprint() {
   }, []);
 }
 
-// Apenas para exibir no dropdown: remove tokens com dígitos (anos/códigos) mantendo nome base.
+// Apenas para exibir no dropdown: remove tokens com dÃ­gitos (anos/cÃ³digos) mantendo nome base.
 function vehicleLabel(name = "") {
   const parts = String(name).split(/\s+/);
   const kept = [];
@@ -532,11 +533,7 @@ function App() {
             imgs.push(b64);
           }
         } catch (e) {
-          const fallback = convertFileSrc(normalized.startsWith("/") ? normalized : normalized);
-          if (!unique.has(fallback)) {
-            unique.add(fallback);
-            imgs.push(fallback);
-          }
+          // Se falhar (arquivo ausente/criptografia), apenas ignore para evitar thumbs quebradas
         }
       }
       setSelectedImages(imgs);
@@ -577,7 +574,7 @@ function App() {
         }
       }
       setLaunchImages(list);
-      // Sempre abre o modal quando a lista ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ carregada manualmente; em auto-init tambÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½m abrimos para exibir novidades
+      // Sempre abre o modal quando a lista ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ carregada manualmente; em auto-init tambÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½m abrimos para exibir novidades
       setLaunchState((s) => ({ ...s, loading: false, open: true, index: 0 }));
     } catch (e) {
       setLaunchImages([]);
@@ -595,7 +592,7 @@ function App() {
       setDbVersion(res?.db_version || res?.dbVersion || dbVersion);
       localStorage.setItem("manifestUrl", target);
       setStatusMsg(`Sincronizado: db v${res?.db_version || res?.dbVersion || "?"} | imgs +${res?.downloaded_images || res?.downloadedImages || 0}`);
-      setToolsMsg("Sync concluÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½do.");
+      setToolsMsg("Sync concluÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½do.");
     } catch (e) {
       setToolsMsg(`Falha ao sincronizar: ${e}`);
     } finally {
@@ -622,7 +619,7 @@ function App() {
       setExcelPath(picked);
       setToolsMsg("Importando Excel...");
       const res = await importExcel(picked);
-      setToolsMsg(`Importado: linhas ${res?.processed_rows ?? "?"}, produtos ${res?.upserted_products ?? "?"}, versÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o db ${res?.new_db_version ?? "?"}`);
+      setToolsMsg(`Importado: linhas ${res?.processed_rows ?? "?"}, produtos ${res?.upserted_products ?? "?"}, versÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o db ${res?.new_db_version ?? "?"}`);
     } catch (e) {
       setToolsMsg(`Falha ao importar Excel: ${e}`);
     }
@@ -785,7 +782,7 @@ function App() {
                 </a>
               </nav>
               <button className="launch-button" onClick={() => loadLaunches(false)} disabled={launchState.loading}>
-                {launchState.loading ? "Carregando..." : "Lançamentos"}
+                {launchState.loading ? "Carregando..." : "LanÃ§amentos"}
               </button>
               {launchState.error ? <span className="launch-error">{launchState.error}</span> : null}
             </div>
@@ -810,9 +807,9 @@ function App() {
                 </div>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={runImportExcel}>Importar Excel</button>
-                  {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ltimo: {excelPath}</span> : null}
+                  {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ltimo: {excelPath}</span> : null}
                   <button onClick={runExportDb}>Exportar DB</button>
-                  {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ltimo: {exportPath}</span> : null}
+                  {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ltimo: {exportPath}</span> : null}
                   <button onClick={() => runSetBranding("logo")}>Aplicar logo</button>
                   {logoInput ? <span style={{ fontSize: 12, color: "#555" }}>Atual: {logoInput}</span> : null}
                   <button onClick={() => runSetBranding("background")}>Aplicar fundo</button>
@@ -1039,10 +1036,10 @@ function App() {
               <div>
                 <p className="auth-kicker">Acesso restrito</p>
                 <h2>Meu Cadastro</h2>
-                <p className="auth-muted">Envie a ficha e Aguarde aprovação. Enquanto o status não for aprovado, o catálogo fica bloqueado.</p>
+                <p className="auth-muted">Envie a ficha e Aguarde aprovaÃ§Ã£o. Enquanto o status nÃ£o for aprovado, o catÃ¡logo fica bloqueado.</p>
                 <p className="auth-status">Status atual: {profile?.status || "pending"}</p>
               </div>
-              <div className="auth-brand">Catálogo IPS</div>
+              <div className="auth-brand">CatÃ¡logo IPS</div>
             </div>
 
             {supabaseConfigured ? (
@@ -1060,16 +1057,16 @@ function App() {
                     <form className="auth-grid" onSubmit={submitRegistration}>
                       <div className="auth-radio">
                         <label>
-                          <input type="radio" name="personType" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa JurÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½dica
+                          <input type="radio" name="personType" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa JurÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½dica
                         </label>
                         <label>
-                          <input type="radio" name="personType" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½sica
+                          <input type="radio" name="personType" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa FÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½sica
                         </label>
                       </div>
 
                       <label className="auth-field wide">
                         Nome/Razao Social
-                        <input value={form.full_name} onChange={(e) => setForm((s) => ({ ...s, full_name: e.target.value }))} placeholder="Nome completo ou razÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o social" />
+                        <input value={form.full_name} onChange={(e) => setForm((s) => ({ ...s, full_name: e.target.value }))} placeholder="Nome completo ou razÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o social" />
                       </label>
                       <label className="auth-field wide">
                         CPF/CNPJ
@@ -1113,7 +1110,7 @@ function App() {
                       <button type="submit" disabled={formSubmitting}>
                         {formSubmitting ? "Enviando..." : "Enviar cadastro"}
                       </button>
-                      <p className="auth-muted small">Após enviar, o admin aprova manualmente. Caso troque de máquina, solicite nova aprovação ou reset do dispositivo.</p>
+                      <p className="auth-muted small">ApÃ³s enviar, o admin aprova manualmente. Caso troque de mÃ¡quina, solicite nova aprovaÃ§Ã£o ou reset do dispositivo.</p>
                     </form>
                   )}
                 </section>
