@@ -722,6 +722,11 @@ function App() {
         style={headerBgStyle}
         onContextMenu={(e) => e.preventDefault()}
       >
+        {syncing && (
+          <div className="sync-overlay" role="alert" aria-live="assertive">
+            <div className="sync-box">Atualizando dados, aguarde...</div>
+          </div>
+        )}
         <div className="appbar">
           <div className="appbar-logo">
             {logoPath ? (
@@ -1127,6 +1132,7 @@ function App() {
 }
 
 export default App;
+
 
 
 

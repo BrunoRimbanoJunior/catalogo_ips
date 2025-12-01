@@ -155,6 +155,8 @@ button {
 .tools details { margin-left: auto; }
 .tools summary { cursor: pointer; padding: 8px 12px; background: #c62828; border-radius: 6px; color: #fff; font-weight: 700; }
 .tools-panel { background: #222; padding: 12px; border-radius: 8px; }
+.sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.sync-box { background: #222; color: #fff; padding: 16px 20px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.35); font-weight: 700; }
 
 .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr) 420px; gap: 16px; margin-top: 4px; align-items: start; width: 100%; max-width: 1280px; }
 .sidebar { background: #ffffff; border: 1px solid #e6e6e6; border-radius: 8px; padding: 10px; }
