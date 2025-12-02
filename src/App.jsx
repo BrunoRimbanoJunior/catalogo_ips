@@ -13,6 +13,7 @@ import {
   setBrandingImage,
   setHeaderLogos as setHeaderLogosApi,
   fetchGroups,
+  cleanupImagesFromManifest,
 } from "./lib/api";
 import { loadInitialCatalog, loadGroups, loadVehiclesByFilters, searchWithFilters } from "./lib/catalogData";
 import {
@@ -123,6 +124,7 @@ function App() {
   const [statusMsg, setStatusMsg] = useState("");
   const [secondaryStatus, setSecondaryStatus] = useState("");
   const [syncing, setSyncing] = useState(false);
+  const [cleanupScheduled, setCleanupScheduled] = useState(false);
 
   const [updateInfo, setUpdateInfo] = useState(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
@@ -219,6 +221,21 @@ function App() {
       img.onerror = null;
     };
   }, [logoPath]);
+
+  useEffect(() => {
+    if (!ready || cleanupScheduled || !manifestUrl) return undefined;
+    const timer = setTimeout(async () => {
+      try {
+        setToolsMsg("Limpando imagens obsoletas (manifest)...");
+        await cleanupImagesFromManifest(manifestUrl);
+        setToolsMsg("Limpeza de imagens concluida.");
+      } catch (e) {
+        setToolsMsg(`Falha ao limpar imagens: ${e}`);
+      }
+    }, 5 * 60 * 1000);
+    setCleanupScheduled(true);
+    return () => clearTimeout(timer);
+  }, [ready, cleanupScheduled, manifestUrl]);
 
   useEffect(() => {
     const src = toDisplaySrc(bgPath || DEFAULT_BACKGROUND);

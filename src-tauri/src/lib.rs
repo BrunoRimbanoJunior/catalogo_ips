@@ -2,13 +2,14 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
 
+mod call_img;
 mod db;
 mod importer;
 mod desc;
 
 mod core {
     use super::*;
-    use base64::Engine;
+    use std::collections::HashSet;
     use reqwest::Client;
     use rusqlite::{params, Connection, OptionalExtension};
     use sha2::{Digest, Sha256};
@@ -16,10 +17,10 @@ mod core {
     use std::fs::File;
     use std::io::copy;
     use std::path::Path;
-    use std::sync::OnceLock;
     use std::time::Duration;
     use tauri::AppHandle;
     use walkdir::WalkDir;
+    use crate::call_img::load_env_key;
     use crate::db::{db_path, ensure_dirs, open_db, META_DB_VERSION_KEY, META_MANIFEST_HASH_KEY};
 
     const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
@@ -28,130 +29,47 @@ mod core {
         "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/img-pt2.zip",
     ];
     const SEED_MARKER: &str = ".images_seeded";
+    const LAUNCH_CANON: &str = "lancamentos";
 
-    fn load_env_key() -> Option<String> {
-        static KEY_CACHE: OnceLock<Option<String>> = OnceLock::new();
-        KEY_CACHE
-            .get_or_init(|| {
-                // 1) compile-time env (quando definido no build)
-                for k in [option_env!("DESCRYPT_KEY"), option_env!("DECRYPT_KEY")] {
-                    if let Some(val) = k {
-                        if !val.trim().is_empty() {
-                            return Some(val.to_string());
-                        }
-                    }
-                }
-                // 2) variavel de ambiente em runtime
-                for name in ["DESCRYPT_KEY", "DECRYPT_KEY"] {
-                    let direct = std::env::var(name).unwrap_or_default();
-                    if !direct.trim().is_empty() {
-                        return Some(direct);
-                    }
-                }
-                // 3) tenta carregar .env em dirs comuns (cwd, pasta do binario/resources)
-                let mut dirs = Vec::new();
-                if let Ok(cwd) = std::env::current_dir() {
-                    dirs.push(cwd.clone());
-                    if let Some(parent) = cwd.parent() {
-                        dirs.push(parent.to_path_buf());
-                    }
-                }
-                if let Ok(exe) = std::env::current_exe() {
-                    if let Some(bin_dir) = exe.parent() {
-                        dirs.push(bin_dir.to_path_buf());
-                        dirs.push(bin_dir.join("resources"));
-                        if let Some(parent) = bin_dir.parent() {
-                            dirs.push(parent.to_path_buf());
-                            dirs.push(parent.join("Resources"));
-                        }
-                    }
-                }
-                dirs.retain(|d| d.exists());
-                dirs.dedup();
-
-                let env_files = [".env.production", ".env", ".env.development"];
-                for d in dirs.iter() {
-                    for f in env_files.iter() {
-                        let candidate = d.join(f);
-                        if candidate.exists() {
-                            let _ = dotenvy::from_path(&candidate);
-                        }
-                    }
-                }
-                for name in ["DESCRYPT_KEY", "DECRYPT_KEY"] {
-                    let from_file = std::env::var(name).unwrap_or_default();
-                    if !from_file.trim().is_empty() {
-                        return Some(from_file);
-                    }
-                }
-                // 4) fallback: arquivo descrypt.key em dirs conhecidos
-                for d in dirs.iter() {
-                    let key_file = d.join("descrypt.key");
-                    if key_file.exists() {
-                        if let Ok(txt) = std::fs::read_to_string(&key_file) {
-                            let trimmed = txt.trim();
-                            if !trimmed.is_empty() {
-                                return Some(trimmed.to_string());
-                            }
-                        }
-                    }
-                }
-                None
+    fn normalize_launch_token(s: &str) -> String {
+        s.to_lowercase()
+            .chars()
+            .map(|c| match c {
+                'ã' | 'á' | 'â' | 'à' | 'ä' => 'a',
+                'ç' => 'c',
+                _ => c,
             })
-            .clone()
+            .collect::<String>()
     }
 
-    fn resolve_key(data_dir: &Path) -> Option<String> {
-        if let Some(k) = load_env_key() {
-            return Some(k);
-        }
-        let key_file = data_dir.join("descrypt.key");
-        if key_file.exists() {
-            if let Ok(txt) = std::fs::read_to_string(&key_file) {
-                let t = txt.trim();
-                if !t.is_empty() {
-                    return Some(t.to_string());
+    fn is_launch_component(name: &str) -> bool {
+        normalize_launch_token(name) == LAUNCH_CANON
+    }
+
+    fn is_in_launch_dir(path: &Path, root: &Path) -> bool {
+        if let Ok(rel) = path.strip_prefix(root) {
+            for comp in rel.components() {
+                if let std::path::Component::Normal(os) = comp {
+                    if let Some(s) = os.to_str() {
+                        if is_launch_component(s) {
+                            return true;
+                        }
+                    }
                 }
             }
         }
-        None
+        false
     }
 
-    fn guess_mime(path: &Path, bytes: &[u8]) -> &'static str {
-        if bytes.len() >= 8 {
-            // PNG magic
-            if bytes[0..8] == [0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A] {
-                return "image/png";
-            }
+    fn normalize_rel_path(path: &str) -> String {
+        let mut cleaned = path.replace('\\', "/");
+        while cleaned.starts_with("./") {
+            cleaned = cleaned.trim_start_matches("./").to_string();
         }
-        if bytes.len() >= 3 {
-            // JPEG magic
-            if bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF {
-                return "image/jpeg";
-            }
+        while cleaned.starts_with('/') {
+            cleaned = cleaned.trim_start_matches('/').to_string();
         }
-        if bytes.len() >= 12 {
-            // WEBP "RIFF....WEBP"
-            if &bytes[0..4] == b"RIFF" && &bytes[8..12] == b"WEBP" {
-                return "image/webp";
-            }
-        }
-        if bytes.len() >= 2 && bytes[0] == b'B' && bytes[1] == b'M' {
-            return "image/bmp";
-        }
-        let ext = path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("")
-            .trim_start_matches('.')
-            .to_ascii_lowercase();
-        match ext.as_str() {
-            "jpg" | "jpeg" => "image/jpeg",
-            "png" => "image/png",
-            "webp" => "image/webp",
-            "bmp" => "image/bmp",
-            _ => "application/octet-stream",
-        }
+        cleaned.to_ascii_lowercase()
     }
 
     #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -227,6 +145,14 @@ mod core {
         pub updated_db: bool,
         pub downloaded_images: usize,
         pub db_version: i64,
+    }
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct CleanupResult {
+        pub removed_files: usize,
+        pub kept_files: usize,
+        pub total_scanned: usize,
+        pub manifest_files: usize,
+        pub skipped_launch_files: usize,
     }
 
     #[derive(Debug, Serialize, Deserialize)]
@@ -386,10 +312,17 @@ mod core {
     #[tauri::command]
     pub fn init_app(app: AppHandle) -> Result<InitInfo, String> {
         let (data_dir, db_file, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        // se a chave vier empacotada, persiste em descrypt.key para facilitar em runtime
+        if let Some(k) = load_env_key(app.path().resource_dir().ok().as_deref(), Some(&data_dir)) {
+            let key_file = data_dir.join("descrypt.key");
+            if !key_file.exists() {
+                let _ = std::fs::write(&key_file, k.as_bytes());
+            }
+        }
         let created = !db_file.exists();
         if created {
             if let Ok(res_dir) = app.path().resource_dir() {
-                // Tente múltiplos caminhos possíveis dentro de resources
+                // Tente multiplos caminhos possiveis dentro de resources
                 let candidates = [
                     res_dir.join("catalog.db"),
                     res_dir.join("data").join("catalog.db"),
@@ -714,7 +647,7 @@ mod core {
         if marker.exists() {
             return Ok(());
         }
-        // Se a pasta já tem arquivos, não sobrescreva
+        // Se a pasta ja tem arquivos, nao sobrescreva
         if images_dir.read_dir().ok().map(|mut d| d.next().is_some()).unwrap_or(false) {
             let _ = fs::write(&marker, b"seeded");
             return Ok(());
@@ -1017,6 +950,8 @@ mod core {
         let mut scanned = 0usize;
         let mut matched = 0usize;
         let mut inserted = 0usize;
+        // Limpa a tabela antes de reindexar para evitar associações antigas/erradas
+        tx.execute("DELETE FROM images", [])?;
         for f in files {
             scanned += 1;
             // Usa apenas o ultimo segmento como nome de arquivo logico
@@ -1244,7 +1179,7 @@ mod core {
                             need = true;
                         }
                     } else if manifest_changed {
-                        // Sem hash no manifest: se o manifest mudou, forÃ§a rebaixar
+                        // Sem hash no manifest: se o manifest mudou, forca rebaixar
                         need = true;
                     }
                 }
@@ -1261,7 +1196,7 @@ mod core {
                                 format!("{}{}", imgs.base_url, item.file)
                             }
                         };
-                    // garantir diretÃ³rio
+                    // garantir diretorio
                     if let Some(parent) = local_path.parent() {
                         if !parent.exists() {
                             let _ = std::fs::create_dir_all(parent);
@@ -1300,18 +1235,16 @@ mod core {
     }
 
     fn clear_launches_dir(imgs_dir: &std::path::Path) -> std::io::Result<()> {
-        // tenta limpar variacoes do nome para evitar problemas de acentuacao/caso
-        let candidates = [
-            "LANÇAAMENTOS",
-            "lançamentos",
-            "LANCAMENTOS",
-            "Lancamentos",
-            "lancamentos",
-        ];
-        for c in candidates {
-            let p = imgs_dir.join(c);
-            if p.exists() && p.is_dir() {
-                let _ = std::fs::remove_dir_all(&p);
+        for entry in std::fs::read_dir(imgs_dir)? {
+            if let Ok(e) = entry {
+                let path = e.path();
+                if path.is_dir() {
+                    if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                        if is_launch_component(name) {
+                            let _ = std::fs::remove_dir_all(&path);
+                        }
+                    }
+                }
             }
         }
         Ok(())
@@ -1322,19 +1255,18 @@ mod core {
         use std::path::PathBuf;
         use walkdir::WalkDir;
         let (_, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
-        let candidates = [
-            "LANÇAAMENTOS",
-            "lançamentos",
-            "LANCAMENTOS",
-            "Lancamentos",
-            "lancamentos",
-        ];
         let mut launch_dir: Option<PathBuf> = None;
-        for c in candidates {
-            let p = imgs_dir.join(c);
-            if p.exists() && p.is_dir() {
-                launch_dir = Some(p);
-                break;
+        for entry in std::fs::read_dir(&imgs_dir).map_err(|e| e.to_string())? {
+            if let Ok(e) = entry {
+                let p = e.path();
+                if p.is_dir() {
+                    if let Some(name) = p.file_name().and_then(|n| n.to_str()) {
+                        if is_launch_component(name) {
+                            launch_dir = Some(p);
+                            break;
+                        }
+                    }
+                }
             }
         }
         let dir = match launch_dir {
@@ -1441,75 +1373,7 @@ mod core {
 
     #[tauri::command]
     pub fn read_image_base64(app: AppHandle, path_or_rel: String) -> Result<String, String> {
-        use std::fs;
-        // monta caminho absoluto
-        let (data_dir, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
-        let abs_try = {
-            let p = std::path::PathBuf::from(&path_or_rel);
-            if p.is_absolute() {
-                p
-            } else {
-                imgs_dir.join(p)
-            }
-        };
-
-        let key_env = resolve_key(&data_dir);
-        let try_decrypt = |data: Vec<u8>| -> Result<Vec<u8>, String> {
-            let encrypted = data.len() > 5 && &data[..4] == b"CIMG";
-            if !encrypted {
-                return Ok(data);
-            }
-            if key_env.is_none() {
-                eprintln!("decrypt_image: arquivo criptografado, mas DESCRYPT_KEY nao encontrado");
-            }
-            let key = key_env
-                .as_ref()
-                .ok_or_else(|| "DESCRYPT_KEY nao definido para imagem criptografada".to_string())?;
-            match crate::desc::decrypt_image(&data, key) {
-                Ok(p) => Ok(p),
-                Err(e) => {
-                    eprintln!(
-                        "decrypt_image: falha ao descriptografar {} ({} bytes): {}",
-                        abs_try.display(),
-                        data.len(),
-                        e
-                    );
-                    Err(format!("Falha ao descriptografar: {}", e))
-                }
-            }
-        };
-
-        fn to_data_url(path: &std::path::Path, bytes: Vec<u8>) -> String {
-            let mime = guess_mime(path, &bytes);
-            let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
-            format!("data:{};base64,{}", mime, encoded)
-        }
-
-        match fs::read(&abs_try) {
-            Ok(bytes) => {
-                let bytes = try_decrypt(bytes).map_err(|e| e.to_string())?;
-                return Ok(to_data_url(&abs_try, bytes));
-            }
-            Err(_) => {
-                if let Some(name) = abs_try.file_name().and_then(|s| s.to_str()) {
-                    for entry in WalkDir::new(&imgs_dir).into_iter().filter_map(|e| e.ok()) {
-                        let p = entry.path();
-                        if p.is_file() {
-                            if let Some(base) = p.file_name().and_then(|s| s.to_str()) {
-                                if base.eq_ignore_ascii_case(name) {
-                                    if let Ok(bytes) = fs::read(p) {
-                                        let bytes = try_decrypt(bytes).map_err(|e| e.to_string())?;
-                                        return Ok(to_data_url(p, bytes));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                eprintln!("read_image_base64: arquivo nao encontrado {}", abs_try.display());
-                return Err(format!("Falha ao ler imagem (nao encontrada): {}", abs_try.display()));
-            }
-        }
+        crate::call_img::read_image_base64(&app, path_or_rel)
     }
 
     #[tauri::command]
@@ -1534,13 +1398,84 @@ mod core {
         index_from_file_list(&mut conn, &files).map_err(|e| e.to_string())
     }
 
+    #[tauri::command]
+    pub async fn cleanup_images_from_manifest(
+        app: AppHandle,
+        manifest_url: String,
+    ) -> Result<CleanupResult, String> {
+        let client = Client::builder()
+            .timeout(Duration::from_secs(20))
+            .build()
+            .map_err(|e| e.to_string())?;
+        let (manifest, _manifest_hash) =
+            fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
+        let imgs = manifest
+            .images
+            .ok_or_else(|| "Manifest nao possui bloco de imagens".to_string())?;
+        let mut manifest_files: HashSet<String> = HashSet::new();
+        for item in imgs.files.iter() {
+            manifest_files.insert(normalize_rel_path(&item.file));
+        }
+        if manifest_files.is_empty() {
+            return Err(
+                "Manifest sem arquivos de imagens; abortando limpeza para evitar remocao total"
+                    .to_string(),
+            );
+        }
+
+        let (_, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        let mut removed = 0usize;
+        let mut kept = 0usize;
+        let mut skipped_launch = 0usize;
+        let mut total = 0usize;
+
+        for entry in WalkDir::new(&imgs_dir).into_iter().filter_map(|e| e.ok()) {
+            if entry.path().is_dir() {
+                continue;
+            }
+            total += 1;
+            if is_in_launch_dir(entry.path(), &imgs_dir) {
+                skipped_launch += 1;
+                continue;
+            }
+            let rel = entry
+                .path()
+                .strip_prefix(&imgs_dir)
+                .unwrap_or(entry.path())
+                .to_string_lossy()
+                .to_string();
+            let rel_norm = normalize_rel_path(&rel);
+            if manifest_files.contains(&rel_norm) {
+                kept += 1;
+                continue;
+            }
+            if let Err(e) = std::fs::remove_file(entry.path()) {
+                eprintln!(
+                    "cleanup_images_from_manifest: falha ao remover {}: {}",
+                    entry.path().display(),
+                    e
+                );
+            } else {
+                removed += 1;
+            }
+        }
+
+        Ok(CleanupResult {
+            removed_files: removed,
+            kept_files: kept,
+            total_scanned: total,
+            manifest_files: manifest_files.len(),
+            skipped_launch_files: skipped_launch,
+        })
+    }
+
     // Tenta baixar manifest por HTTP; se falhar, usa seed do bundle (manifest.json em resources).
     async fn fetch_or_seed_manifest(
         client: &Client,
         app: &AppHandle,
         manifest_url: &str,
     ) -> Result<(CatalogManifest, String), String> {
-        // Se nÃ£o for http(s), tenta ler como arquivo local
+        // Se nao for http(s), tenta ler como arquivo local
         if !(manifest_url.starts_with("http://") || manifest_url.starts_with("https://")) {
             let txt = std::fs::read_to_string(manifest_url)
                 .map_err(|e| format!("Falha lendo manifest local: {}", e))?;
@@ -1631,19 +1566,19 @@ fn candidate_codes(stem: &str) -> Vec<String> {
             }
         }
 
-        // somente caracteres alfanumÃ©ricos
+            // somente caracteres alfanumericos
         let only_alnum: String = up.chars().filter(|c| c.is_ascii_alphanumeric()).collect();
         if !only_alnum.is_empty() {
             set.insert(only_alnum.clone());
         }
 
-        // prefixo numÃ©rico contÃ­nuo (ex.: "7111043002LE" -> "7111043002")
+            // prefixo numerico continuo (ex.: "7111043002LE" -> "7111043002")
         let digits_prefix: String = up.chars().take_while(|c| c.is_ascii_digit()).collect();
         if !digits_prefix.is_empty() {
             set.insert(digits_prefix);
         }
 
-        // retorna em ordem determinÃ­stica
+        // retorna em ordem deterministica
         let mut out: Vec<String> = set.into_iter().collect();
         out.sort();
         out
@@ -1739,6 +1674,7 @@ pub fn run() {
             core::get_product_details_cmd,
             core::sync_from_manifest,
             core::index_images_from_manifest,
+            core::cleanup_images_from_manifest,
             core::list_launch_images,
             core::import_excel,
             core::index_images,
@@ -1752,6 +1688,8 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+
 
 
 

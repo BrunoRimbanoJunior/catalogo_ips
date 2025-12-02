@@ -66,6 +66,10 @@ export async function indexImagesFromManifest(manifestUrl) {
   return await invoke("index_images_from_manifest", { manifestUrl });
 }
 
+export async function cleanupImagesFromManifest(manifestUrl) {
+  return await invoke("cleanup_images_from_manifest", { manifestUrl });
+}
+
 export async function exportDbTo(destPath) {
   return await invoke("export_db_to", { destPath });
 }
