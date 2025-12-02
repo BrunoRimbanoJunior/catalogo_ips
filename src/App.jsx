@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import {
   initApp,
@@ -194,6 +195,19 @@ function App() {
   }, [headerLogos]);
 
   useEffect(() => {
+    const unlisten = listen("images_downloaded", (event) => {
+      const downloaded = event?.payload?.downloaded || 0;
+      const errors = event?.payload?.errors || 0;
+      const msg = `Imagens atualizadas (${downloaded} baixadas${errors ? `, ${errors} erros` : ""}).`;
+      setSecondaryStatus(msg);
+      setTimeout(() => setSecondaryStatus(""), 2000);
+    });
+    return () => {
+      unlisten.then((fn) => fn()).catch(() => {});
+    };
+  }, []);
+
+  useEffect(() => {
     if (!supabaseConfigured) return;
     if (profile?.status === "block" || cachedProfile?.status === "block") {
       setAllowAfterDelay(false);
@@ -284,9 +298,6 @@ function App() {
         setStatusMsg(`Falha ao carregar catalogos: ${e}`);
       }
 
-      // Libera UI assim que dados base carregam; sync/branding continuam em paralelo
-      setReady(true);
-
       if (manifestUrl) {
         try {
           const manifest = await fetch(manifestUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null);
@@ -302,7 +313,7 @@ function App() {
 
         try {
           setSyncing(true);
-          const res = await syncFromManifest(manifestUrl);
+          const res = await syncFromManifest(manifestUrl, { skipImages: true });
           setDbVersion(res?.db_version || res?.dbVersion || dbVersion);
           setStatusMsg(`Sincronizado: db v${res?.db_version || res?.dbVersion || "?"} | imgs +${res?.downloaded_images || res?.downloadedImages || 0}`);
           localStorage.setItem("manifestUrl", manifestUrl);
@@ -319,6 +330,9 @@ function App() {
           setSecondaryStatus(`Falha ao indexar: ${e}`);
         }
       }
+
+      // Libera UI depois do DB e index
+      setReady(true);
 
       try {
         const branding = await fetch("/images/branding.json").then((r) => (r.ok ? r.json() : null)).catch(() => null);

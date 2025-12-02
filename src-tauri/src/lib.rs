@@ -1,6 +1,6 @@
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use tauri::Manager;
+use tauri::{Manager, Emitter};
 
 mod call_img;
 mod db;
@@ -20,6 +20,7 @@ mod core {
     use std::time::Duration;
     use tauri::AppHandle;
     use walkdir::WalkDir;
+    use serde_json::json;
     use crate::call_img::load_env_key;
     use crate::db::{db_path, ensure_dirs, open_db, META_DB_VERSION_KEY, META_MANIFEST_HASH_KEY};
 
@@ -125,12 +126,12 @@ mod core {
         pub url: String,
         pub sha256: Option<String>,
     }
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Serialize, Deserialize, Clone)]
     pub struct ManifestImageItem {
         pub file: String,
         pub sha256: Option<String>,
     }
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug, Serialize, Deserialize, Clone)]
     pub struct ManifestImages {
         pub base_url: String,
         pub files: Vec<ManifestImageItem>,
@@ -1121,7 +1122,9 @@ mod core {
     pub async fn sync_from_manifest(
         app: AppHandle,
         manifest_url: String,
+        skip_images: Option<bool>,
     ) -> Result<SyncResult, String> {
+        let skip_images = skip_images.unwrap_or(false);
         let client = Client::builder()
             .timeout(Duration::from_secs(20))
             .build()
@@ -1158,62 +1161,24 @@ mod core {
             clear_launches_dir(&imgs_dir).ok();
         }
         let mut downloaded_images: usize = 0;
-        if let Some(ref imgs) = manifest.images {
-            // Abrir conexao para cache de hashes
-            let conn_cache = open_db(&dbf).map_err(|e| e.to_string())?;
-            for item in imgs.files.iter() {
-                let local_path = imgs_dir.join(&item.file);
-                let mut need = !local_path.exists();
-                if !need {
-                    if let Some(ref man_sha) = item.sha256 {
-                        // compara com cache
-                        let cached: Option<String> = conn_cache
-                            .query_row(
-                                "SELECT sha256 FROM images_cache WHERE filename=?1",
-                                params![&item.file],
-                                |row| row.get(0),
-                            )
-                            .optional()
-                            .unwrap_or(None);
-                        if cached.as_deref() != Some(man_sha.as_str()) {
-                            need = true;
-                        }
-                    } else if manifest_changed {
-                        // Sem hash no manifest: se o manifest mudou, forca rebaixar
-                        need = true;
-                    }
-                }
-                if need {
-                    let url =
-                        if item.file.starts_with("http://") || item.file.starts_with("https://") {
-                            item.file.clone()
-                        } else {
-                            if let Ok(base) = url::Url::parse(&imgs.base_url) {
-                                base.join(&item.file)
-                                    .map(|u| u.to_string())
-                                    .unwrap_or_else(|_| format!("{}{}", imgs.base_url, item.file))
-                            } else {
-                                format!("{}{}", imgs.base_url, item.file)
-                            }
-                        };
-                    // garantir diretorio
-                    if let Some(parent) = local_path.parent() {
-                        if !parent.exists() {
-                            let _ = std::fs::create_dir_all(parent);
-                        }
-                    }
-                    if let Err(e) = download_to_file(&client, &url, &local_path).await {
-                        eprintln!("Falha ao baixar imagem {}: {}", item.file, e);
-                    } else {
-                        downloaded_images += 1;
-                        if let Some(ref man_sha) = item.sha256 {
-                            let _ = conn_cache.execute(
-                                "INSERT OR REPLACE INTO images_cache(filename, sha256) VALUES(?1, ?2)",
-                                params![&item.file, man_sha]
-                            );
-                        }
-                    }
-                }
+        if let Some(imgs) = manifest.images.clone() {
+            if skip_images {
+                let app_bg = app.clone();
+                let client_bg = client.clone();
+                let imgs_dir_bg = imgs_dir.clone();
+                let db_bg = dbf.clone();
+                tauri::async_runtime::spawn(async move {
+                    let (down, errs) =
+                        download_images_sequential(&client_bg, &imgs_dir_bg, &db_bg, &imgs, manifest_changed).await;
+                    let _ = app_bg.emit(
+                        "images_downloaded",
+                        json!({ "downloaded": down, "errors": errs }),
+                    );
+                });
+            } else {
+                let (down, _errs) =
+                    download_images_sequential(&client, &imgs_dir, &dbf, &imgs, manifest_changed).await;
+                downloaded_images = down;
             }
         }
         let conn = open_db(&dbf).map_err(|e| e.to_string())?;
@@ -1232,6 +1197,76 @@ mod core {
             downloaded_images,
             db_version: final_version,
         })
+    }
+
+    async fn download_images_sequential(
+        client: &Client,
+        imgs_dir: &Path,
+        db_path: &Path,
+        imgs: &ManifestImages,
+        manifest_changed: bool,
+    ) -> (usize, usize) {
+        let mut downloaded_images: usize = 0;
+        let mut errors: usize = 0;
+        let conn_cache = match open_db(db_path) {
+            Ok(c) => c,
+            Err(e) => {
+                eprintln!("Falha ao abrir cache de imagens: {}", e);
+                return (0, 1);
+            }
+        };
+        for item in imgs.files.iter() {
+            let local_path = imgs_dir.join(&item.file);
+            let mut need = !local_path.exists();
+            if !need {
+                if let Some(ref man_sha) = item.sha256 {
+                    let cached: Option<String> = conn_cache
+                        .query_row(
+                            "SELECT sha256 FROM images_cache WHERE filename=?1",
+                            params![&item.file],
+                            |row| row.get(0),
+                        )
+                        .optional()
+                        .unwrap_or(None);
+                    if cached.as_deref() != Some(man_sha.as_str()) {
+                        need = true;
+                    }
+                } else if manifest_changed {
+                    need = true;
+                }
+            }
+            if need {
+                let url = if item.file.starts_with("http://") || item.file.starts_with("https://") {
+                    item.file.clone()
+                } else {
+                    if let Ok(base) = url::Url::parse(&imgs.base_url) {
+                        base.join(&item.file)
+                            .map(|u| u.to_string())
+                            .unwrap_or_else(|_| format!("{}{}", imgs.base_url, item.file))
+                    } else {
+                        format!("{}{}", imgs.base_url, item.file)
+                    }
+                };
+                if let Some(parent) = local_path.parent() {
+                    if !parent.exists() {
+                        let _ = std::fs::create_dir_all(parent);
+                    }
+                }
+                if let Err(e) = download_to_file(client, &url, &local_path).await {
+                    eprintln!("Falha ao baixar imagem {}: {}", item.file, e);
+                    errors += 1;
+                } else {
+                    downloaded_images += 1;
+                    if let Some(ref man_sha) = item.sha256 {
+                        let _ = conn_cache.execute(
+                            "INSERT OR REPLACE INTO images_cache(filename, sha256) VALUES(?1, ?2)",
+                            params![&item.file, man_sha],
+                        );
+                    }
+                }
+            }
+        }
+        (downloaded_images, errors)
     }
 
     fn clear_launches_dir(imgs_dir: &std::path::Path) -> std::io::Result<()> {

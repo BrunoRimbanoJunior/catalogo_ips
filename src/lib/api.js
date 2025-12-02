@@ -20,8 +20,8 @@ export async function getProductDetails(productId) {
   return await invoke("get_product_details_cmd", { productId });
 }
 
-export async function syncFromManifest(manifestUrl) {
-  return await invoke("sync_from_manifest", { manifestUrl });
+export async function syncFromManifest(manifestUrl, opts = {}) {
+  return await invoke("sync_from_manifest", { manifestUrl, skipImages: !!opts.skipImages });
 }
 
 export async function importExcel(path) {
