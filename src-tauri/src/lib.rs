@@ -1,4 +1,4 @@
-use anyhow::{Result, anyhow};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
 
@@ -14,13 +14,12 @@ mod core {
     use sha2::{Digest, Sha256};
     use std::fs;
     use std::fs::File;
-    use std::io::{self, copy};
+    use std::io::copy;
     use std::path::Path;
     use std::sync::OnceLock;
     use std::time::Duration;
     use tauri::AppHandle;
     use walkdir::WalkDir;
-    use zip::ZipArchive;
     use crate::db::{db_path, ensure_dirs, open_db, META_DB_VERSION_KEY, META_MANIFEST_HASH_KEY};
 
     const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
