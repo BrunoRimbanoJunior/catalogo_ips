@@ -40,5 +40,6 @@ open = "5"
 url = "2"
 aes-gcm = "0.10"
 pbkdf2 = "0.12"
-zip = { version = "0.6", default-features = false, features = ["deflate"] }`r`ndotenvy = "0.15"`r`n
+zip = { version = "0.6", default-features = false, features = ["deflate"] }
+dotenvy = "0.15"
 

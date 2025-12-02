@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import {
@@ -578,7 +578,7 @@ function App() {
       setLaunchState((s) => ({ ...s, loading: false, open: true, index: 0 }));
     } catch (e) {
       setLaunchImages([]);
-      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar lancamentos: ${e.message || e}` });
+      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar Lancamentos: ${e.message || e}` });
     }
   }
 
@@ -782,7 +782,7 @@ function App() {
                 </a>
               </nav>
               <button className="launch-button" onClick={() => loadLaunches(false)} disabled={launchState.loading}>
-                {launchState.loading ? "Carregando..." : "LanÃ§amentos"}
+                {launchState.loading ? "Carregando..." : "Lançamentos"}
               </button>
               {launchState.error ? <span className="launch-error">{launchState.error}</span> : null}
             </div>
@@ -802,7 +802,7 @@ function App() {
                     Indexar imagens (manifest)
                   </button>
                   <button onClick={() => loadLaunches(true)} disabled={launchState.loading}>
-                    Abrir lancamentos
+                    Abrir Lancamentos
                   </button>
                 </div>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -1129,6 +1129,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
