@@ -29,7 +29,8 @@
     "targets": "all",
     "resources": [
       "../data/catalog.db",
-      "../manifest.json"
+      "../manifest.json",
+      "../.env.production"
     ],
     "windows": {
       "nsis": {

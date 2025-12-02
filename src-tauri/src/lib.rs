@@ -48,21 +48,33 @@ mod core {
                         return Some(direct);
                     }
                 }
-                // 3) tenta carregar .env em dirs comuns (cwd e pai)
+                // 3) tenta carregar .env em dirs comuns (cwd, pasta do binario/resources)
+                let mut dirs = Vec::new();
                 if let Ok(cwd) = std::env::current_dir() {
-                    let mut dirs = Vec::new();
                     dirs.push(cwd.clone());
                     if let Some(parent) = cwd.parent() {
                         dirs.push(parent.to_path_buf());
                     }
-                    dirs.dedup();
-                    let env_files = [".env.production", ".env", ".env.development"];
-                    for d in dirs {
-                        for f in env_files {
-                            let candidate = d.join(f);
-                            if candidate.exists() {
-                                let _ = dotenvy::from_path(&candidate);
-                            }
+                }
+                if let Ok(exe) = std::env::current_exe() {
+                    if let Some(bin_dir) = exe.parent() {
+                        dirs.push(bin_dir.to_path_buf());
+                        dirs.push(bin_dir.join("resources"));
+                        if let Some(parent) = bin_dir.parent() {
+                            dirs.push(parent.to_path_buf());
+                            dirs.push(parent.join("Resources"));
+                        }
+                    }
+                }
+                dirs.retain(|d| d.exists());
+                dirs.dedup();
+
+                let env_files = [".env.production", ".env", ".env.development"];
+                for d in dirs.iter() {
+                    for f in env_files.iter() {
+                        let candidate = d.join(f);
+                        if candidate.exists() {
+                            let _ = dotenvy::from_path(&candidate);
                         }
                     }
                 }
@@ -70,6 +82,18 @@ mod core {
                     let from_file = std::env::var(name).unwrap_or_default();
                     if !from_file.trim().is_empty() {
                         return Some(from_file);
+                    }
+                }
+                // 4) fallback: arquivo descrypt.key em dirs conhecidos
+                for d in dirs.iter() {
+                    let key_file = d.join("descrypt.key");
+                    if key_file.exists() {
+                        if let Ok(txt) = std::fs::read_to_string(&key_file) {
+                            let trimmed = txt.trim();
+                            if !trimmed.is_empty() {
+                                return Some(trimmed.to_string());
+                            }
+                        }
                     }
                 }
                 None
