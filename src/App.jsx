@@ -179,6 +179,20 @@ function App() {
   }, [isDev, supabaseConfigured, cachedProfile, profile, allowAfterDelay]);
 
   useEffect(() => {
+    const preventContextMenu = (event) => {
+      event.preventDefault();
+      return false;
+    };
+    // Captura no topo para garantir bloqueio inclusive sobre imagens.
+    window.addEventListener("contextmenu", preventContextMenu, { capture: true });
+    document.addEventListener("contextmenu", preventContextMenu, { capture: true });
+    return () => {
+      window.removeEventListener("contextmenu", preventContextMenu, { capture: true });
+      document.removeEventListener("contextmenu", preventContextMenu, { capture: true });
+    };
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem("registration.email", registrationEmail || "");
   }, [registrationEmail]);
 
@@ -838,9 +852,9 @@ function App() {
                 </div>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={runImportExcel}>Importar Excel</button>
-                  {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ltimo: {excelPath}</span> : null}
+                  {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>Ultimo: {excelPath}</span> : null}
                   <button onClick={runExportDb}>Exportar DB</button>
-                  {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ltimo: {exportPath}</span> : null}
+                  {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>Ultimo: {exportPath}</span> : null}
                   <button onClick={() => runSetBranding("logo")}>Aplicar logo</button>
                   {logoInput ? <span style={{ fontSize: 12, color: "#555" }}>Atual: {logoInput}</span> : null}
                   <button onClick={() => runSetBranding("background")}>Aplicar fundo</button>
