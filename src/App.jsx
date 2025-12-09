@@ -267,7 +267,7 @@ function App() {
       } catch (e) {
         setToolsMsg(`Falha ao limpar imagens: ${e}`);
       }
-    }, 5 * 60 * 1000);
+    }, 10 * 60 * 1000); // auto-clean depois de 10 min no cliente
     setCleanupScheduled(true);
     return () => clearTimeout(timer);
   }, [ready, cleanupScheduled, manifestUrl]);
