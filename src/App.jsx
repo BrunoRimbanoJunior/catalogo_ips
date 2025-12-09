@@ -67,13 +67,20 @@ function useFingerprint() {
   }, []);
 }
 
-// Apenas para exibir no dropdown: remove tokens com dÃ­gitos (anos/cÃ³digos) mantendo nome base.
+// Apenas para exibir no dropdown: remove tokens de ano/codigo, mas preserva motores (ex.: 2.0).
 function vehicleLabel(name = "") {
   const parts = String(name).split(/\s+/);
   const kept = [];
-  for (const p of parts) {
+  for (const raw of parts) {
+    const p = raw.trim();
     if (!p) continue;
-    if (/\d/.test(p) || p.includes("(")) break;
+    const normalized = p.replace(/[()]/g, "");
+    const looksYear =
+      /^\d{4}$/.test(normalized) || // 2012
+      /^\d{2}\/\d{2}$/.test(normalized) || // 12/14
+      /^[12][0-9]{3}[-/][0-9]{2}$/.test(normalized); // 2012-14
+    const looksCode = normalized.length >= 5 && /^[0-9A-Z-]+$/.test(normalized);
+    if (looksYear || looksCode) break;
     kept.push(p);
   }
   const out = kept.join(" ").trim();
@@ -558,18 +565,33 @@ function App() {
         setSelectedImages([]);
         return;
       }
+      const isLaunchAsset = (img) => {
+        const lower = String(img || "").toLowerCase();
+        return /(^|[\\/])lan[cç]amentos([\\/]|$)/.test(lower);
+      };
+      const imagesFiltered = (detail.images || []).filter((img) => !isLaunchAsset(img));
       const codeStr = detail?.code ? String(detail.code) : "";
       const listFiltered =
-        codeStr && Array.isArray(detail.images) && detail.images.length
-          ? detail.images.filter((img) => {
+        codeStr && Array.isArray(imagesFiltered) && imagesFiltered.length
+          ? imagesFiltered.filter((img) => {
               const lower = String(img || "").toLowerCase();
               return lower.includes(codeStr.toLowerCase());
             })
-          : detail.images;
-      const imagesList = listFiltered && listFiltered.length ? listFiltered : detail.images;
+          : imagesFiltered;
+      const imagesList = listFiltered && listFiltered.length ? listFiltered : imagesFiltered;
+      const dedupByName = [];
+      const seenNames = new Set();
+      for (const img of imagesList || []) {
+        const fname = String(img || "").split(/[/\\\\]/).pop();
+        const key = (fname || "").toLowerCase();
+        if (!key) continue;
+        if (seenNames.has(key)) continue;
+        seenNames.add(key);
+        dedupByName.push(img);
+      }
       const unique = new Set();
       const imgs = [];
-      for (const img of imagesList) {
+      for (const img of dedupByName) {
         const normalized = normalizePath(imagesDir, img);
         try {
           const b64 = await readImageBase64(normalized);
