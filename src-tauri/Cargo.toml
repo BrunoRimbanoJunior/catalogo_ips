@@ -1,8 +1,8 @@
 [package]
 name = "catalogo_ips"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "1.2.9"
+description = "Catalogo Eletronico IPS"
+authors = ["Bruno Rimbano Junior"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
