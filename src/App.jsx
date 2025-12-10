@@ -167,7 +167,6 @@ function App() {
     () => localStorage.getItem("manifestUrl") || import.meta.env.VITE_DEFAULT_MANIFEST_URL || DEFAULT_MANIFEST_URL,
     []
   );
-  const FIXED_DOWNLOAD = "https://1drv.ms/u/c/4e4e660955b19ef5/EdHos0VU9D5BihkzIiMhhUEB0skBGWNpeQvmVQhspQj-7g?e=Vm1ixV";
 
   const blockAccess = useMemo(() => {
     if (isDev) return false; // Em desenvolvimento nao bloquear pela aprovacao
@@ -330,18 +329,6 @@ function App() {
       }
 
       if (manifestUrl) {
-        try {
-          const manifest = await fetch(manifestUrl).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-          if (manifest?.appVersion && compareVersions(manifest.appVersion, appVersion || "0.0.0") > 0) {
-            setUpdateInfo({ availableVersion: manifest.appVersion, downloadUrl: FIXED_DOWNLOAD });
-            setUpdateDismissed(false);
-          } else {
-            setUpdateInfo(null);
-          }
-        } catch (_) {
-          /* ignore */
-        }
-
         try {
           setSyncing(true);
           const res = await syncFromManifest(manifestUrl, { skipImages: true });
@@ -506,10 +493,9 @@ function App() {
       }
       return;
     }
-    const url = updateInfo?.downloadUrl || FIXED_DOWNLOAD;
-    if (url) {
-      window.open(url, "_blank", "noreferrer");
-    }
+    // Fallback to opening the releases page if native updater is not available
+    const url = "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest";
+    openExternal(url).catch(() => window.open(url, "_blank", "noreferrer"));
   }
 
 
@@ -851,7 +837,7 @@ function App() {
                   Nova versao disponivel: {updateInfo.availableVersion} (atual {appVersion})
                 </span>
                 <button className="launch-button" style={{ padding: "6px 10px" }} onClick={(e) => handleUpdateClick(e)}>
-                  {updaterAvailable ? "Atualizar agora" : "Baixar/Atualizar"}
+                  {updaterAvailable ? "Atualizar agora" : "Ver no GitHub"}
                 </button>
                 <button className="ghost" onClick={() => setUpdateDismissed(true)}>
                   Fechar

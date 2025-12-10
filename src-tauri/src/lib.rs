@@ -28,11 +28,6 @@ mod core {
     use crate::db::{db_path, ensure_dirs, open_db, META_DB_VERSION_KEY, META_MANIFEST_HASH_KEY};
 
     const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
-    const SEED_ZIP_URLS: [&str; 2] = [
-        "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/img-pt1.zip",
-        "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/img-pt2.zip",
-    ];
-    const SEED_MARKER: &str = ".images_seeded";
     const LAUNCH_CANON: &str = "lancamentos";
     const DEFAULT_IMG_CONCURRENCY: usize = 16;
 
@@ -354,9 +349,6 @@ mod core {
         }
         let conn = open_db(&db_file).map_err(|e| e.to_string())?;
         migrate(&conn).map_err(|e| e.to_string())?;
-        if let Err(e) = ensure_seed_images(&data_dir, &imgs_dir) {
-            eprintln!("Falha ao semear imagens: {}", e);
-        }
         
 
         // Normaliza montadoras e coluna make em vehicles
@@ -617,61 +609,7 @@ mod core {
         Ok(())
     }
 
-    fn download_zip_file(url: &str, dest: &Path) -> Result<()> {
-        let client = reqwest::blocking::Client::builder()
-            .timeout(Duration::from_secs(60))
-            .build()?;
-        let mut resp = client.get(url).send()?;
-        if !resp.status().is_success() {
-            return Err(anyhow::anyhow!("Falha ao baixar {}: status {}", url, resp.status()));
-        }
-        let mut file = File::create(dest)?;
-        resp.copy_to(&mut file)?;
-        Ok(())
-    }
 
-    fn extract_zip_to(zip_path: &Path, dest_dir: &Path) -> Result<()> {
-        let file = File::open(zip_path)?;
-        let mut archive = zip::ZipArchive::new(file)?;
-        for i in 0..archive.len() {
-            let mut entry = archive.by_index(i)?;
-            let outpath = dest_dir.join(entry.mangled_name());
-            if entry.name().ends_with('/') {
-                fs::create_dir_all(&outpath)?;
-            } else {
-                if let Some(parent) = outpath.parent() {
-                    fs::create_dir_all(parent)?;
-                }
-                let mut outfile = File::create(&outpath)?;
-                copy(&mut entry, &mut outfile)?;
-            }
-        }
-        Ok(())
-    }
-
-    fn ensure_seed_images(data_dir: &Path, images_dir: &Path) -> Result<()> {
-        let marker = data_dir.join(SEED_MARKER);
-        if marker.exists() {
-            return Ok(());
-        }
-        // Se a pasta ja tem arquivos, nao sobrescreva
-        if images_dir.read_dir().ok().map(|mut d| d.next().is_some()).unwrap_or(false) {
-            let _ = fs::write(&marker, b"seeded");
-            return Ok(());
-        }
-        fs::create_dir_all(images_dir)?;
-        fs::create_dir_all(data_dir)?;
-
-        for url in SEED_ZIP_URLS.iter() {
-            let filename = url.split('/').last().unwrap_or("seed.zip");
-            let tmp_path = data_dir.join(filename);
-            download_zip_file(url, &tmp_path)?;
-            extract_zip_to(&tmp_path, images_dir)?;
-            let _ = fs::remove_file(&tmp_path);
-        }
-        let _ = fs::write(&marker, b"seeded");
-        Ok(())
-    }
 
     fn fetch_brand_groups(conn: &Connection, brand_id: Option<i64>) -> Result<Vec<String>> {
         let mut out = Vec::new();
