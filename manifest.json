@@ -1,10 +1,8 @@
 {
-  "appVersion": "1.2.8",
-  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.2.8/catalogo_ips_1.2.8_x64-setup.exe",
   "db": {
-    "version": 1764014361,
+    "version": 1764014362,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "12ff20fa9d26a5c4cab911154caca4a143c114ff81a9993cff8ef48987eedd64"
+    "sha256": "b72c07da36d750070754837bb29f00003017b6c7e1dc6b70ddf5a10cf87564f7"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -2554,12 +2552,20 @@
         "sha256": "bf41ede1fbf10d1fd038632ed4c41047"
       },
       {
+        "file": "CAIXA_DIRECAO/7141306011.png.cimg",
+        "sha256": "bc816447ed0949548788101a73f68b78"
+      },
+      {
         "file": "CAIXA_DIRECAO/7141506010.png.cimg",
         "sha256": "4af2a41f0613536dab503865d0343868"
       },
       {
         "file": "CAIXA_DIRECAO/7142046000.png.cimg",
         "sha256": "ba9cc287e9b5e8840f59a4d3f6f90876"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7142056010.png.cimg",
+        "sha256": "7db5b0400d925a088f6943649f34a58e"
       },
       {
         "file": "CAIXA_DIRECAO/7142066000.png.cimg",
@@ -2678,6 +2684,10 @@
         "sha256": "91cc8638facecd79e55302cc40990b85"
       },
       {
+        "file": "CAIXA_DIRECAO/7146685910.png.cimg",
+        "sha256": "563597b8c9b58c5ea083eae31f7936b0"
+      },
+      {
         "file": "CAIXA_DIRECAO/7146905900-1.png.cimg",
         "sha256": "d65cccd08f9319c2bc867c73ed81f265"
       },
@@ -2752,6 +2762,10 @@
       {
         "file": "CAIXA_DIRECAO/7148506001.png.cimg",
         "sha256": "e723f9f04801a44c31855901e5ad4b54"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7149076020.png.cimg",
+        "sha256": "480f5b949083c820348204ae4c909622"
       },
       {
         "file": "CAIXA_DIRECAO/7149806010.png.cimg",
@@ -2832,6 +2846,14 @@
       {
         "file": "CAIXA_DIRECAO/7150685900.png.cimg",
         "sha256": "aa7a0c41983765a156ff31210384e15a"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7150816010.png.cimg",
+        "sha256": "cd11afdc5aa780b78a69a344a855223d"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7151506010.png.cimg",
+        "sha256": "4e3ba9c776d78fec07cd6f0a4621b1c1"
       },
       {
         "file": "CAIXA_DIRECAO/7156026000.png.cimg",
@@ -3024,6 +3046,10 @@
       {
         "file": "CAIXA_DIRECAO/7169386010.png.cimg",
         "sha256": "88b6bc57878e2fc757e75acba0f0061f"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7169715910.png.cimg",
+        "sha256": "91509617785ddcb24edd48dd2726ead6"
       },
       {
         "file": "CAIXA_DIRECAO/7169716010 (2).png.cimg",
@@ -4714,6 +4740,30 @@
         "sha256": "7edd572a6fdeb95e8f7f7b347e0cc419"
       },
       {
+        "file": "LANCAMENTOS/7141306011.png",
+        "sha256": "fdd25c1daa53b7153fd0bee593419222"
+      },
+      {
+        "file": "LANCAMENTOS/7142056010.png",
+        "sha256": "b44485439bb7b3226968edc1a8c28972"
+      },
+      {
+        "file": "LANCAMENTOS/7146685910.png",
+        "sha256": "75a91889e3424c161da49796baf24293"
+      },
+      {
+        "file": "LANCAMENTOS/7149076020.png",
+        "sha256": "470ba34ce3806f7b55ca2d109c58815c"
+      },
+      {
+        "file": "LANCAMENTOS/7150816010.png",
+        "sha256": "301407900a79ddcd3b5de2a0d0a0d26a"
+      },
+      {
+        "file": "LANCAMENTOS/7151506010.png",
+        "sha256": "f59c5ad02e394688d8cfb809904f0c8a"
+      },
+      {
         "file": "LANCAMENTOS/7156426010.png",
         "sha256": "c6618f8cc7a36b61b048fc9f06ec32b4"
       },
@@ -4736,6 +4786,10 @@
       {
         "file": "LANCAMENTOS/7163286610.png",
         "sha256": "7453688b7705ffa57cbc06fa606664ac"
+      },
+      {
+        "file": "LANCAMENTOS/7169715910.png",
+        "sha256": "17ddd8b8c282efb6c6959b99c5e33440"
       },
       {
         "file": "LANCAMENTOS/SEMI-EIXOS.png",
