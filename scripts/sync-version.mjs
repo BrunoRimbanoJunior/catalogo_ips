@@ -3,10 +3,19 @@
 import fs from "fs";
 import path from "path";
 
-const version = process.env.APP_VERSION;
+const version =
+  process.env.APP_VERSION?.trim() ||
+  (() => {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"));
+      return pkg.version;
+    } catch (err) {
+      return "";
+    }
+  })();
 
 if (!version) {
-  throw new Error("APP_VERSION not set (expected from tag or env)");
+  throw new Error("APP_VERSION not set (expected from tag, env, or package.json)");
 }
 
 const root = process.cwd();

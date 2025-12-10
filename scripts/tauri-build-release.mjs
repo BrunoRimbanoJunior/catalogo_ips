@@ -41,7 +41,7 @@ function main() {
   const extraArgs = process.argv.slice(2);
   const result = spawnSync("pnpm", ["tauri", "build", ...extraArgs], {
     stdio: "inherit",
-    shell: true,
+    shell: false,
   });
 
   if (result.status !== 0) {

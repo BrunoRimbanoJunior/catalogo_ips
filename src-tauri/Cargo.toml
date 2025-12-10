@@ -1,6 +1,6 @@
 [package]
 name = "catalogo_ips"
-version = "1.3.1"
+version = "1.3.2"
 description = "Catalogo Eletronico IPS"
 authors = ["Bruno Rimbano Junior"]
 edition = "2021"
@@ -15,14 +15,15 @@ name = "catalogo_ips_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "2.0.0", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2.0.0", features = [] }
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-log = ">=0.2"
 tauri-plugin-store = ">=0.2"
+tauri-plugin-updater = "2.0.0"
 # Banco local (lado Rust, mais rápido)
 rusqlite = { version = "0.31", features = ["bundled", "functions"] }
 # HTTP p/ sync
@@ -42,4 +43,3 @@ aes-gcm = "0.10"
 pbkdf2 = "0.12"
 zip = { version = "0.6", default-features = false, features = ["deflate"] }
 dotenvy = "0.15"
-

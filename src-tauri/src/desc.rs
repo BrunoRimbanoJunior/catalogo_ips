@@ -23,7 +23,8 @@ pub fn decrypt_image(data: &[u8], password: &str) -> anyhow::Result<Vec<u8>> {
     let salt = &data[offset..offset + SALT_LEN];
     offset += SALT_LEN;
     let nonce_bytes: [u8; NONCE_LEN] = data[offset..offset + NONCE_LEN].try_into()?;
-    let nonce = Nonce::from_slice(&nonce_bytes);
+    // clone_from_slice evita o aviso de API depreciada do GenericArray::from_slice
+    let nonce = Nonce::clone_from_slice(&nonce_bytes);
     offset += NONCE_LEN;
     let ciphertext = &data[offset..];
 
