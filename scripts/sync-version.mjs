@@ -30,8 +30,16 @@ function writeJson(relPath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n");
 }
 
-function updateEnvFile(relPath) {
-  const filePath = path.join(root, relPath);
+function updateEnvFile(relPath, fallbackRelPath) {
+  let filePath = path.join(root, relPath);
+  if (!fs.existsSync(filePath) && fallbackRelPath) {
+    // Se o env de dev não existir (CI), atualiza o de produção
+    filePath = path.join(root, fallbackRelPath);
+  }
+  if (!fs.existsSync(filePath)) {
+    console.warn(`Skipped ${relPath}: file not found`);
+    return;
+  }
   const content = fs.readFileSync(filePath, "utf8");
   const updated = content.match(/^VITE_APP_VERSION=.*$/m)
     ? content.replace(/^VITE_APP_VERSION=.*$/gm, `VITE_APP_VERSION=${version}`)
@@ -53,9 +61,10 @@ function updateEnvFile(relPath) {
   writeJson("src-tauri/tauri.conf.json", data);
 }
 
-// .env files that expose app version to o front
+// .env files que expõem versão ao front; se .env.development não existir (CI),
+// caímos para .env.production.
 updateEnvFile(".env.production");
-updateEnvFile(".env.development");
+updateEnvFile(".env.development", ".env.production");
 updateEnvFile(".env.example");
 
 console.log(`Synced version to ${version}`);
