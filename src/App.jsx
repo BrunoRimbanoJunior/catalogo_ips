@@ -170,7 +170,8 @@ function App() {
     return Number.isNaN(n) ? null : n;
   }, [brandId]);
 
-  const DEFAULT_MANIFEST_URL = "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json";
+  const DEFAULT_MANIFEST_URL =
+    "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/manifest.json";
   const manifestUrl = useMemo(
     () => localStorage.getItem("manifestUrl") || import.meta.env.VITE_DEFAULT_MANIFEST_URL || DEFAULT_MANIFEST_URL,
     []

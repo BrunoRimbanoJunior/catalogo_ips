@@ -3,7 +3,7 @@
 App desktop (Tauri + React) para consulta de peças com sincronização de banco/imagens via manifest. Fluxo de controle de acesso usando Supabase e aprovação manual.
 
 ## Como funciona
-- Manifest público (`VITE_DEFAULT_MANIFEST_URL`): aponta para o `manifest.json` publicado (raw da main). Contém `appVersion`, `appDownloadUrl`, `db.version/url` e lista de imagens (R2).
+- Manifest público (`VITE_DEFAULT_MANIFEST_URL`): aponta para o `manifest.json` publicado (asset de release). Contém `appVersion`, `appDownloadUrl`, `db.version/url` e lista de imagens (R2).
 - Cliente: ao abrir, lê o manifest, avisa se há nova versão do app, baixa DB/imagens se `db.version` subir e indexa imagens no SQLite local.
 - Auth: formulário de cadastro salva no Supabase (`profiles`), status `pending`; admin aprova (service role) e o app libera quando `status=approved`.
 
@@ -12,14 +12,14 @@ App desktop (Tauri + React) para consulta de peças com sincronização de banco
 - **Windows**: `catalogo_ips_*_x64-setup.exe` (instalador) ou `.msi`. Basta executar. Se o SmartScreen avisar, clique em “Mais informações” > “Executar assim mesmo”.
 - **macOS**: `catalogo_ips_*_aarch64.dmg` (Apple Silicon) ou `x64.dmg` (Intel). Abra o `.dmg`, arraste para Aplicativos; se o Gatekeeper bloquear, vá em Preferências > Segurança > “Abrir mesmo assim”.
 - **Linux**: `catalogo_ips_*_app.tar.gz` (AppImage). Dê permissão de execução (`chmod +x catalogo_ips_*.AppImage`) e rode; dependendo da distro, pode exigir libs GTK/webkit (já empacotadas na maioria das distros). Se usar installer `.deb/.rpm` quando disponível, instale com o gerenciador de pacotes.
-- Manifest padrão do app: `https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/refs/heads/main/manifest.json`.
+- Manifest padrão do app: `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/manifest.json`.
 
 ## Desenvolvimento local
 Pré-requisitos: Node 20, Rust toolchain, pnpm, Supabase (anon key), manifest público válido.
 1) `pnpm install`
 2) Configurar `.env.development` (exemplo):
    ```
-   VITE_DEFAULT_MANIFEST_URL=https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/refs/heads/main/manifest.json
+   VITE_DEFAULT_MANIFEST_URL=https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/manifest.json
    VITE_SUPABASE_URL=...
    VITE_SUPABASE_ANON_KEY=...
    VITE_APP_VERSION=dev
@@ -68,5 +68,5 @@ Credenciais R2 vêm do ambiente (`R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID
 
 ## Dicas para produção
 - Supabase: RLS ativa na tabela `profiles`, políticas para anon (insert/update/select) e UNIQUE no email. Service role nunca vai para o front.
-- Manifest público sempre na main (raw GitHub) ou asset de release; configure `VITE_DEFAULT_MANIFEST_URL` para esse endereço.
+- Manifest público sempre no asset de release; configure `VITE_DEFAULT_MANIFEST_URL` para esse endereço.
 - Releases: use tags `v*` para gerar instaladores e atualizar o manifest com `appVersion` e link de download.

@@ -1,5 +1,5 @@
 Param(
-  [string]$ManifestUrl = "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json"
+  [string]$ManifestUrl = "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/manifest.json"
 )
 
 Write-Host "==> Preparando ambiente (Node deps)" -ForegroundColor Cyan
