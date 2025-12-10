@@ -17,8 +17,11 @@ mod core {
     use std::fs::File;
     use std::io::copy;
     use std::path::Path;
+    use std::sync::Arc;
     use std::time::Duration;
     use tauri::AppHandle;
+    use tokio::sync::Semaphore;
+    use tokio::task::JoinSet;
     use walkdir::WalkDir;
     use serde_json::json;
     use crate::call_img::load_env_key;
@@ -31,6 +34,7 @@ mod core {
     ];
     const SEED_MARKER: &str = ".images_seeded";
     const LAUNCH_CANON: &str = "lancamentos";
+    const DEFAULT_IMG_CONCURRENCY: usize = 16;
 
     fn normalize_launch_token(s: &str) -> String {
         s.to_lowercase()
@@ -522,7 +526,9 @@ mod core {
     ) -> Result<Vec<Vehicle>, String> {
         let conn =
             open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-        let mut sql = String::from("SELECT DISTINCT v.id, v.name FROM vehicles v JOIN product_vehicles pv ON pv.vehicle_id = v.id JOIN products p ON p.id = pv.product_id");
+        let mut sql = String::from(
+            "SELECT DISTINCT v.id, v.name FROM vehicles v JOIN product_vehicles pv ON pv.vehicle_id = v.id JOIN products p ON p.id = pv.product_id",
+        );
         let mut wherec: Vec<String> = Vec::new();
         if brand_id.is_some() {
             wherec.push("p.brand_id = ?".into());
@@ -805,6 +811,18 @@ mod core {
             open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
         // Agrega veiculos sem filtrar montadora para nao baguncar a ordem de parametros
         let mut sql = String::from("SELECT p.id, p.code, p.description, b.name, (SELECT group_concat(DISTINCT v2.name) FROM product_vehicles pv2 JOIN vehicles v2 ON v2.id=pv2.vehicle_id WHERE pv2.product_id=p.id) AS vehicles FROM products p JOIN brands b ON b.id=p.brand_id");
+        // Quando filtra por veículo, precisamos do nome para permitir match parcial no texto.
+        let vehicle_name: Option<String> = if let Some(vid) = params.vehicle_id {
+            conn.query_row(
+                "SELECT name FROM vehicles WHERE id = ?1",
+                params![vid],
+                |row| row.get(0),
+            )
+            .optional()
+            .unwrap_or(None)
+        } else {
+            None
+        };
 
         let mut where_clauses: Vec<String> = Vec::new();
         if params.brand_id.is_some() {
@@ -827,7 +845,11 @@ mod core {
             where_clauses.push("EXISTS (SELECT 1 FROM product_vehicles pvm JOIN vehicles vm ON vm.id=pvm.vehicle_id WHERE pvm.product_id=p.id AND UPPER(TRIM(COALESCE(vm.make,''))) = ?)".into());
         }
         if params.vehicle_id.is_some() {
-            where_clauses.push("EXISTS (SELECT 1 FROM product_vehicles pv WHERE pv.product_id=p.id AND pv.vehicle_id = ?)".into());
+            // Match por id e também por nome do veículo em qualquer posição.
+            where_clauses.push(
+                "EXISTS (SELECT 1 FROM product_vehicles pv JOIN vehicles v2 ON v2.id=pv.vehicle_id WHERE pv.product_id=p.id AND (pv.vehicle_id = ? OR (? IS NOT NULL AND UPPER(v2.name) LIKE ?)))"
+                    .into(),
+            );
         }
         if params
             .code_query
@@ -861,6 +883,14 @@ mod core {
         }
         if let Some(v) = params.vehicle_id {
             values.push(v.into());
+            // Passa o nome (ou null) para permitir LIKE por nome
+            if let Some(ref name) = vehicle_name {
+                values.push(name.to_ascii_uppercase().into());
+                values.push(format!("%{}%", name.to_ascii_uppercase()).into());
+            } else {
+                values.push(rusqlite::types::Value::Null);
+                values.push(rusqlite::types::Value::Null);
+            }
         }
         if let Some(q) = params.code_query.as_ref().filter(|s| !s.trim().is_empty()) {
             let like = format!("%{}%", q);
@@ -1206,8 +1236,17 @@ mod core {
         imgs: &ManifestImages,
         manifest_changed: bool,
     ) -> (usize, usize) {
+        // Mantém a assinatura para compatibilidade, mas usa paralelismo controlado.
+        let max_concurrency = std::env::var("IMG_CONCURRENCY")
+            .ok()
+            .and_then(|v| v.parse::<usize>().ok())
+            .filter(|v| *v > 0)
+            .unwrap_or(DEFAULT_IMG_CONCURRENCY);
+        let semaphore = Arc::new(Semaphore::new(max_concurrency));
         let mut downloaded_images: usize = 0;
         let mut errors: usize = 0;
+
+        // Avalia quem precisa ser baixado consultando cache local.
         let conn_cache = match open_db(db_path) {
             Ok(c) => c,
             Err(e) => {
@@ -1215,6 +1254,13 @@ mod core {
                 return (0, 1);
             }
         };
+        struct DownloadJob {
+            url: String,
+            local_path: std::path::PathBuf,
+            rel_name: String,
+            sha256: Option<String>,
+        }
+        let mut jobs: Vec<DownloadJob> = Vec::new();
         for item in imgs.files.iter() {
             let local_path = imgs_dir.join(&item.file);
             let mut need = !local_path.exists();
@@ -1238,34 +1284,73 @@ mod core {
             if need {
                 let url = if item.file.starts_with("http://") || item.file.starts_with("https://") {
                     item.file.clone()
+                } else if let Ok(base) = url::Url::parse(&imgs.base_url) {
+                    base.join(&item.file)
+                        .map(|u| u.to_string())
+                        .unwrap_or_else(|_| format!("{}{}", imgs.base_url, item.file))
                 } else {
-                    if let Ok(base) = url::Url::parse(&imgs.base_url) {
-                        base.join(&item.file)
-                            .map(|u| u.to_string())
-                            .unwrap_or_else(|_| format!("{}{}", imgs.base_url, item.file))
-                    } else {
-                        format!("{}{}", imgs.base_url, item.file)
-                    }
+                    format!("{}{}", imgs.base_url, item.file)
                 };
-                if let Some(parent) = local_path.parent() {
+                jobs.push(DownloadJob {
+                    url,
+                    local_path,
+                    rel_name: item.file.clone(),
+                    sha256: item.sha256.clone(),
+                });
+            }
+        }
+        drop(conn_cache);
+
+        let mut set = JoinSet::new();
+        let semaphore_dl = semaphore.clone();
+        for job in jobs {
+            let client = client.clone();
+            let sem = semaphore_dl.clone();
+            set.spawn(async move {
+                // Respeita limite de concorrência.
+                let _permit = sem.acquire_owned().await.ok();
+                if let Some(parent) = job.local_path.parent() {
                     if !parent.exists() {
                         let _ = std::fs::create_dir_all(parent);
                     }
                 }
-                if let Err(e) = download_to_file(client, &url, &local_path).await {
-                    eprintln!("Falha ao baixar imagem {}: {}", item.file, e);
-                    errors += 1;
-                } else {
+                match download_to_file(&client, &job.url, &job.local_path).await {
+                    Ok(_) => Ok((job.rel_name, job.sha256)),
+                    Err(e) => Err((job.rel_name, e.to_string())),
+                }
+            });
+        }
+
+        let mut cache_updates: Vec<(String, String)> = Vec::new();
+        while let Some(res) = set.join_next().await {
+            match res {
+                Ok(Ok((rel, sha))) => {
                     downloaded_images += 1;
-                    if let Some(ref man_sha) = item.sha256 {
-                        let _ = conn_cache.execute(
-                            "INSERT OR REPLACE INTO images_cache(filename, sha256) VALUES(?1, ?2)",
-                            params![&item.file, man_sha],
-                        );
+                    if let Some(s) = sha {
+                        cache_updates.push((rel, s));
                     }
+                }
+                Ok(Err((rel, err))) => {
+                    eprintln!("Falha ao baixar imagem {}: {}", rel, err);
+                    errors += 1;
+                }
+                Err(e) => {
+                    eprintln!("Task de download falhou: {}", e);
+                    errors += 1;
                 }
             }
         }
+
+        // Atualiza cache de hashes após os downloads concluírem.
+        if let Ok(conn) = open_db(db_path) {
+            for (rel, sha) in cache_updates {
+                let _ = conn.execute(
+                    "INSERT OR REPLACE INTO images_cache(filename, sha256) VALUES(?1, ?2)",
+                    params![&rel, &sha],
+                );
+            }
+        }
+
         (downloaded_images, errors)
     }
 

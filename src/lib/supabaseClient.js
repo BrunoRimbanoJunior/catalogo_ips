@@ -26,3 +26,9 @@ if (supabaseUrl && supabaseServiceKeyRaw && import.meta.env.DEV) {
     },
   });
 }
+
+if (import.meta.env.DEV) {
+  console.log("SUPA URL:", supabaseUrl);
+  console.log("SERVICE KEY prefix:", (supabaseServiceKeyRaw || "").slice(0, 8));
+  console.log("ANON KEY prefix:", (supabaseAnonKey || "").slice(0, 8));
+}

@@ -67,24 +67,13 @@ function useFingerprint() {
   }, []);
 }
 
-// Apenas para exibir no dropdown: remove tokens de ano/codigo, mas preserva motores (ex.: 2.0).
+// Label curto: apenas a primeira "palavra" (antes de espaço ou /) para agrupar nomes iguais.
 function vehicleLabel(name = "") {
-  const parts = String(name).split(/\s+/);
-  const kept = [];
-  for (const raw of parts) {
-    const p = raw.trim();
-    if (!p) continue;
-    const normalized = p.replace(/[()]/g, "");
-    const looksYear =
-      /^\d{4}$/.test(normalized) || // 2012
-      /^\d{2}\/\d{2}$/.test(normalized) || // 12/14
-      /^[12][0-9]{3}[-/][0-9]{2}$/.test(normalized); // 2012-14
-    const looksCode = normalized.length >= 5 && /^[0-9A-Z-]+$/.test(normalized);
-    if (looksYear || looksCode) break;
-    kept.push(p);
-  }
-  const out = kept.join(" ").trim();
-  return out || name;
+  const first = String(name)
+    .split(/[\/\s]+/)
+    .map((s) => s.trim())
+    .find(Boolean);
+  return first || name || "";
 }
 
 function App() {
@@ -982,18 +971,23 @@ function App() {
               </select>
               <select value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}>
                 <option value="">Veiculo (todos)</option>
-                {Array.from(
-                  new Map(
-                    vehicles.map((v) => {
-                      const label = vehicleLabel(v.name);
-                      return [label, v.id];
-                    })
-                  ).entries()
-                ).map(([label, id]) => (
-                  <option key={id} value={id}>
-                    {label}
-                  </option>
-                ))}
+                {(() => {
+                  const seen = new Set();
+                  const opts = [];
+                  for (const v of vehicles) {
+                    const label = vehicleLabel(v.name);
+                    if (!label) continue;
+                    const key = label.toUpperCase();
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    opts.push([label, v.id]);
+                  }
+                  return opts.map(([label, id]) => (
+                    <option key={id} value={id}>
+                      {label}
+                    </option>
+                  ));
+                })()}
               </select>
               <button onClick={doSearch}>Pesquisar</button>
             </div>
