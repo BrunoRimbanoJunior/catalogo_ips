@@ -39,7 +39,8 @@ pub fn decrypt_image(data: &[u8], password: &str) -> anyhow::Result<Vec<u8>> {
     pbkdf2_hmac::<Sha256>(effective_password.as_bytes(), salt, KDF_ITERS, &mut key);
     let cipher = Aes256Gcm::new_from_slice(&key)?;
     let plaintext = cipher
-        .decrypt(nonce, ciphertext)
+        // aes-gcm decrypt expects a borrowed nonce; Nonce already implements the required GenericArray
+        .decrypt(&nonce, ciphertext)
         .map_err(|e| anyhow!(format!("decrypt fail: {}", e)))?;
     Ok(plaintext)
 }

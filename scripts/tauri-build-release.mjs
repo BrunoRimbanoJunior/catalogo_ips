@@ -37,14 +37,20 @@ function main() {
   // Make sure the Tauri CLI receives the signing material.
   process.env.TAURI_PRIVATE_KEY = privateKey;
   process.env.TAURI_KEY_PASSWORD = keyPassword;
+  console.log("Signing env set; invoking pnpm tauri build");
 
   const extraArgs = process.argv.slice(2);
   const result = spawnSync("pnpm", ["tauri", "build", ...extraArgs], {
     stdio: "inherit",
-    shell: false,
+    shell: true, // use shell so pnpm is resolved on Windows
   });
 
   if (result.status !== 0) {
+    console.error("tauri build failed", {
+      status: result.status,
+      signal: result.signal,
+      error: result.error?.message,
+    });
     process.exit(result.status ?? 1);
   }
 }
