@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
@@ -80,6 +80,7 @@ function App() {
   const fingerprint = useFingerprint();
   const cachedProfile = useMemo(() => safeParseProfile(localStorage.getItem("profile.cached")), []);
   const isDev = import.meta.env.MODE !== "production";
+  const updaterRef = useRef(null);
 
   const [ready, setReady] = useState(false);
   const [dataDir, setDataDir] = useState("");
@@ -125,6 +126,7 @@ function App() {
 
   const [updateInfo, setUpdateInfo] = useState(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
+  const [updaterAvailable, setUpdaterAvailable] = useState(false);
 
   const [launchImages, setLaunchImages] = useState([]);
   const [launchState, setLaunchState] = useState({ open: false, index: 0, loading: false, error: "" });
@@ -230,6 +232,24 @@ function App() {
     }
     if (sentOnce) setAllowAfterDelay(false);
   }, [supabaseConfigured, profile, cachedProfile, sentOnce]);
+
+  // Tenta usar o updater nativo do Tauri: baixa e instala sem abrir link externo.
+  useEffect(() => {
+    (async () => {
+      try {
+        const updater = await import("@tauri-apps/plugin-updater");
+        if (!updater?.check) return;
+        const res = await updater.check();
+        if (res?.available) {
+          updaterRef.current = res;
+          setUpdateInfo({ availableVersion: res.version, downloadUrl: null });
+          setUpdaterAvailable(true);
+        }
+      } catch (_) {
+        /* se falhar, mantemos o fluxo atual via link */
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     const src = toDisplaySrc(logoPath || DEFAULT_LOGO);
@@ -473,6 +493,24 @@ function App() {
     if (!imagesDir) return;
     loadLaunches(true);
   }, [imagesDir]);
+
+  async function handleUpdateClick(ev) {
+    ev?.preventDefault();
+    if (updaterRef.current?.downloadAndInstall) {
+      try {
+        setToolsMsg("Baixando e instalando atualização...");
+        await updaterRef.current.downloadAndInstall();
+        setToolsMsg("Atualização aplicada. O app pode reiniciar.");
+      } catch (e) {
+        setToolsMsg(`Falha ao atualizar: ${e.message || e}`);
+      }
+      return;
+    }
+    const url = updateInfo?.downloadUrl || FIXED_DOWNLOAD;
+    if (url) {
+      window.open(url, "_blank", "noreferrer");
+    }
+  }
 
 
   async function submitRegistration(ev) {
@@ -812,15 +850,9 @@ function App() {
                 <span>
                   Nova versao disponivel: {updateInfo.availableVersion} (atual {appVersion})
                 </span>
-                <a
-                  className="launch-button"
-                  href={updateInfo.downloadUrl || FIXED_DOWNLOAD}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ textDecoration: "none", padding: "6px 10px" }}
-                >
-                  Baixar/Atualizar
-                </a>
+                <button className="launch-button" style={{ padding: "6px 10px" }} onClick={(e) => handleUpdateClick(e)}>
+                  {updaterAvailable ? "Atualizar agora" : "Baixar/Atualizar"}
+                </button>
                 <button className="ghost" onClick={() => setUpdateDismissed(true)}>
                   Fechar
                 </button>
