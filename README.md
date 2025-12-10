@@ -49,6 +49,13 @@ node scripts/gen-manifest-r2.mjs \
 ```
 Credenciais R2 vêm do ambiente (`R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BASE_URL`).
 
+## Build de release (assinada + updater)
+- Gere as chaves uma única vez: `pnpm tauri signer generate` (guarde a `private.key` fora do git; `public.key` fica no `tauri.conf.json`).
+- Build local assinada e com `latest.json`: `TAURI_KEY_PASSWORD=*** pnpm tauri:build:signed` (usa `TAURI_PRIVATE_KEY` do ambiente ou o arquivo `./private.key`; defina `TAURI_PRIVATE_KEY_PATH` se estiver em outro lugar).
+- Saída: `src-tauri/target/release/bundle/*` com instaladores, `.sig` e `latest.json` para publicar no endpoint configurado no `tauri.conf.json`.
+- CI: defina secrets `TAURI_PRIVATE_KEY` (conteúdo do `private.key`) e `TAURI_KEY_PASSWORD` e rode o mesmo comando ou habilite `includeUpdaterJson` no `tauri-action` para anexar o `latest.json` na Release.
+- Endpoint default no `tauri.conf.json` usa Releases do GitHub: publique o `latest.json` gerado junto dos instaladores na Release que o updater vai baixar.
+
 ## Estrutura do manifest (resumo)
 ```json
 {

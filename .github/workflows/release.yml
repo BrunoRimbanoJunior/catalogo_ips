@@ -16,6 +16,12 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Export signing secrets
+        run: |
+          echo "TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}" >> $GITHUB_ENV
+
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -30,13 +36,19 @@ jobs:
       - name: Prepare pnpm
         run: corepack prepare pnpm@9.12.3 --activate
 
-      - name: Set version from tag (Tauri/package.json)
+      - name: Export APP_VERSION from tag
         if: startsWith(github.ref, 'refs/tags/v')
+        run: echo "APP_VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Sync version files
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: node scripts/sync-version.mjs
+
+      - name: Export signing secrets
         shell: bash
         run: |
-          APP_VERSION="${GITHUB_REF_NAME#v}"
-          echo "Setting version to ${APP_VERSION}"
-          node -e "const fs=require('fs');const path=require('path');const pkgPath=path.join(process.cwd(),'package.json');const pkg=JSON.parse(fs.readFileSync(pkgPath,'utf8'));pkg.version='${APP_VERSION}';fs.writeFileSync(pkgPath,JSON.stringify(pkg,null,2));const tauriPath=path.join(process.cwd(),'src-tauri','tauri.conf.json');const tauri=JSON.parse(fs.readFileSync(tauriPath,'utf8')); tauri.version='${APP_VERSION}'; fs.writeFileSync(tauriPath,JSON.stringify(tauri,null,2));"
+          echo "TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Decode PFX for signing (Windows)
         if: matrix.os == 'windows-latest'
@@ -77,7 +89,7 @@ jobs:
           releaseBody: |
             Automated release for ${{ github.ref_name }}.
             Includes installers for Windows, macOS and Linux when available.
-          includeUpdaterJson: false
+          includeUpdaterJson: true
 
       - name: Commit DB to main
         if: startsWith(github.ref, 'refs/tags/')

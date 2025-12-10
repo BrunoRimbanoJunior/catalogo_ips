@@ -34,6 +34,12 @@ dist-ssr
 !.env.example
 backend/.env
 .env.production
+.key
+
+# Signing keys (não versionar)
+private.key
+public.key
+
 
 # Tauri / Rust build
 /src-tauri/target/

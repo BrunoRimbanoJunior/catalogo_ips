@@ -1,13 +1,14 @@
 {
   "name": "catalogo_ips",
   "private": true,
-  "version": "1.1.2",
+  "version": "1.3.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "tauri:build:signed": "node scripts/tauri-build-release.mjs",
     "manifest": "node scripts/gen-manifest.mjs",
     "manifest:onedrive": "node scripts/gen-manifest-onedrive.mjs",
     "manifest:r2": "node scripts/gen-manifest-r2.mjs",
