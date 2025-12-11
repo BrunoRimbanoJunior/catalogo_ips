@@ -23,8 +23,8 @@ pub fn decrypt_image(data: &[u8], password: &str) -> anyhow::Result<Vec<u8>> {
     let salt = &data[offset..offset + SALT_LEN];
     offset += SALT_LEN;
     let nonce_bytes: [u8; NONCE_LEN] = data[offset..offset + NONCE_LEN].try_into()?;
-    // clone_from_slice evita o aviso de API depreciada do GenericArray::from_slice
-    let nonce = Nonce::clone_from_slice(&nonce_bytes);
+    #[allow(deprecated)] // aes-gcm reexporta generic-array 0.x; suppress ate atualizarmos dependencia
+    let nonce = Nonce::from_slice(&nonce_bytes);
     offset += NONCE_LEN;
     let ciphertext = &data[offset..];
 
@@ -39,8 +39,8 @@ pub fn decrypt_image(data: &[u8], password: &str) -> anyhow::Result<Vec<u8>> {
     pbkdf2_hmac::<Sha256>(effective_password.as_bytes(), salt, KDF_ITERS, &mut key);
     let cipher = Aes256Gcm::new_from_slice(&key)?;
     let plaintext = cipher
-        // aes-gcm decrypt expects a borrowed nonce; Nonce already implements the required GenericArray
-        .decrypt(&nonce, ciphertext)
+        // aes-gcm decrypt espera um Nonce por referÇõncia; from_slice jÇÁ retorna &Nonce
+        .decrypt(nonce, ciphertext)
         .map_err(|e| anyhow!(format!("decrypt fail: {}", e)))?;
     Ok(plaintext)
 }

@@ -14,8 +14,6 @@ mod core {
     use rusqlite::{params, Connection, OptionalExtension};
     use sha2::{Digest, Sha256};
     use std::fs;
-    use std::fs::File;
-    use std::io::copy;
     use std::path::Path;
     use std::sync::Arc;
     use std::time::Duration;
@@ -761,6 +759,14 @@ mod core {
         } else {
             None
         };
+        let mut vehicle_token: Option<String> = None;
+        if let Some(ref name) = vehicle_name {
+            vehicle_token = name
+                .split(|c: char| c.is_whitespace() || c == '/' || c == '\\' || c == '-')
+                .map(|s| s.trim())
+                .find(|s| !s.is_empty())
+                .map(|s| s.to_ascii_uppercase());
+        }
 
         let mut where_clauses: Vec<String> = Vec::new();
         if params.brand_id.is_some() {
@@ -785,7 +791,7 @@ mod core {
         if params.vehicle_id.is_some() {
             // Match por id e também por nome do veículo em qualquer posição.
             where_clauses.push(
-                "EXISTS (SELECT 1 FROM product_vehicles pv JOIN vehicles v2 ON v2.id=pv.vehicle_id WHERE pv.product_id=p.id AND (pv.vehicle_id = ? OR (? IS NOT NULL AND UPPER(v2.name) LIKE ?)))"
+                "EXISTS (SELECT 1 FROM product_vehicles pv JOIN vehicles v2 ON v2.id=pv.vehicle_id WHERE pv.product_id=p.id AND (pv.vehicle_id = ? OR (? IS NOT NULL AND UPPER(v2.name) LIKE ?) OR (? IS NOT NULL AND UPPER(v2.name) LIKE ?)))"
                     .into(),
             );
         }
@@ -821,10 +827,18 @@ mod core {
         }
         if let Some(v) = params.vehicle_id {
             values.push(v.into());
-            // Passa o nome (ou null) para permitir LIKE por nome
+            // Passa o nome completo e tambÇ¸m o token inicial para permitir LIKE mais amplo
             if let Some(ref name) = vehicle_name {
-                values.push(name.to_ascii_uppercase().into());
-                values.push(format!("%{}%", name.to_ascii_uppercase()).into());
+                let upper = name.to_ascii_uppercase();
+                values.push(upper.clone().into()); // nome completo para ? IS NOT NULL
+                values.push(format!("%{}%", upper).into()); // match em qualquer posiÇõÇœo
+            } else {
+                values.push(rusqlite::types::Value::Null);
+                values.push(rusqlite::types::Value::Null);
+            }
+            if let Some(ref token) = vehicle_token {
+                values.push(token.clone().into()); // token para ? IS NOT NULL
+                values.push(format!("%{}%", token).into());
             } else {
                 values.push(rusqlite::types::Value::Null);
                 values.push(rusqlite::types::Value::Null);
