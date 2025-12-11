@@ -24,6 +24,7 @@
 html, body, #root {
   height: 100%;
   min-height: 100%;
+  margin: 0;
 }
 
 .container {
@@ -35,6 +36,7 @@ html, body, #root {
   justify-content: flex-start; /* fixa conteúdo no topo */
   gap: 12px;
   padding: 12px;
+  padding-inline: clamp(12px, 3vw, 28px);
   box-sizing: border-box;
   text-align: center;
   min-height: 100vh;
@@ -130,6 +132,7 @@ button {
 
 /* Catálogo custom */
 .appbar { position: sticky; top: 0; z-index: 10; background: #f9f9f9; color: #060606; padding: 8px 8px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: grid; grid-template-columns: auto 1fr auto; align-items: flex-end; gap: 12px; width: 100%; max-width: 1280px; margin: 0 auto; }
+.appbar { padding-inline: clamp(10px, 2vw, 22px); width: min(1600px, 100%); max-width: 100%; }
 .appbar h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.3px; text-align: center; transform: translateY(-10px); }
 .appbar-title { display: flex; flex-direction: column; align-items: center; gap: 6px; justify-self: center; width: 100%; justify-content: flex-end; padding-bottom: 4px; }
 .appbar-logo { display: flex; align-items: center; justify-content: center; min-width: 90px; }
@@ -158,7 +161,7 @@ button {
 .sync-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; z-index: 999; }
 .sync-box { background: #222; color: #fff; padding: 16px 20px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.35); font-weight: 700; }
 
-.layout { display: grid; grid-template-columns: 260px minmax(0, 1fr) 420px; gap: 16px; margin-top: 4px; align-items: start; width: 100%; max-width: 1280px; }
+.layout { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(520px, 1.6fr) minmax(360px, 1.1fr); gap: 16px; margin-top: 4px; align-items: start; width: min(1600px, 100%); max-width: 100%; }
 .sidebar { background: #ffffff; border: 1px solid #e6e6e6; border-radius: 8px; padding: 10px; }
 .sidebar h3 { margin-top: 0; }
 .sidebar, .panel { color: #111; }
@@ -280,3 +283,24 @@ button {
 .auth-success { margin-top: 10px; padding: 10px; background: #e8fff5; color: #0c6b3d; border: 1px solid #b1e5c8; border-radius: 8px; }
 .auth-error { margin-top: 10px; padding: 10px; background: #ffecec; color: #9a1b1b; border: 1px solid #f3bbbb; border-radius: 8px; }
 
+/* Responsive layout adjustments */
+@media (max-width: 900px) {
+  .layout {
+    /* On smaller screens, stack all columns vertically */
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    /* Optional: limit the height of the sidebar when stacked */
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .filters {
+    /* Allow filters to wrap more gracefully */
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filters button {
+      flex: 0 0 auto;
+  }
+}
