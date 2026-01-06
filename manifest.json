@@ -1,10 +1,8 @@
 {
-  "appVersion": "1.3.6",
-  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.3.6/catalogo_ips_1.3.6_x64-setup.exe",
   "db": {
-    "version": 1764014362,
+    "version": 1764014363,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "b72c07da36d750070754837bb29f00003017b6c7e1dc6b70ddf5a10cf87564f7"
+    "sha256": "f49d9bcb47f868afd2269cd0bf9a7e207303201b89a7d68cfedfac13288eb900"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -2262,10 +2260,6 @@
         "sha256": "e99b9780e17a3e0810cd481149a02524"
       },
       {
-        "file": "CAIXA_DIRECAO/7115506011 (2).png.cimg",
-        "sha256": "e2089b688bc98143d280210379e5fe60"
-      },
-      {
         "file": "CAIXA_DIRECAO/7115506011.png.cimg",
         "sha256": "13f78a51bec1154bc0c555e3c110fb3e"
       },
@@ -2408,10 +2402,6 @@
       {
         "file": "CAIXA_DIRECAO/71348055910.png.cimg",
         "sha256": "6c64b6ce3dcac555124b51199d51b92e"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7134805910 (2).png.cimg",
-        "sha256": "be8adb32d389b5fe6144e6d2e1bfcd00"
       },
       {
         "file": "CAIXA_DIRECAO/7134805910.png.cimg",
@@ -2758,10 +2748,6 @@
         "sha256": "24ad8f17b41f07efb7ccb99279b77cfe"
       },
       {
-        "file": "CAIXA_DIRECAO/7148506001 (2).png.cimg",
-        "sha256": "8f11d038d63995790e41df4699e7a20e"
-      },
-      {
         "file": "CAIXA_DIRECAO/7148506001.png.cimg",
         "sha256": "e723f9f04801a44c31855901e5ad4b54"
       },
@@ -3052,14 +3038,6 @@
       {
         "file": "CAIXA_DIRECAO/7169715910.png.cimg",
         "sha256": "91509617785ddcb24edd48dd2726ead6"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7169716010 (2).png.cimg",
-        "sha256": "ea23c03adfe46adfdf8e8aee79fc86ed"
-      },
-      {
-        "file": "CAIXA_DIRECAO/7169716010 (3).png.cimg",
-        "sha256": "fdad8bb58c8ec632faba5284030439dc"
       },
       {
         "file": "CAIXA_DIRECAO/7169716010.png.cimg",
@@ -7983,519 +7961,519 @@
       },
       {
         "file": "RETROVISORES/1211042101.png.cimg",
-        "sha256": "128e959c8a6dd82d216a8160c6f8d498"
+        "sha256": "8770f342d53afa35d276f924ccad308f"
       },
       {
         "file": "RETROVISORES/1211042102.png.cimg",
-        "sha256": "e17706713040d182af4996b5aca9d553"
+        "sha256": "dc150bfee8b804bf4e717b1f9a7a2069"
       },
       {
         "file": "RETROVISORES/1211822101.png.cimg",
-        "sha256": "34fbc11486482e326d23ec4bc82b146b"
+        "sha256": "fb923376b7f20b8ab0057eae1f739f27"
       },
       {
         "file": "RETROVISORES/1211822102.png.cimg",
-        "sha256": "e6a9d28b138aab24c21478eed91dfce3"
+        "sha256": "1e953f126e221ac42ac89c5e3456653d"
       },
       {
         "file": "RETROVISORES/1211822121.png.cimg",
-        "sha256": "dd49720efdc400ea929c08a7ae224184"
+        "sha256": "5ae7cc67683e5f9afa7fb737ea56b7e6"
       },
       {
         "file": "RETROVISORES/1211822122.png.cimg",
-        "sha256": "014fb09ca37616cc55b1b52ce2725a12"
+        "sha256": "9d23dcbd7fc26b9d7156153aa96b6186"
       },
       {
         "file": "RETROVISORES/1211932101.png.cimg",
-        "sha256": "26231567bfc5afcea2948e677f378727"
+        "sha256": "9d0f36142fa20e376b32485950c05bfe"
       },
       {
         "file": "RETROVISORES/1211932102.png.cimg",
-        "sha256": "933a596cb2459017c621e886c80b28dc"
+        "sha256": "99bdcdaa27a97a1a4c175cdb03db7052"
       },
       {
         "file": "RETROVISORES/1211962101.png.cimg",
-        "sha256": "3587dfb830a3aa12f4eae1dc989bf03c"
+        "sha256": "b8b8392a7734aa01e9c337d859bf631d"
       },
       {
         "file": "RETROVISORES/1211962102.png.cimg",
-        "sha256": "0bcfbc0617bcbf327bd74ffa51c5ad27"
+        "sha256": "18156a7e6457e8d3bf7e9e1c559beb45"
       },
       {
         "file": "RETROVISORES/1215802101.png.cimg",
-        "sha256": "9ee14b8ea25ff8fb33c0a6404f81c625"
+        "sha256": "046ff128bfa520f9c1bb305a59c64fc7"
       },
       {
         "file": "RETROVISORES/1215802102.png.cimg",
-        "sha256": "8b69c9ed385ccad57e3d2345cc8be225"
+        "sha256": "a23f96bfe8e73cbba98c540c11da32fa"
       },
       {
         "file": "RETROVISORES/1215802103.png.cimg",
-        "sha256": "db413a0225c4025a0e15a6c272e61cab"
+        "sha256": "d7957560febe725a7dddc4a80afa90a3"
       },
       {
         "file": "RETROVISORES/1215802104.png.cimg",
-        "sha256": "e450957a2ec08469add71f438528bad2"
+        "sha256": "c9ada31a1ad9507b941258a487ace28b"
       },
       {
         "file": "RETROVISORES/1215802111.png.cimg",
-        "sha256": "0d79e2c0716a5b1a74268051522d19a2"
+        "sha256": "f26c33124ab6e29e490dd618445cfdca"
       },
       {
         "file": "RETROVISORES/1215802112.png.cimg",
-        "sha256": "eeb9c952bd6dee2d7b2cdf0e5cf0b50f"
+        "sha256": "d191af51d0b72c534c7c171266e30ce6"
       },
       {
         "file": "RETROVISORES/1215802113.png.cimg",
-        "sha256": "f3ffc43e3385e2f3a3769e639eafd0b8"
+        "sha256": "bcda013342faeafcbb3dc033bd85e88b"
       },
       {
         "file": "RETROVISORES/1215802114.png.cimg",
-        "sha256": "adb3aab624424ebc969d10ba4760c541"
+        "sha256": "b914caa0cbe87a032f067341b7669093"
       },
       {
         "file": "RETROVISORES/1234202111.png.cimg",
-        "sha256": "274d1936b64f988730199ee30180a29d"
+        "sha256": "15e8aa379f7484abd493b8252f0871b8"
       },
       {
         "file": "RETROVISORES/1234202112.png.cimg",
-        "sha256": "ed507b7a25ac1050bca2c02b9d0c12f4"
+        "sha256": "0790fe01224bc6e36707261772b3c399"
       },
       {
         "file": "RETROVISORES/1234552111.png.cimg",
-        "sha256": "ab757a737d8f47c87b3db7de9200932f"
+        "sha256": "d3e512a547e133493281cb041a4b47e3"
       },
       {
         "file": "RETROVISORES/1234552112.png.cimg",
-        "sha256": "7437fe65f00f13ebcdb26cd12beee722"
+        "sha256": "414084fcd5076786068c0591867ca556"
       },
       {
         "file": "RETROVISORES/1234962101.png.cimg",
-        "sha256": "08780a3ffde87d945d6f468c7f97f335"
+        "sha256": "906f6a5350411d6b88aa68e9040bb352"
       },
       {
         "file": "RETROVISORES/1234962102.png.cimg",
-        "sha256": "fa956c8c20bf58a781201b55a73d34a8"
+        "sha256": "eed10176ef0801add525e06523e9e44b"
       },
       {
         "file": "RETROVISORES/1236702111.png.cimg",
-        "sha256": "fce3001b3a2419d52102520cb72310e6"
+        "sha256": "2c7d0b299d5e2413c768a87340a3ad1a"
       },
       {
         "file": "RETROVISORES/1236702112.png.cimg",
-        "sha256": "a9c07894ab349f8f21ae0c50c7150e56"
+        "sha256": "51b7e4fab13ca4a5e9d71e72b60af6f4"
       },
       {
         "file": "RETROVISORES/1236702113.png.cimg",
-        "sha256": "2a0db38eaca4751a80bc264eaaa6a0b2"
+        "sha256": "a87316c8a692c785820bcf9754b7972c"
       },
       {
         "file": "RETROVISORES/1236702114.png.cimg",
-        "sha256": "e74ee9592aff3129bd4ed6e2ee86a95e"
+        "sha256": "899fb346e244ff684d62735f1c6cef85"
       },
       {
         "file": "RETROVISORES/1249802111.png.cimg",
-        "sha256": "44f052a4bfd0cc27103477e5b2ff2d43"
+        "sha256": "1a714dec90802a88e3dbe13bcb55ca3a"
       },
       {
         "file": "RETROVISORES/1249802112.png.cimg",
-        "sha256": "47d8637be239ea8b820d002478bb186d"
+        "sha256": "d62f22bb26a1650e90240c8ded377e7c"
       },
       {
         "file": "RETROVISORES/1269382103.png.cimg",
-        "sha256": "7d75988048a71581ce010efa1f475a88"
+        "sha256": "21297df3e9678215ff2f6970396a6f0b"
       },
       {
         "file": "RETROVISORES/1269382104.png.cimg",
-        "sha256": "481743c025d7b731285265cf4f210f08"
+        "sha256": "1ebb42d366b39c692e1f441dacea8f25"
       },
       {
         "file": "RETROVISORES/1269382105.png.cimg",
-        "sha256": "bda14d1a2175e80a4e29e657a817309c"
+        "sha256": "7feccc2295c0c2b4a1d3ac74a298092d"
       },
       {
         "file": "RETROVISORES/1269382106.png.cimg",
-        "sha256": "460661a556dee2e2d0f32c8cb9f2b237"
+        "sha256": "050ba3cc3d4c2903d4be1e41fb51f70b"
       },
       {
         "file": "RETROVISORES/1269382107.png.cimg",
-        "sha256": "b62fdbabec64119b144b660d45ea3a04"
+        "sha256": "09c482b893ab20c07a8618eae9a95079"
       },
       {
         "file": "RETROVISORES/1269382108.png.cimg",
-        "sha256": "de108090e1014ecb3f85a6f2f075bde2"
+        "sha256": "e4f4077aea3bd6a178b3a82633538fb4"
       },
       {
         "file": "RETROVISORES/1269382109.png.cimg",
-        "sha256": "678685dde1680a14053379909e2a98ce"
+        "sha256": "6c33822c860a576f2fd5cd65ead9bc69"
       },
       {
         "file": "RETROVISORES/1269382110.png.cimg",
-        "sha256": "89e9ba5f4cce3a323f7780fef42e8434"
+        "sha256": "0711530f6c863b592b4ef6924d835c15"
       },
       {
         "file": "RETROVISORES/1269382111.png.cimg",
-        "sha256": "f1ff355646bc5fff76e97a9cf546a69b"
+        "sha256": "db5448c18cc5b95dbb17aa85f53a5168"
       },
       {
         "file": "RETROVISORES/1269382112.png.cimg",
-        "sha256": "c6e51191cebc0736c8ef84d73283ec4f"
+        "sha256": "fb59ff8f269faa1a3fdd7cdbffe8f3b1"
       },
       {
         "file": "RETROVISORES/1269382123.png.cimg",
-        "sha256": "361abad76c01ce17bc586029bbf10757"
+        "sha256": "6cbf9a17792e1d1be68d55fef21b0cef"
       },
       {
         "file": "RETROVISORES/1269382124.png.cimg",
-        "sha256": "d64f3a288bf921d11b562c55544c2451"
+        "sha256": "f8f34e0bf9f28a90179e235b77214e7d"
       },
       {
         "file": "RETROVISORES/1269382125.png.cimg",
-        "sha256": "397e1ed39c5dfa010a567c4d69f468d2"
+        "sha256": "7f72dc144cfd1d20ce79fba32728f245"
       },
       {
         "file": "RETROVISORES/1269382126.png.cimg",
-        "sha256": "9b5e9d25c868b5d744becc3fab101bd8"
+        "sha256": "36ea7e4734fcbe38abef951e2d6c1b09"
       },
       {
         "file": "RETROVISORES/1269382127.png.cimg",
-        "sha256": "9436a58df1190b958fe1fe068c2b7dcf"
+        "sha256": "f42ad0f4311d8602f64994a5a5b1bacf"
       },
       {
         "file": "RETROVISORES/1269382128.png.cimg",
-        "sha256": "31219bf0db55b73548442cb327a222e8"
+        "sha256": "bb2f52de7af93c492f01b7bea6c5a279"
       },
       {
         "file": "RETROVISORES/1269382129.png.cimg",
-        "sha256": "a5ea4f31b2404d7884750515edf6bc09"
+        "sha256": "b18785df50cbcca54b36cf5e8b993e1e"
       },
       {
         "file": "RETROVISORES/1269382130.png.cimg",
-        "sha256": "ab21b510a8d135cf45d1b8e391845592"
+        "sha256": "b4a26636ac025259ee9f95aaacf1022b"
       },
       {
         "file": "RETROVISORES/1269382131.png.cimg",
-        "sha256": "dfd52fbfce1f80b4995d7f2c30ad87d6"
+        "sha256": "44447b514f067327d0dd876dc7faed06"
       },
       {
         "file": "RETROVISORES/1269382132.png.cimg",
-        "sha256": "214d82a0dbe1fa43fdf8e6320d7495b8"
+        "sha256": "6ae789d83c58b788b2aa35436fb9733c"
       },
       {
         "file": "RETROVISORES/1269382135.png.cimg",
-        "sha256": "10b45b91074b1752faab6111fcf0aeda"
+        "sha256": "4315f2a940fbd6a06bf16ca6b8838477"
       },
       {
         "file": "RETROVISORES/1269382136.png.cimg",
-        "sha256": "f564d53aaa693488b373fb606c8b65f1"
+        "sha256": "dd8d17e4b389134233dd1c4d91ef2f68"
       },
       {
         "file": "RETROVISORES/1269382141.png.cimg",
-        "sha256": "ecb6306ce55273fae3474e36ed7332e0"
+        "sha256": "5cbba739cc206fb27c1e7788ce59baae"
       },
       {
         "file": "RETROVISORES/1269382142.png.cimg",
-        "sha256": "fcd2af13a76f020b36a8228729f7468d"
+        "sha256": "965eb386f59383bae31ddcc4819cb141"
       },
       {
         "file": "RETROVISORES/1269382143.png.cimg",
-        "sha256": "a253e2ca3d70057c2754d13c868fc3b1"
+        "sha256": "dd6922fc872308797c6a02f63a7afbdc"
       },
       {
         "file": "RETROVISORES/1269382144.png.cimg",
-        "sha256": "de82882cea93b0e001e85d0bccc09c64"
+        "sha256": "2acb8518522370198bad07f193ca64ae"
       },
       {
         "file": "RETROVISORES/1269382145.png.cimg",
-        "sha256": "a37509a006f63ed9051507aeb988fa5b"
+        "sha256": "a1a4f49ec3d1ef42367ef5896f0cc365"
       },
       {
         "file": "RETROVISORES/1269382146.png.cimg",
-        "sha256": "fb04cd96926cea071b40f9896478140b"
+        "sha256": "93fcb01efd9531bc34ed7ca251cbdf8a"
       },
       {
         "file": "RETROVISORES/1269382147.png.cimg",
-        "sha256": "1b29a8525410009bf0b17400f6572675"
+        "sha256": "06b110359c93023b94363a5caea1b3f3"
       },
       {
         "file": "RETROVISORES/1269382148.png.cimg",
-        "sha256": "442dbf89f60d2ad822b431b24ade3b1d"
+        "sha256": "8ba74af53f52a2eea819d8d4c1cf778c"
       },
       {
         "file": "RETROVISORES/1270102101.png.cimg",
-        "sha256": "b22ecac82f942c84116ade563102d4e5"
+        "sha256": "59cd6fe24df03b263eb3a2f6f868c169"
       },
       {
         "file": "RETROVISORES/1270102102.png.cimg",
-        "sha256": "f0c6442447ef546501ed2f2e43877412"
+        "sha256": "a4e30cc27eb10d5b77ad9ada3b1ec992"
       },
       {
         "file": "RETROVISORES/1270102111.png.cimg",
-        "sha256": "13d4ea34bbfd119895076e61fdebd537"
+        "sha256": "11c566f09672ad6d79e916a9750c53ed"
       },
       {
         "file": "RETROVISORES/1270102112.png.cimg",
-        "sha256": "ad83f57ccb2e240351d5418e357dcfa5"
+        "sha256": "a9276fa76d13dd71f14711bcb93139a3"
       },
       {
         "file": "RETROVISORES/1270202101.png.cimg",
-        "sha256": "dcff4bcf4a7e6a00b5fea09181ce7742"
+        "sha256": "e3eae4919855c5db960775a9e6a6bb9f"
       },
       {
         "file": "RETROVISORES/1270202102.png.cimg",
-        "sha256": "c34211bfb65a120d4c9b5866b4e47283"
+        "sha256": "966fbad1a44ef5e4635549f11bdfbde2"
       },
       {
         "file": "RETROVISORES/1270202103.png.cimg",
-        "sha256": "dc0a1c02c1b7c1f1edb700792a06e7b8"
+        "sha256": "80779d70fe2b4505653a9456e69957ac"
       },
       {
         "file": "RETROVISORES/1270202104.png.cimg",
-        "sha256": "ed2c205a978c7ec7ff8f21d2df0c652a"
+        "sha256": "d38ce54c3c05780ec295db51f09ace15"
       },
       {
         "file": "RETROVISORES/1270202111.png.cimg",
-        "sha256": "8b6789f17be2555cfadad1f00711a308"
+        "sha256": "c316a47930def05bc4303a9192b47788"
       },
       {
         "file": "RETROVISORES/1270202112.png.cimg",
-        "sha256": "16f73f8e00b0c00791505b7a712cf758"
+        "sha256": "11d3adc88e047a0b737b6290aecfe5b4"
       },
       {
         "file": "RETROVISORES/1270202113.png.cimg",
-        "sha256": "d9be3ebd35ac937c28da88413358e29c"
+        "sha256": "19debbc2b02759978061bdf659bb2b29"
       },
       {
         "file": "RETROVISORES/1270202114.png.cimg",
-        "sha256": "95ed17405c9555563fd5bc53155e74e8"
+        "sha256": "91280b865fc8e444ac3ecdaf912473b4"
       },
       {
         "file": "RETROVISORES/1270202115.png.cimg",
-        "sha256": "5fdd335b01efb3618d372d60ebc02275"
+        "sha256": "8dcfea29f243b4beb1ea99a327023bbf"
       },
       {
         "file": "RETROVISORES/1270202116.png.cimg",
-        "sha256": "f692eb5f4bc5b4782d5228c681e5d0f2"
+        "sha256": "f968fc29c98e7192aa47b5071eba984d"
       },
       {
         "file": "RETROVISORES/1270422103.png.cimg",
-        "sha256": "8c6e34a4573c1ee523df9f39d7042d91"
+        "sha256": "e7c67b8967ca28e2561b64bd9d5e8fb5"
       },
       {
         "file": "RETROVISORES/1270422104.png.cimg",
-        "sha256": "baa1c1e725401a396c9c0ee32865c1ab"
+        "sha256": "8aed8fe8e9ed35ee05becadba55489c3"
       },
       {
         "file": "RETROVISORES/1270422105.png.cimg",
-        "sha256": "4e56fdfd06e4704dc65228527409b70c"
+        "sha256": "a36cfca3b880fdea29a42f32644bed2f"
       },
       {
         "file": "RETROVISORES/1270422106.png.cimg",
-        "sha256": "3b42ae4b1a7251e7bf92caea64c9a836"
+        "sha256": "c10330ba58d74ed6f33a50a18acde533"
       },
       {
         "file": "RETROVISORES/1270422107.png.cimg",
-        "sha256": "376a7a6050c429c269f1574aba01b19b"
+        "sha256": "1165fc89915fb187894e457ccf8b3817"
       },
       {
         "file": "RETROVISORES/1270422108.png.cimg",
-        "sha256": "f70a124660e63dc28fac3c93d2a559b5"
+        "sha256": "2c3ad758e27f6030977cc995d9cf12b1"
       },
       {
         "file": "RETROVISORES/1270422111.png.cimg",
-        "sha256": "06ef1484632d187ef3bcd0e0c196cbc5"
+        "sha256": "87ee8eefd8b44c9190f7cc89a93e7056"
       },
       {
         "file": "RETROVISORES/1270422112.png.cimg",
-        "sha256": "f69683515027463fc030e11b5daa7a32"
+        "sha256": "565cca67c97b5b7881def53f9d52b169"
       },
       {
         "file": "RETROVISORES/1270502101.png.cimg",
-        "sha256": "cd554e7355ca0286573a65bfa1775edc"
+        "sha256": "33a54edd40682ededff6ee0cb2b7c5d8"
       },
       {
         "file": "RETROVISORES/1270502102.png.cimg",
-        "sha256": "573254edda7406aaac6709148845891b"
+        "sha256": "0b54004bcafabf2ba9bc9fe79c0ad6f3"
       },
       {
         "file": "RETROVISORES/1270502103.png.cimg",
-        "sha256": "c99f4f54fffe49f45b15a01bb537cef1"
+        "sha256": "548b4602e5a1a1c57e52b234d255534d"
       },
       {
         "file": "RETROVISORES/1270502104.png.cimg",
-        "sha256": "3f013b6f513c2f43c62f9f62e2990468"
+        "sha256": "bb7f1537cf8f869c9337e04b4febbbc8"
       },
       {
         "file": "RETROVISORES/1270602101.png.cimg",
-        "sha256": "1cf157b22fb6fc5aca66d3d6918d3306"
+        "sha256": "d2858736b82c8826ea85eb8257fc9bae"
       },
       {
         "file": "RETROVISORES/1270602102.png.cimg",
-        "sha256": "5027901ed9ab70028f8c39d9d4f947a8"
+        "sha256": "f44476ecbad2f00b7ef82ffbc6014f22"
       },
       {
         "file": "RETROVISORES/1270602111.png.cimg",
-        "sha256": "f23f8d940a3c9761cd5da25846544c10"
+        "sha256": "791e9aa74d27a5366d811b055534040c"
       },
       {
         "file": "RETROVISORES/1270602112.png.cimg",
-        "sha256": "a7b153171f713a376092af573060dcef"
+        "sha256": "0c89ee903ef48b275d1b474ce708916e"
       },
       {
         "file": "RETROVISORES/1270602121.png.cimg",
-        "sha256": "863002b3ba9f15b5627e7b473f840ad8"
+        "sha256": "1718553fde502d232169efdbc62aab86"
       },
       {
         "file": "RETROVISORES/1270602122.png.cimg",
-        "sha256": "0aee9531ac92d70415c87f4b822fb0d3"
+        "sha256": "43341aa1a9038fcf3d0855ee05db3a53"
       },
       {
         "file": "RETROVISORES/1270602123.png.cimg",
-        "sha256": "6813d9b51dae22e32c9152f55220a169"
+        "sha256": "c0b31a066e63655922a73aa0e5e147f3"
       },
       {
         "file": "RETROVISORES/1270602124.png.cimg",
-        "sha256": "a1020d37e02a802b39932601cab4b224"
+        "sha256": "da5cba2009405613170b8a4fa858590a"
       },
       {
         "file": "RETROVISORES/1270702101.png.cimg",
-        "sha256": "2d612e7cd8bcecd4d99e5ad51b8e6cfb"
+        "sha256": "6fe489cec69dcd566d5c4dbb4a82c6b8"
       },
       {
         "file": "RETROVISORES/1270702102.png.cimg",
-        "sha256": "d3fcbe62ea7cbe6a9be36c67e6bce9fe"
+        "sha256": "fd1cbbe6570cfe2cc6b090ac1dcd8141"
       },
       {
         "file": "RETROVISORES/1270702103.png.cimg",
-        "sha256": "96a9df26bf47be54ca0bf1b4bd21cffc"
+        "sha256": "c2afa0a8160e5853ca611a81681d9a98"
       },
       {
         "file": "RETROVISORES/1270702104.png.cimg",
-        "sha256": "6e68ae6f4bc49c06ae60cb2dd3dfee9e"
+        "sha256": "0a33f0fc90287f40a7f70ccdf2d5ba21"
       },
       {
         "file": "RETROVISORES/1270862111.png.cimg",
-        "sha256": "dd8b7249c4be2718f237ed1d98659202"
+        "sha256": "aeff4704a34ca5912c1d8dcfdaed6fc0"
       },
       {
         "file": "RETROVISORES/1270862112.png.cimg",
-        "sha256": "d64f9eb4b78eb7d61ba8e773b3b7f2e2"
+        "sha256": "18381ed181b2a4168f6b13f8cda54d6f"
       },
       {
         "file": "RETROVISORES/1270862113.png.cimg",
-        "sha256": "73f866c91428f4953d8a84f5f7b838e2"
+        "sha256": "01e10a528941587baeb6608cab37842d"
       },
       {
         "file": "RETROVISORES/1270862114.png.cimg",
-        "sha256": "304211b775b59c039c41c48851e3feb2"
+        "sha256": "9a7b872265eb39669bf0387426bc5bc8"
       },
       {
         "file": "RETROVISORES/1270862117.png.cimg",
-        "sha256": "40a5b3de3bbdb065071bc6c490259324"
+        "sha256": "a4461b54ec487b3bcd957f719ad781cb"
       },
       {
         "file": "RETROVISORES/1270862118.png.cimg",
-        "sha256": "73419b22ab74d319a1ae050dc999aeae"
+        "sha256": "93542f919c2008bed14e0afafa75b8f5"
       },
       {
         "file": "RETROVISORES/1275522101.png.cimg",
-        "sha256": "3fca9b2506cd166893bc953a52fe95fd"
+        "sha256": "3200eb73b391c692f3b0e1d6eac73094"
       },
       {
         "file": "RETROVISORES/1275522102.png.cimg",
-        "sha256": "37015407f6bc323a3424430f7a092e6e"
+        "sha256": "b76961f0f8f5a0fb1a7ee9ba7b42e865"
       },
       {
         "file": "RETROVISORES/1275522111.png.cimg",
-        "sha256": "8eb056ee34bcc43a6401ff965fd91730"
+        "sha256": "d6da9c33770f0d3567bcf99963474348"
       },
       {
         "file": "RETROVISORES/1275522112.png.cimg",
-        "sha256": "d7c82da68d911244d65f736b758a65ae"
+        "sha256": "95e50cfddfc4f2177ca3536ba7e502c0"
       },
       {
         "file": "RETROVISORES/1275522113.png.cimg",
-        "sha256": "25d453db267296bc2e7782c4d961314d"
+        "sha256": "13e9f74fdeb6d0b0c083d4ec4bae3fd9"
       },
       {
         "file": "RETROVISORES/1275522114.png.cimg",
-        "sha256": "1b56d648636ce7fd14c18a0bc44d5dc0"
+        "sha256": "3d9229f1dd3f750a0a29941f9c76920f"
       },
       {
         "file": "RETROVISORES/1275522115.png.cimg",
-        "sha256": "0385962ef48aa8b5b687119f574b38eb"
+        "sha256": "ed54b3f3c25c7dea7ac314432541f440"
       },
       {
         "file": "RETROVISORES/1275522116.png.cimg",
-        "sha256": "fefc787fe30bb31375408ec57092be32"
+        "sha256": "d775a79193b8bd1e11469232ce27dafc"
       },
       {
         "file": "RETROVISORES/1275522117.png.cimg",
-        "sha256": "f01f3a306fce09935b97c19fe8f487e0"
+        "sha256": "d0de46e16984aeaaa53bb2cdbbef7204"
       },
       {
         "file": "RETROVISORES/1275522118.png.cimg",
-        "sha256": "5097e45648042aaec73f5d628b6f6aa8"
+        "sha256": "43fb5a4db0ab998cd04d22c90d6188a7"
       },
       {
         "file": "RETROVISORES/1275522119.png.cimg",
-        "sha256": "6b333d909894878e99a53275ca06fae9"
+        "sha256": "b45edf579d0d18356d41ade981da1b03"
       },
       {
         "file": "RETROVISORES/1275522120.png.cimg",
-        "sha256": "30ce6576fcd79ca8d3e8c8e4f08f8a69"
+        "sha256": "fcc8b2e124fead2c9f89583a31281ab3"
       },
       {
         "file": "RETROVISORES/1275522121.png.cimg",
-        "sha256": "8e8a7c63c192ee2c53dbb1da129f3d21"
+        "sha256": "44f910569f31ec38a0053a984d2a53a9"
       },
       {
         "file": "RETROVISORES/1275522122.png.cimg",
-        "sha256": "992d1ab55d02e9df3248030201e194f3"
+        "sha256": "f6a9fb5055c2bfca103e8dacc9703b60"
       },
       {
         "file": "RETROVISORES/1275522123.png.cimg",
-        "sha256": "a3e2ee022b75400887b319c442b3b2d5"
+        "sha256": "201d9aa23b2e6a589cd76e0d12f27210"
       },
       {
         "file": "RETROVISORES/1275522124.png.cimg",
-        "sha256": "4974c2641d9e67f477aa8e8056b87201"
+        "sha256": "08ab661d9044c87a608facfaa9a21f4e"
       },
       {
         "file": "RETROVISORES/1275522125.png.cimg",
-        "sha256": "20f4b85c1f07b6e76f7fcc78a9efaeff"
+        "sha256": "f7c1d1c041cbea8601d48527b6cffff6"
       },
       {
         "file": "RETROVISORES/1275522126.png.cimg",
-        "sha256": "7d52d5071f49453c8b7664a2c51ae1b7"
+        "sha256": "480292e563a797873e216c4dd86cf3e9"
       },
       {
         "file": "RETROVISORES/1275522127.png.cimg",
-        "sha256": "3ac72942a25943b9838707f539e45218"
+        "sha256": "4cea4c06e545595b460ab2c80fb6b7fa"
       },
       {
         "file": "RETROVISORES/1275522128.png.cimg",
-        "sha256": "cca00324faee58c89192a67ed602df84"
+        "sha256": "130864f1b401b240aa493756ee5dc4de"
       },
       {
         "file": "RETROVISORES/1275522129.png.cimg",
-        "sha256": "164ceaa5171f7bdb35f1f4c7902f5330"
+        "sha256": "85e57358b930c48793cf87e627b8ba77"
       },
       {
         "file": "RETROVISORES/1275522130.png.cimg",
-        "sha256": "d473c88b0f9a7e68c88c8d48e9607f77"
+        "sha256": "5ccbd17cf66a9ecf6ae7b1b388b2782d"
       },
       {
         "file": "RETROVISORES/ISAKA_RETROVISOR (2).png.cimg",
-        "sha256": "bce6e51b46eb8ba8a5a7c555b4f51d96"
+        "sha256": "9159ad61a4673afe8d3b11b02815ecfc"
       },
       {
         "file": "RETROVISORES/ISAKA_RETROVISOR.png.cimg",
-        "sha256": "fb2ec9476d446450de3da0e3d154899f"
+        "sha256": "0f742f7b3a42723785c3f60fb46cff32"
       },
       {
         "file": "RETROVISORES/RETROV_HILUX.png.cimg",
-        "sha256": "4dc571ae31a939864ec2504e0982b664"
+        "sha256": "e417d661abc3465bb04ad2a25b82859c"
       },
       {
         "file": "ROLAMENTOS/7175527343.png.cimg",
@@ -9212,14 +9190,6 @@
       {
         "file": "TAMPA DE VALVULA/8175520510.png.cimg",
         "sha256": "e129f72b0688f372e89cf5fe0c65cee7"
-      },
-      {
-        "file": "img-pt1.zip",
-        "sha256": "da5bf815ae71b004c08087fc62d5cddd"
-      },
-      {
-        "file": "img-pt2.zip",
-        "sha256": "4fa9500b9fe6feb3b516175f68fda480"
       }
     ]
   }
