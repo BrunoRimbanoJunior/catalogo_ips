@@ -45,6 +45,25 @@ const REG_DEFAULT = {
   email: "",
 };
 
+const GITHUB_REPO = "BrunoRimbanoJunior/catalogo_ips";
+const GITHUB_RELEASES_LATEST = `https://github.com/${GITHUB_REPO}/releases/latest`;
+const GITHUB_LATEST_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
+
+function normalizeVersionTag(raw = "") {
+  return String(raw || "").trim().replace(/^v/i, "");
+}
+
+async function fetchLatestRelease() {
+  const res = await fetch(GITHUB_LATEST_API, {
+    headers: { Accept: "application/vnd.github+json" },
+  });
+  if (!res.ok) throw new Error(`GitHub latest release failed: ${res.status}`);
+  const data = await res.json();
+  const version = normalizeVersionTag(data?.tag_name || data?.name || "");
+  const htmlUrl = data?.html_url || GITHUB_RELEASES_LATEST;
+  return { version, htmlUrl };
+}
+
 async function openExternal(path) {
   try {
     const opener = await import("@tauri-apps/plugin-opener");
@@ -234,20 +253,48 @@ function App() {
 
   // Tenta usar o updater nativo do Tauri: baixa e instala sem abrir link externo.
   useEffect(() => {
+    let cancelled = false;
     (async () => {
+      let localVersion = "0.0.0";
+      try {
+        localVersion = (await getAppVersion()) || "0.0.0";
+        if (!cancelled) setAppVersion(localVersion);
+      } catch (_) {
+        /* ignore */
+      }
       try {
         const updater = await import("@tauri-apps/plugin-updater");
         if (!updater?.check) return;
         const res = await updater.check();
         if (res?.available) {
-          updaterRef.current = res;
-          setUpdateInfo({ availableVersion: res.version, downloadUrl: null });
-          setUpdaterAvailable(true);
+          if (!cancelled) {
+            updaterRef.current = res;
+            setUpdateInfo({ availableVersion: res.version, downloadUrl: null, source: "tauri" });
+            setUpdateDismissed(false);
+            setUpdaterAvailable(true);
+          }
+          return;
         }
       } catch (_) {
         /* se falhar, mantemos o fluxo atual via link */
       }
+      try {
+        const latest = await fetchLatestRelease();
+        if (!latest?.version) return;
+        if (compareVersions(latest.version, localVersion) > 0) {
+          if (!cancelled) {
+            setUpdateInfo({ availableVersion: latest.version, downloadUrl: latest.htmlUrl, source: "github" });
+            setUpdateDismissed(false);
+            setUpdaterAvailable(false);
+          }
+        }
+      } catch (_) {
+        /* ignore */
+      }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -494,7 +541,7 @@ function App() {
       return;
     }
     // Fallback to opening the releases page if native updater is not available
-    const url = "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest";
+    const url = updateInfo?.downloadUrl || GITHUB_RELEASES_LATEST;
     openExternal(url).catch(() => window.open(url, "_blank", "noreferrer"));
   }
 
@@ -1163,7 +1210,7 @@ function App() {
                       </label>
                       <label className="auth-field">
                         Cidade
-                        <input value={form.city} onChange={(e) => setForm((s) => ({ ...s, city: e.target.value }))} placeholder="Curitiba" />
+                        <input value={form.city} onChange={(e) => setForm((s) => ({ ...s, city: e.target.value }))} placeholder="CIDADE" />
                       </label>
 
                       <div className="auth-row-compact">
