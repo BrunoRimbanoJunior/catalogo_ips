@@ -117,6 +117,9 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "github-actions"
+          # clean working tree before switching branches
+          git reset --hard
+          git clean -fd
           git fetch origin main
           git checkout main
           git checkout $GITHUB_SHA -- data/catalog.db
