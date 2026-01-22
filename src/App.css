@@ -283,6 +283,25 @@ button {
 .auth-success { margin-top: 10px; padding: 10px; background: #e8fff5; color: #0c6b3d; border: 1px solid #b1e5c8; border-radius: 8px; }
 .auth-error { margin-top: 10px; padding: 10px; background: #ffecec; color: #9a1b1b; border: 1px solid #f3bbbb; border-radius: 8px; }
 
+/* Configuracoes */
+.settings-wrap { position: relative; display: flex; align-items: center; }
+.settings-button { width: 40px; height: 40px; background: #0b4d91; color: #fff; border: 0; padding: 8px; border-radius: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.settings-button:hover { background: #093e76; }
+.settings-button svg { width: 20px; height: 20px; fill: currentColor; }
+.settings-menu { position: absolute; right: 0; top: calc(100% + 6px); background: #ffffff; border: 1px solid #e3e3e3; border-radius: 10px; box-shadow: 0 10px 24px rgba(0,0,0,0.18); display: flex; flex-direction: column; min-width: 200px; z-index: 12000; }
+.settings-menu button { width: 100%; text-align: left; padding: 10px 12px; background: transparent; border: 0; box-shadow: none; font-weight: 600; color: #111; }
+.settings-menu button:hover { background: #f2f6ff; }
+
+.config-backdrop { position: fixed; inset: 0; background: rgba(6,6,6,0.55); display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 21000; }
+.config-modal { background: #ffffff; border-radius: 12px; width: min(880px, 96vw); max-height: 90vh; overflow: auto; padding: 16px; box-shadow: 0 14px 36px rgba(0,0,0,0.35); color: #111; }
+.config-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #ececec; padding-bottom: 8px; margin-bottom: 10px; }
+.config-header h3 { margin: 0; }
+.config-close { border: 0; background: #f0f0f0; color: #111; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+.config-close:hover { background: #e4e4e4; }
+.privacy-body { text-align: left; font-size: 15px; color: #111; }
+.privacy-body p { margin: 8px 0; }
+.privacy-link { background: none; border: 0; padding: 0; color: #0b4d91; font-weight: 700; cursor: pointer; text-decoration: underline; }
+
 /* Responsive layout adjustments */
 @media (max-width: 900px) {
   .layout {

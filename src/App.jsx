@@ -75,7 +75,9 @@ async function fetchLatestRelease() {
 async function openExternal(path) {
   try {
     const opener = await import("@tauri-apps/plugin-opener");
-    if (opener?.openPath) return opener.openPath(path);
+    const isUrl = /^https?:\/\//i.test(String(path || ""));
+    if (isUrl && opener?.openUrl) return opener.openUrl(path);
+    if (!isUrl && opener?.openPath) return opener.openPath(path);
     if (opener?.openUrl) return opener.openUrl(path);
   } catch (_) {
     // fallback
@@ -85,18 +87,16 @@ async function openExternal(path) {
 }
 
 async function getPlatformInfo() {
-  try {
-    const os = await import("@tauri-apps/api/os");
-    const [platform, arch] = await Promise.all([os?.platform?.(), os?.arch?.()]);
-    return { platform, arch };
-  } catch (_) {
-    // fallback to user-agent
-  }
   const ua = navigator?.userAgent || "";
-  if (/Windows/i.test(ua)) return { platform: "windows", arch: null };
-  if (/Mac/i.test(ua)) return { platform: "macos", arch: null };
-  if (/Linux/i.test(ua)) return { platform: "linux", arch: null };
-  return { platform: "unknown", arch: null };
+  let platform = "unknown";
+  if (/Windows/i.test(ua)) platform = "windows";
+  else if (/Mac/i.test(ua)) platform = "macos";
+  else if (/Linux/i.test(ua)) platform = "linux";
+
+  let arch = null;
+  if (/arm64|aarch64/i.test(ua)) arch = "arm64";
+  if (/x86_64|win64|x64|amd64/i.test(ua)) arch = "x64";
+  return { platform, arch };
 }
 
 function normalizeAssetName(name = "") {
@@ -166,6 +166,7 @@ function App() {
   const cachedProfile = useMemo(() => safeParseProfile(localStorage.getItem("profile.cached")), []);
   const isDev = import.meta.env.MODE !== "production";
   const updaterRef = useRef(null);
+  const settingsRef = useRef(null);
 
   const [ready, setReady] = useState(false);
   const [dataDir, setDataDir] = useState("");
@@ -221,6 +222,9 @@ function App() {
   const [exportPath, setExportPath] = useState("");
   const [logoInput, setLogoInput] = useState("");
   const [bgInput, setBgInput] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const [profile, setProfile] = useState(cachedProfile);
   const [authLoading, setAuthLoading] = useState(true);
@@ -557,6 +561,17 @@ function App() {
       }
     })();
   }, [supabaseServiceConfigured]);
+
+  useEffect(() => {
+    if (!showSettings) return;
+    const handler = (event) => {
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setShowSettings(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showSettings]);
 
   useEffect(() => {
     const handler = (ev) => {
@@ -981,6 +996,35 @@ function App() {
               </button>
               {launchState.error ? <span className="launch-error">{launchState.error}</span> : null}
             </div>
+            <div className="settings-wrap" ref={settingsRef}>
+              <button className="settings-button" onClick={() => setShowSettings((s) => !s)} aria-label="Configuracoes">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M19.14 12.94a7.19 7.19 0 000-1.88l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.6-.22l-2.39.96a7.17 7.17 0 00-1.63-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54a7.17 7.17 0 00-1.63.94l-2.39-.96a.5.5 0 00-.6.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58a7.19 7.19 0 000 1.88L2.82 14.52a.5.5 0 00-.12.64l1.92 3.32a.5.5 0 00.6.22l2.39-.96c.5.38 1.05.7 1.63.94l.36 2.54a.5.5 0 00.5.42h3.84a.5.5 0 00.5-.42l.36-2.54c.58-.24 1.13-.56 1.63-.94l2.39.96a.5.5 0 00.6-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z" />
+                </svg>
+              </button>
+              {showSettings && (
+                <div className="settings-menu">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowProfileModal(true);
+                      setShowSettings(false);
+                    }}
+                  >
+                    Meu cadastro
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPrivacyModal(true);
+                      setShowSettings(false);
+                    }}
+                  >
+                    Politica de Privacidade
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         {isDev && (
@@ -1199,6 +1243,107 @@ function App() {
           </section>
         </div>
       </main>
+
+      {showProfileModal && (
+        <div className="config-backdrop" onClick={() => setShowProfileModal(false)}>
+          <div className="config-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="config-header">
+              <h3>Meu cadastro</h3>
+              <button className="config-close" onClick={() => setShowProfileModal(false)} aria-label="Fechar">
+                X
+              </button>
+            </div>
+            {supabaseConfigured ? (
+              <form className="auth-grid" onSubmit={submitRegistration}>
+                <div className="auth-radio">
+                  <label>
+                    <input type="radio" name="personTypeConfig" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa Juridica
+                  </label>
+                  <label>
+                    <input type="radio" name="personTypeConfig" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa Fisica
+                  </label>
+                </div>
+
+                <label className="auth-field wide">
+                  Nome/Razao Social
+                  <input value={form.full_name} onChange={(e) => setForm((s) => ({ ...s, full_name: e.target.value }))} placeholder="Nome completo ou razão social" />
+                </label>
+                <label className="auth-field wide">
+                  CPF/CNPJ
+                  <input value={form.cpf_cnpj} onChange={(e) => setForm((s) => ({ ...s, cpf_cnpj: e.target.value }))} placeholder="000.000.000-00" />
+                </label>
+
+                <label className="auth-field">
+                  Pais
+                  <input value={form.country} onChange={(e) => setForm((s) => ({ ...s, country: e.target.value }))} placeholder="Brasil" />
+                </label>
+                <label className="auth-field">
+                  Estado
+                  <input value={form.state} onChange={(e) => setForm((s) => ({ ...s, state: e.target.value }))} placeholder="UF" />
+                </label>
+                <label className="auth-field">
+                  Cidade
+                  <input value={form.city} onChange={(e) => setForm((s) => ({ ...s, city: e.target.value }))} placeholder="CIDADE" />
+                </label>
+
+                <div className="auth-row-compact">
+                  <label className="auth-field">
+                    DDD
+                    <input value={form.phone_area} onChange={(e) => setForm((s) => ({ ...s, phone_area: e.target.value }))} placeholder="41" />
+                  </label>
+                  <label className="auth-field">
+                    Telefone
+                    <input value={form.phone_number} onChange={(e) => setForm((s) => ({ ...s, phone_number: e.target.value }))} placeholder="999999999" />
+                  </label>
+                </div>
+
+                <label className="auth-field wide">
+                  E-mail
+                  <input type="email" value={form.email || registrationEmail} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} placeholder="usuario@empresa.com" />
+                </label>
+
+                <div className="auth-meta">
+                  <span>Codigo do cadastro: {profile?.id || "aguardando.."}</span>
+                  <span>Dispositivo vinculado: {profile?.device_fingerprint || fingerprint}</span>
+                </div>
+
+                <button type="submit" disabled={formSubmitting}>
+                  {formSubmitting ? "Salvando..." : "Salvar dados"}
+                </button>
+                {authSuccess && <div className="auth-success">{authSuccess}</div>}
+                {authError && <div className="auth-error">{authError}</div>}
+              </form>
+            ) : (
+              <div className="auth-alert">Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env antes de liberar o acesso.</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {showPrivacyModal && (
+        <div className="config-backdrop" onClick={() => setShowPrivacyModal(false)}>
+          <div className="config-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="config-header">
+              <h3>Politica de Privacidade / LGPD</h3>
+              <button className="config-close" onClick={() => setShowPrivacyModal(false)} aria-label="Fechar">
+                X
+              </button>
+            </div>
+            <div className="privacy-body">
+              <p>Para continuar utilizando esse Catálogo é necessário concordar com a Politica de Privacidade.</p>
+              <p>Você já se cadastrou nesse Catálogo e pode consultar, alterar ou excluir o seu Cadastro a qualquer momento, através do botão Configurações.</p>
+              <p>Informamos que coletamos dados ref. à utilização do catálogo para fins estatísticos e melhoria desse produto.</p>
+              <p>
+                Para saber mais, verifique a nossa{" "}
+                <button className="privacy-link" onClick={() => openExternal("https://github.com/BrunoRimbanoJunior/catalogo_ips/wiki")}>
+                  Politica de Privacidade
+                </button>
+                .
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {imageModal.open && selectedImages.length > 0 && (
         <div className="modal-backdrop" onClick={() => setImageModal({ open: false, index: 0 })}>
