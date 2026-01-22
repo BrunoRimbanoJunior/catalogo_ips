@@ -1335,7 +1335,7 @@ function App() {
               <p>Informamos que coletamos dados ref. à utilização do catálogo para fins estatísticos e melhoria desse produto.</p>
               <p>
                 Para saber mais, verifique a nossa{" "}
-                <button className="privacy-link" onClick={() => openExternal("https://github.com/BrunoRimbanoJunior/catalogo_ips/wiki")}>
+                <button className="privacy-link" onClick={() => openExternal("http://ipsbrasil.com.br/politica_privacidade/")}>
                   Politica de Privacidade
                 </button>
                 .
