@@ -1,4 +1,6 @@
 {
+  "appVersion": "1.4.4",
+  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.4.4/catalogo_ips_1.4.4_x64-setup.exe",
   "db": {
     "version": 1764014368,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
@@ -2365,11 +2367,11 @@
       },
       {
         "file": "CAIXA_DIRECAO/7134436001.png.cimg",
-        "sha256": "1762c81a033ed261d1640e1ab8e61ce9"
+        "sha256": "dc378118e3171afee1b66a2d16b13dc8"
       },
       {
         "file": "CAIXA_DIRECAO/7134446001.png.cimg",
-        "sha256": "e1171c55af7c712790f4491b07d07d66"
+        "sha256": "912870ab45d7848862a0bb24003cad17"
       },
       {
         "file": "CAIXA_DIRECAO/7134455911.png.cimg",
@@ -2585,7 +2587,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7144036010.png.cimg",
-        "sha256": "38147d48743ade1c3efbccc7789153d5"
+        "sha256": "d740aafaa6f967910666090242c86c5d"
       },
       {
         "file": "CAIXA_DIRECAO/7144216010-1.png.cimg",
@@ -2701,11 +2703,11 @@
       },
       {
         "file": "CAIXA_DIRECAO/7146675910.png.cimg",
-        "sha256": "ef84f6b80d03c5fb95c718ff05110db8"
+        "sha256": "8f48c65b984fc70bb321b629d1364a8c"
       },
       {
         "file": "CAIXA_DIRECAO/7146685910.png.cimg",
-        "sha256": "149d609c750a8aa10c62a63d486edd20"
+        "sha256": "28d66c7cd7b4361d4cabdbab5ea2be4a"
       },
       {
         "file": "CAIXA_DIRECAO/7146905900-1.png.cimg",
@@ -2841,7 +2843,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7150616001.png.cimg",
-        "sha256": "d79c4b4b1156599af8a044d205e57e5f"
+        "sha256": "21aaace6eab0eca38c7839731e84af59"
       },
       {
         "file": "CAIXA_DIRECAO/7150616010.png.cimg",
@@ -2870,6 +2872,10 @@
       {
         "file": "CAIXA_DIRECAO/7150685900.png.cimg",
         "sha256": "61d05494661495bf569178fb971cee5e"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7150686001.png.cimg",
+        "sha256": "311bbcc254cf85393a1107af2157bb40"
       },
       {
         "file": "CAIXA_DIRECAO/7150816010.png.cimg",
