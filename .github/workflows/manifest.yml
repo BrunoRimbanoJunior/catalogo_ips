@@ -65,7 +65,7 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             APP_VERSION="${GITHUB_REF_NAME#v}"
             echo "app_version=${APP_VERSION}" >> $GITHUB_OUTPUT
-            echo "download_url=https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/catalogo_ips_${APP_VERSION}_x64-setup.exe" >> $GITHUB_OUTPUT
+            echo "download_url=https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/catalogo_ips_x64-setup.exe" >> $GITHUB_OUTPUT
           else
             echo "app_version=" >> $GITHUB_OUTPUT
             echo "download_url=" >> $GITHUB_OUTPUT

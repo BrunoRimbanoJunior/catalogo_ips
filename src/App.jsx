@@ -61,7 +61,15 @@ async function fetchLatestRelease() {
   const data = await res.json();
   const version = normalizeVersionTag(data?.tag_name || data?.name || "");
   const htmlUrl = data?.html_url || GITHUB_RELEASES_LATEST;
-  return { version, htmlUrl };
+  const assets = Array.isArray(data?.assets)
+    ? data.assets
+        .map((asset) => ({
+          name: asset?.name || "",
+          url: asset?.browser_download_url || "",
+        }))
+        .filter((asset) => asset.name && asset.url)
+    : [];
+  return { version, htmlUrl, assets };
 }
 
 async function openExternal(path) {
@@ -74,6 +82,64 @@ async function openExternal(path) {
   }
   window.open(path, "_blank");
   return undefined;
+}
+
+async function getPlatformInfo() {
+  try {
+    const os = await import("@tauri-apps/api/os");
+    const [platform, arch] = await Promise.all([os?.platform?.(), os?.arch?.()]);
+    return { platform, arch };
+  } catch (_) {
+    // fallback to user-agent
+  }
+  const ua = navigator?.userAgent || "";
+  if (/Windows/i.test(ua)) return { platform: "windows", arch: null };
+  if (/Mac/i.test(ua)) return { platform: "macos", arch: null };
+  if (/Linux/i.test(ua)) return { platform: "linux", arch: null };
+  return { platform: "unknown", arch: null };
+}
+
+function normalizeAssetName(name = "") {
+  return String(name).toLowerCase();
+}
+
+function assetMatchesArch(name, arch) {
+  if (!arch) return true;
+  const n = normalizeAssetName(name);
+  if (arch === "x86_64" || arch === "x64" || arch === "amd64") {
+    return n.includes("x64") || n.includes("x86_64") || n.includes("amd64");
+  }
+  if (arch === "aarch64" || arch === "arm64") {
+    return n.includes("arm64") || n.includes("aarch64");
+  }
+  return true;
+}
+
+function pickAssetForPlatform(assets, platform, arch) {
+  if (!Array.isArray(assets) || assets.length === 0) return null;
+  const scored = assets
+    .map((asset) => {
+      const name = normalizeAssetName(asset.name);
+      let score = 0;
+      if (platform === "windows") {
+        if (name.endsWith("-setup.exe")) score += 40;
+        if (name.endsWith(".msi")) score += 30;
+        if (name.endsWith(".exe")) score += 20;
+      } else if (platform === "macos") {
+        if (name.endsWith(".dmg")) score += 40;
+        if (name.endsWith(".app.tar.gz")) score += 30;
+        if (name.endsWith(".app.zip")) score += 20;
+      } else if (platform === "linux") {
+        if (name.endsWith(".appimage")) score += 40;
+        if (name.endsWith(".deb")) score += 30;
+        if (name.endsWith(".rpm")) score += 20;
+      }
+      if (assetMatchesArch(name, arch)) score += 10;
+      return { asset, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+  return scored[0]?.asset?.url || null;
 }
 
 function useFingerprint() {
@@ -282,8 +348,15 @@ function App() {
         const latest = await fetchLatestRelease();
         if (!latest?.version) return;
         if (compareVersions(latest.version, localVersion) > 0) {
+          const platformInfo = await getPlatformInfo();
+          const downloadUrl = pickAssetForPlatform(latest.assets, platformInfo.platform, platformInfo.arch) || latest.htmlUrl;
           if (!cancelled) {
-            setUpdateInfo({ availableVersion: latest.version, downloadUrl: latest.htmlUrl, source: "github" });
+            setUpdateInfo({
+              availableVersion: latest.version,
+              downloadUrl,
+              source: "github",
+              downloadKind: downloadUrl === latest.htmlUrl ? "page" : "direct",
+            });
             setUpdateDismissed(false);
             setUpdaterAvailable(false);
           }
@@ -540,7 +613,7 @@ function App() {
       }
       return;
     }
-    // Fallback to opening the releases page if native updater is not available
+    // Fallback to downloading the correct installer when the native updater is not available
     const url = updateInfo?.downloadUrl || GITHUB_RELEASES_LATEST;
     openExternal(url).catch(() => window.open(url, "_blank", "noreferrer"));
   }
@@ -884,7 +957,7 @@ function App() {
                   Nova versao disponivel: {updateInfo.availableVersion} (atual {appVersion})
                 </span>
                 <button className="launch-button" style={{ padding: "6px 10px" }} onClick={(e) => handleUpdateClick(e)}>
-                  {updaterAvailable ? "Atualizar agora" : "Ver no GitHub"}
+                  {updaterAvailable ? "Atualizar agora" : updateInfo?.downloadKind === "direct" ? "Baixar atualizacao" : "Ver no GitHub"}
                 </button>
                 <button className="ghost" onClick={() => setUpdateDismissed(true)}>
                   Fechar

@@ -9,7 +9,7 @@ App desktop (Tauri + React) para consulta de peças com sincronização de banco
 
 ## Instalação do cliente
 - Baixar na aba Releases do GitHub (tags `v*`).
-- **Windows**: `catalogo_ips_*_x64-setup.exe` (instalador) ou `.msi`. Basta executar. Se o SmartScreen avisar, clique em “Mais informações” > “Executar assim mesmo”.
+- **Windows**: `catalogo_ips_x64-setup.exe` (instalador estável) ou `catalogo_ips_*_x64-setup.exe`/`.msi`. Basta executar. Se o SmartScreen avisar, clique em “Mais informações” > “Executar assim mesmo”.
 - **macOS**: `catalogo_ips_*_aarch64.dmg` (Apple Silicon) ou `x64.dmg` (Intel). Abra o `.dmg`, arraste para Aplicativos; se o Gatekeeper bloquear, vá em Preferências > Segurança > “Abrir mesmo assim”.
 - **Linux**: `catalogo_ips_*_app.tar.gz` (AppImage). Dê permissão de execução (`chmod +x catalogo_ips_*.AppImage`) e rode; dependendo da distro, pode exigir libs GTK/webkit (já empacotadas na maioria das distros). Se usar installer `.deb/.rpm` quando disponível, instale com o gerenciador de pacotes.
 - Manifest padrão do app: `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/manifest.json`.

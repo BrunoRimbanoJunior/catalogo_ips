@@ -123,7 +123,7 @@ async function main() {
   const files = objects.map(o => ({ file: o.key, sha256: o.etag || null }));
   const computedDownload =
     appDownloadUrl ||
-    (appVersion ? `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v${appVersion}/catalogo_ips_${appVersion}_x64-setup.exe` : null);
+    (appVersion ? `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v${appVersion}/catalogo_ips_x64-setup.exe` : null);
   const manifest = {
     appVersion: appVersion || undefined,
     appDownloadUrl: computedDownload || undefined,
