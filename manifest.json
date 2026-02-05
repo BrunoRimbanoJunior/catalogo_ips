@@ -1,10 +1,8 @@
 {
-  "appVersion": "1.4.4",
-  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.4.4/catalogo_ips_1.4.4_x64-setup.exe",
   "db": {
-    "version": 1764014368,
+    "version": 1764014374,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "a91fd41ba340cdad34efc7af1fc1e08dbfd71f5be919d78b51bfec5fd2824222"
+    "sha256": "95128d8ff02005f7913b5b98530f8fceafb5b941691980d8edbd1d0467437dad"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -1362,6 +1360,14 @@
         "sha256": "e1f924bd5a3d8242a3b3f46c2a24eb50"
       },
       {
+        "file": "BANDEJAS/7146513001.png.cimg",
+        "sha256": "ce6931d09f2ad9370428274932d0165a"
+      },
+      {
+        "file": "BANDEJAS/7146513002.png.cimg",
+        "sha256": "5e719458638191ac5498c374c244ff3f"
+      },
+      {
         "file": "BANDEJAS/7150363001.png.cimg",
         "sha256": "22aaf0dfc9d2d1858dc8c08246783c20"
       },
@@ -1704,6 +1710,14 @@
       {
         "file": "BANDEJAS/7175263042.png.png.cimg",
         "sha256": "c44472de4887813329cca33ef7344060"
+      },
+      {
+        "file": "BANDEJAS/7175273001.png.cimg",
+        "sha256": "929fd720f430a3dcbab839de08f53a0b"
+      },
+      {
+        "file": "BANDEJAS/7175273002.png.cimg",
+        "sha256": "a88f816725dbe5306b1cccc0251cab27"
       },
       {
         "file": "BANDEJAS/7175523031.png.png.cimg",
@@ -2144,6 +2158,22 @@
       {
         "file": "BOMBAS/8175520510.png.cimg",
         "sha256": "188d82f511fc795c68d2dd05ef035a2c"
+      },
+      {
+        "file": "CAIXA_DIRECAO/6169382231.png.cimg",
+        "sha256": "61c224acc128d124a488a9518be99623"
+      },
+      {
+        "file": "CAIXA_DIRECAO/6169382232.png.cimg",
+        "sha256": "060f621938d0944a47148c7cdf8224ff"
+      },
+      {
+        "file": "CAIXA_DIRECAO/6169382233.png.cimg",
+        "sha256": "9b4826b510e483c1b601b49c6b569b60"
+      },
+      {
+        "file": "CAIXA_DIRECAO/6169382234.png.cimg",
+        "sha256": "973db7e667d1cb821fd4ca52349a651c"
       },
       {
         "file": "CAIXA_DIRECAO/7111046010.png.cimg",
@@ -3770,6 +3800,26 @@
         "sha256": "eebd56b44beb9589db15657f5a47b855"
       },
       {
+        "file": "FAROIS/6111042303.png.cimg",
+        "sha256": "6d07cadc9fa64d4697f19331bf355e63"
+      },
+      {
+        "file": "FAROIS/6111042304.png.cimg",
+        "sha256": "173385a0708a19c54f59aba31686b3f8"
+      },
+      {
+        "file": "FAROIS/6111042335.png.cimg",
+        "sha256": "ee4b58cf56fc64a7349f7bbdd350c365"
+      },
+      {
+        "file": "FAROIS/6111412303.png.cimg",
+        "sha256": "e6bd2f6f1ea48226d2ed836d9a961d17"
+      },
+      {
+        "file": "FAROIS/6111412304.png.cimg",
+        "sha256": "9501d31881fdb66ad00262b550e70d03"
+      },
+      {
         "file": "FAROIS/6111822241-1.JPG.cimg",
         "sha256": "5b11db924c0b61a4d1ee4a5b8c301334"
       },
@@ -3779,7 +3829,7 @@
       },
       {
         "file": "FAROIS/6111822241.png.cimg",
-        "sha256": "1846d37edca3b1ebfd80930508f431cf"
+        "sha256": "44bc168fe6595b162ced86cb0126f133"
       },
       {
         "file": "FAROIS/6111822242-1.JPG.cimg",
@@ -3791,7 +3841,7 @@
       },
       {
         "file": "FAROIS/6111822242.png.cimg",
-        "sha256": "8c52b39894840ab9ea535f85f963fdc3"
+        "sha256": "8605245193faa5f54bd19f70095a4490"
       },
       {
         "file": "FAROIS/6111822243 - Copia.JPG.cimg",
@@ -3807,7 +3857,7 @@
       },
       {
         "file": "FAROIS/6111822243.png.cimg",
-        "sha256": "75cff8037c9e780bb2671ab49db3187b"
+        "sha256": "7589ab57e302fc725714bb91513ab3fa"
       },
       {
         "file": "FAROIS/6111822244-1.JPG.cimg",
@@ -3819,7 +3869,7 @@
       },
       {
         "file": "FAROIS/6111822244.png.cimg",
-        "sha256": "57e686def4c2ae379e4496a2a7cd7a93"
+        "sha256": "63c8851a84e8c88bebc3d18822f62cf2"
       },
       {
         "file": "FAROIS/6111822245-1.JPG.cimg",
@@ -3831,7 +3881,7 @@
       },
       {
         "file": "FAROIS/6111822245.png.cimg",
-        "sha256": "971b8359acd81b32111f0a3605e22461"
+        "sha256": "e1a4602bc133ae7c1b77a9da890e3d57"
       },
       {
         "file": "FAROIS/6111822246-1.JPG.cimg",
@@ -3851,7 +3901,7 @@
       },
       {
         "file": "FAROIS/6111822251.png.cimg",
-        "sha256": "c2d1a20f727fcc4edec1b5f8cade1af3"
+        "sha256": "9aa765be1c3bb96f6d3dcfd55e0d03f3"
       },
       {
         "file": "FAROIS/6111822252-1.JPG.cimg",
@@ -3863,7 +3913,7 @@
       },
       {
         "file": "FAROIS/6111822252.png.cimg",
-        "sha256": "e0466b10610362a18f818109613ff99f"
+        "sha256": "4495786ae501ef727787e3720246041d"
       },
       {
         "file": "FAROIS/6111822253-1.JPG.cimg",
@@ -3883,7 +3933,7 @@
       },
       {
         "file": "FAROIS/6111822253.png.cimg",
-        "sha256": "c925048da7e7c059e78737972e6b3db9"
+        "sha256": "a058dc72d742bc7879ff23da197da3e3"
       },
       {
         "file": "FAROIS/6111822254-1.JPG.cimg",
@@ -3903,115 +3953,151 @@
       },
       {
         "file": "FAROIS/6111822254.png.cimg",
-        "sha256": "aae006840fbbe7df35c2e94347b18c9c"
+        "sha256": "923851a6fa4f0a0a33d736cfedb08621"
       },
       {
         "file": "FAROIS/6111822341.png.cimg",
-        "sha256": "38a40b632f32d685805d5b6389262d5a"
+        "sha256": "190531b8c1124ef71209d14a659cde98"
       },
       {
         "file": "FAROIS/6111822342.png.cimg",
-        "sha256": "7b52ba3c67883b1ffc1a8587482dd8ef"
+        "sha256": "2f5654e4df306c7264bdcaf3c7e6b89b"
       },
       {
         "file": "FAROIS/6111822343.png.cimg",
-        "sha256": "5d2975d40d0d0babaffe74f511cc0da9"
+        "sha256": "3ff6d1ab3d4a40a62a22dfe7d7407ed7"
       },
       {
         "file": "FAROIS/6111822344.png.cimg",
-        "sha256": "0fd9617d6580d35242cb10494da9182f"
+        "sha256": "514232476fa783746b80a12aa6c8f64a"
       },
       {
         "file": "FAROIS/6115802251.png.cimg",
-        "sha256": "340081ca049702d935d31dab6c808419"
+        "sha256": "9a68a88f608d60509f5d89d2ba33d60c"
       },
       {
         "file": "FAROIS/6115802252.png.cimg",
-        "sha256": "7ac96fc6a03555c06c5f250287ff7c8c"
+        "sha256": "560ef7d0fa4ff5e9aad9483de4d412c0"
       },
       {
         "file": "FAROIS/6149802221.png.cimg",
-        "sha256": "0ea9bcda724d0daa75744aa872265f2a"
+        "sha256": "848ee1daced11d6a58cf3add076286e5"
       },
       {
         "file": "FAROIS/6149802222.png.cimg",
-        "sha256": "9053b6d8a052715f3d0adef409dcf8d8"
+        "sha256": "190ca685b9620522d23aa40e08f4e422"
       },
       {
         "file": "FAROIS/6169382211.png.cimg",
-        "sha256": "1168a27078f5569e6ad61d6d9ffb6937"
+        "sha256": "55eeb9da19b1a34c2d512c0df7bcd5df"
       },
       {
         "file": "FAROIS/6169382212.png.cimg",
-        "sha256": "1041188169e5da4544166ef266c26d98"
+        "sha256": "676749a290680136e9ca61a094106cfc"
       },
       {
         "file": "FAROIS/6169382213.png.cimg",
-        "sha256": "83e12951f3d42dea652ccd901899ddab"
+        "sha256": "5da87e6197d97e9ec6263ddd6f3397c4"
       },
       {
         "file": "FAROIS/6169382214.png.cimg",
-        "sha256": "f9ddc59b9db06c664ca6025c32bf4c92"
+        "sha256": "9a537db7cc4c223c6ce3febd7c4fbedc"
       },
       {
         "file": "FAROIS/6169382221.png.cimg",
-        "sha256": "984b4213fbf57c9b920ef61955b32687"
+        "sha256": "af94a58535793e08378f987b62b626d9"
       },
       {
         "file": "FAROIS/6169382222.png.cimg",
-        "sha256": "54cb904e26bf5c4b6c9ebbee8736e193"
+        "sha256": "af382e22c6f289783151b08021e2bcc7"
       },
       {
         "file": "FAROIS/6169382223.png.cimg",
-        "sha256": "fe73192e85d86049b28f6d866cb4f0bf"
+        "sha256": "7089569080133f1cfe33903a3bdd0769"
       },
       {
         "file": "FAROIS/6169382224.png.cimg",
-        "sha256": "afce260f0a20642d5b7e1bfbba3b7080"
+        "sha256": "62008521c8d9a1f477cbc6f0b58773e2"
+      },
+      {
+        "file": "FAROIS/6169382231.png.cimg",
+        "sha256": "acdef5e715cea56392ac247019beee22"
+      },
+      {
+        "file": "FAROIS/6169382232.png.cimg",
+        "sha256": "d53cacbfb1afb3ba210acc5c3d29d219"
+      },
+      {
+        "file": "FAROIS/6169382233.png.cimg",
+        "sha256": "3b3bfdaf53ffe90ba9b0fc396814dbac"
+      },
+      {
+        "file": "FAROIS/6169382234.png.cimg",
+        "sha256": "da7e7efc21ebe303cd5c31fd7bd6c384"
+      },
+      {
+        "file": "FAROIS/6169382301.png.cimg",
+        "sha256": "06420e7bb1ae4e4564a290c0744360ae"
+      },
+      {
+        "file": "FAROIS/6169382302.png.cimg",
+        "sha256": "ab1a4243ea6cc8c3bce4d1df14ccef12"
+      },
+      {
+        "file": "FAROIS/6169382311.png.cimg",
+        "sha256": "219d00c7bf7ccbebe85609951e630ac3"
+      },
+      {
+        "file": "FAROIS/6169382312.png.cimg",
+        "sha256": "a8768889119812545a16a842330c4137"
       },
       {
         "file": "FAROIS/6169382321.png.cimg",
-        "sha256": "8969a2521d46a9b3b3dd5d2a8c483b3a"
+        "sha256": "9931d9c4da2848739dd233c019bf631d"
       },
       {
         "file": "FAROIS/6169382322.png.cimg",
-        "sha256": "ae4db5fd09f89f7f4e65d08505d57f73"
+        "sha256": "f1286e6bb7dcd611d3c55dc315af8fc4"
       },
       {
         "file": "FAROIS/6169382323.png.cimg",
-        "sha256": "c64ae34c9940279651918b4fbbff85d7"
+        "sha256": "4d110db197e41278b0522b262cd5a33f"
       },
       {
         "file": "FAROIS/6169382324.png.cimg",
-        "sha256": "c4d3f1cae86ca729970158e90f6cd52e"
+        "sha256": "ae87be398abb8053c8319eeb829d4e10"
       },
       {
         "file": "FAROIS/6170202241.png.cimg",
-        "sha256": "15f3b551591aa77a9956ac1402badbf3"
+        "sha256": "92a9d5a966d89818c2b6079ee0d9c8b8"
       },
       {
         "file": "FAROIS/6170202242.png.cimg",
-        "sha256": "fd10522f69b9b1d80bd3838605257a36"
+        "sha256": "8ae996caa320508e62a8adba906babef"
       },
       {
         "file": "FAROIS/6170202331.png.cimg",
-        "sha256": "2e7a799804139b92a5078c875d943881"
+        "sha256": "6fc9416033043ac29a92e9cd7fd7a1cc"
       },
       {
         "file": "FAROIS/6170202332.png.cimg",
-        "sha256": "b7c80cd2e06fe24f866e31bf7d68ca01"
+        "sha256": "2e2fc95703de87a5dc6a5354965f3842"
       },
       {
         "file": "FAROIS/6170202333.png.cimg",
-        "sha256": "c283b259c8e48d8b0e52385c09b84b95"
+        "sha256": "b8cded02c00fa11f5883187b4be392c0"
       },
       {
         "file": "FAROIS/6170202334.png.cimg",
-        "sha256": "bb3f0ff94d56fc01db3b8b313b6d1ea5"
+        "sha256": "d3f76a854794b999d20656231e44f426"
       },
       {
         "file": "FAROIS/6170422211.JPG.cimg",
         "sha256": "e410eda5554a91715ea9b53e2f8d0bce"
+      },
+      {
+        "file": "FAROIS/6170422211.png.cimg",
+        "sha256": "155a9ef65fd5e317483c5677b2bd95b0"
       },
       {
         "file": "FAROIS/6170422211_2.jpg.cimg",
@@ -4022,8 +4108,16 @@
         "sha256": "1595ec3f0e6ff3ca50754700e56ad3b9"
       },
       {
+        "file": "FAROIS/6170422212.png.cimg",
+        "sha256": "de0a40aa3b71c2f2d45c7c67e5b6c20c"
+      },
+      {
         "file": "FAROIS/6170422213.jpg.cimg",
         "sha256": "d7952e8d637699b4909f27530ebb56a4"
+      },
+      {
+        "file": "FAROIS/6170422213.png.cimg",
+        "sha256": "fae353e5f014269b2c07ae785f4c342c"
       },
       {
         "file": "FAROIS/6170422213_2.jpg.cimg",
@@ -4034,40 +4128,64 @@
         "sha256": "d3e93d96190b4d31955f17962e8f4b53"
       },
       {
+        "file": "FAROIS/6170422214.png.cimg",
+        "sha256": "63539e5bed419d8502ada2828fe0d7e2"
+      },
+      {
+        "file": "FAROIS/6170422301.png.cimg",
+        "sha256": "b79af1f9ae4e99930d0e26431e1b67bf"
+      },
+      {
+        "file": "FAROIS/6170422302.png.cimg",
+        "sha256": "101c09f3fd5e93bb960c1b8e73e3107a"
+      },
+      {
+        "file": "FAROIS/6170422313.png.cimg",
+        "sha256": "a5c327bc510b29bd410e9c6cafadbfeb"
+      },
+      {
+        "file": "FAROIS/6170422314.png.cimg",
+        "sha256": "40f240192b7ee3fa050e7638c6c9c40b"
+      },
+      {
         "file": "FAROIS/6170502201.png.cimg",
-        "sha256": "00e970d18900c71784c16caf4422de1b"
+        "sha256": "31021167e6efc2770538472805b9cd1c"
       },
       {
         "file": "FAROIS/6170502202.png.cimg",
-        "sha256": "f1f0f956cc5e753966cf31e255eb8ded"
+        "sha256": "6a2868fc9bdc9253eef6cac03b5608fe"
       },
       {
         "file": "FAROIS/6170502203.png.cimg",
-        "sha256": "cede555bc0ceb3845e97520f713bc9d7"
+        "sha256": "467a4e0669594c5e0343a8810655b77a"
       },
       {
         "file": "FAROIS/6170502204.png.cimg",
-        "sha256": "e18b8e1e379a1632bc83f70aa62f910a"
+        "sha256": "5df6bbb5f3127ec895704b4d9aeda269"
       },
       {
         "file": "FAROIS/6170602321.png.cimg",
-        "sha256": "102ff429ded353deda71025fdf4d7907"
+        "sha256": "c58cf559691eeedde6a3591a993a27ce"
       },
       {
         "file": "FAROIS/6170602322.png.cimg",
-        "sha256": "3133c323eb0e9f590c46f315e8b066c2"
+        "sha256": "6ca194d588cdb3797ae8379f0f32deb9"
       },
       {
         "file": "FAROIS/6170602331.png.cimg",
-        "sha256": "468d8021b2bfe03c5a9a2f60bd10db17"
+        "sha256": "30e32285200dff6395230952692d05ff"
       },
       {
         "file": "FAROIS/6170602332.png.cimg",
-        "sha256": "6acd94675b859c535f2e8d39572388af"
+        "sha256": "e6222a084b9db8f96cf2fea3e20cdbba"
       },
       {
         "file": "FAROIS/6170862201.JPG.cimg",
         "sha256": "5b9afd8fdcbfa1171b8b8070d45480c8"
+      },
+      {
+        "file": "FAROIS/6170862201.png.cimg",
+        "sha256": "4af4f0b1dbd5391873ac4f585f47aae5"
       },
       {
         "file": "FAROIS/6170862201_1.JPG.cimg",
@@ -4078,132 +4196,152 @@
         "sha256": "d5796a28eb055ef5008bcbbb218d3d6e"
       },
       {
+        "file": "FAROIS/6170862202.png.cimg",
+        "sha256": "2542a54df520167c381bd68c66a9e908"
+      },
+      {
+        "file": "FAROIS/6170862311.png.cimg",
+        "sha256": "556535d448502c6b45d3310b86c97102"
+      },
+      {
+        "file": "FAROIS/6170862312.png.cimg",
+        "sha256": "9dbf1a7c821b4c509d272d083f55e967"
+      },
+      {
         "file": "FAROIS/6170862321.png.cimg",
-        "sha256": "2fd7a489b07344098defdfdb7de13a39"
+        "sha256": "75fe66eaa96cde736b0948cef06dfd37"
       },
       {
         "file": "FAROIS/6170862322.png.cimg",
-        "sha256": "e43abc39ad3ebcee3e69f713b6e242e2"
+        "sha256": "e7662e3e5465191968fdb76943297bd3"
       },
       {
         "file": "FAROIS/6175272201.png.cimg",
-        "sha256": "1e2793879b26d66c3c4bf26897698c41"
+        "sha256": "9b12e976bdc9a83a9d31b33a0a6fa630"
       },
       {
         "file": "FAROIS/6175272202.png.cimg",
-        "sha256": "5d0b9872ccb461b1bbfecfb26ed17f72"
+        "sha256": "ee5a180f984c504d0e23934bb9fb4f96"
       },
       {
         "file": "FAROIS/6175272203.png.cimg",
-        "sha256": "3983c4f147e094cd9a88634c3fe71d01"
+        "sha256": "b9c7b8549e667885834ae3cc6ac58fde"
       },
       {
         "file": "FAROIS/6175272204.png.cimg",
-        "sha256": "3911bb1a6e3a647c030c5ebb7ba1b8ea"
+        "sha256": "b0e2e14e6f9aae5b6c43ed6bedc9dd71"
       },
       {
         "file": "FAROIS/6175272205.png.cimg",
-        "sha256": "828214aabf8451cf5b918d9160fbc4d3"
+        "sha256": "c0cae98f8ff239f54b973e29c0bbcd0f"
       },
       {
         "file": "FAROIS/6175272206.png.cimg",
-        "sha256": "a84acf30cd1b7058c4813995234a15de"
+        "sha256": "1c7762e694f94ef9fd1c810b7c4de8f3"
       },
       {
         "file": "FAROIS/6175522251.png.cimg",
-        "sha256": "7267a9f0f9ddd7cdc283d6488b47061f"
+        "sha256": "18d7cac7fe55f5fc7063a1ba193f0d3a"
       },
       {
         "file": "FAROIS/6175522252.png.cimg",
-        "sha256": "d5098e207fb92407911607067f96dd01"
+        "sha256": "f0a85a0207a32d1e6c84d30b69295898"
       },
       {
         "file": "FAROIS/6175522261.png.cimg",
-        "sha256": "005bf658f96fa8fd185e96ada022478d"
+        "sha256": "d1bda2679fce61ec0a37e6f0d75cef97"
       },
       {
         "file": "FAROIS/6175522262.png.cimg",
-        "sha256": "35f353a1accd3d93df43a7471c8b3a50"
+        "sha256": "5ba32ca6371261097715336170bee202"
       },
       {
         "file": "FAROIS/6175522271.png.cimg",
-        "sha256": "3e81b8466a0daff43ca7afc57a7b95f7"
+        "sha256": "432a45eec0ef0f8d9b2bbfcee78ffcd0"
       },
       {
         "file": "FAROIS/6175522272.png.cimg",
-        "sha256": "7f0267f10830400fce183effbc7cee94"
+        "sha256": "88d6768a45e920e5890d939c1f2de90e"
       },
       {
         "file": "FAROIS/6175522281.png.cimg",
-        "sha256": "b8883ee57bc82f1c628b35802c5e4bc5"
+        "sha256": "d30a319f02e66e77b00dd41011606b71"
       },
       {
         "file": "FAROIS/6175522282.png.cimg",
-        "sha256": "d9927a1bb2c9d6533915aaffcf9e596a"
+        "sha256": "19021e2f56ef3f2905aae98ff8cab8c1"
       },
       {
         "file": "FAROIS/6175522283.png.cimg",
-        "sha256": "ee2e2823190fbc36a79c2f4cf460f898"
+        "sha256": "721d06f1ac1079a127961072f4e70167"
       },
       {
         "file": "FAROIS/6175522284.png.cimg",
-        "sha256": "af50bd3466a5c3a3e8fa1cb41064827e"
+        "sha256": "fc3136a6e16bbbafad10431413eeac88"
+      },
+      {
+        "file": "FAROIS/6175522361.png.cimg",
+        "sha256": "386750e221360beaf7a5ac4967f190ec"
+      },
+      {
+        "file": "FAROIS/6175522362.png.cimg",
+        "sha256": "eec94a9ac214542f0f79aeeef6eecd1b"
       },
       {
         "file": "FAROIS/6175522381.png.cimg",
-        "sha256": "82240796e6373c396dddba93676c2934"
+        "sha256": "fc2b6a40a41312efae210dad00bbab8c"
       },
       {
         "file": "FAROIS/6175522382.png.cimg",
-        "sha256": "22c0be8dff00ca2d3a3be3fb74387002"
+        "sha256": "57efe7abe11d0b654c0b18d31f71209e"
       },
       {
         "file": "FAROIS/6175522383.png.cimg",
-        "sha256": "b8e24bce7add56e4ba618db628f6d46b"
+        "sha256": "865daeb4927f08ec942e95e0e5cc0997"
       },
       {
         "file": "FAROIS/6175522384.png.cimg",
-        "sha256": "05036582ed53491d43414d6015ad5c98"
+        "sha256": "120f2bf5de4f8ec4eab8bc29c1254d3b"
       },
       {
         "file": "FAROIS/6175852201.png.cimg",
-        "sha256": "0fab17652c87ca01ce32537d83d81b02"
+        "sha256": "c759f672d0f5eb76734b3b3ab38ad08e"
       },
       {
         "file": "FAROIS/6175852202.png.cimg",
-        "sha256": "44c10e91cca0093170ff6f149427beb8"
+        "sha256": "39ce36473987f39b20061a624eabd7f4"
       },
       {
         "file": "FAROIS/6175852301.png.cimg",
-        "sha256": "ac5e070e510382a492090a86c72e1701"
+        "sha256": "85d3eb726b95454b4f4e2cd426d5af6a"
       },
       {
         "file": "FAROIS/6175852302.png.cimg",
-        "sha256": "93d4d3d99e3f967d38001981b25a2eda"
+        "sha256": "143d0fd9ecc47ebc8e783939d3041c60"
       },
       {
         "file": "FAROIS/6175852303.png.cimg",
-        "sha256": "74478b58351e727ebf0bf1a0af477773"
+        "sha256": "767c5cae3c5b3df557875495590c690b"
       },
       {
         "file": "FAROIS/6175852304.png.cimg",
-        "sha256": "8b5d0a2370499b9c73ca9864c61d2795"
+        "sha256": "a8b3b33f8e1695224bc7d0a659e37868"
       },
       {
         "file": "FAROIS/6275852201.png.cimg",
-        "sha256": "4e3be21e8d58a18a874dd8b31232db54"
+        "sha256": "a70278285c5e7b3e89060a0110a95195"
       },
       {
         "file": "FAROIS/6275852202.png.cimg",
-        "sha256": "0e0b2b7967cf81600df5323b1b0502f4"
+        "sha256": "6e10337557b203d9c3b2f158c8318a11"
       },
       {
         "file": "FAROIS/6275852301.png.cimg",
-        "sha256": "c4b4629203811b5765a78b9fbb3e4204"
+        "sha256": "3550136ae07aac9fe967c0b6c31ae7da"
       },
       {
         "file": "FAROIS/6275852302.png.cimg",
-        "sha256": "3a7b86299db4e3dd830303372809377d"
+        "sha256": "34b681e8d6d6219657e6a98532cbf364"
       },
       {
         "file": "FAROIS/68930d3c-75fc-48b6-88a4-3470e4ffaa8d.png.cimg",
@@ -4786,6 +4924,18 @@
         "sha256": "7edd572a6fdeb95e8f7f7b347e0cc419"
       },
       {
+        "file": "LANCAMENTOS/3111681601.png",
+        "sha256": "452e0c854a0fcb24e1ed5838a4abd10b"
+      },
+      {
+        "file": "LANCAMENTOS/6169382231 - 6169382232.png",
+        "sha256": "24bea68a927c7fba54cf838115285027"
+      },
+      {
+        "file": "LANCAMENTOS/6169382233 - 6169382234.png",
+        "sha256": "15713d1eb943ceb099bcd48e4a5c7466"
+      },
+      {
         "file": "LANCAMENTOS/6175272201 - 6175272202.png",
         "sha256": "5f24c6423079551a2de0a12c2b4db5d2"
       },
@@ -4826,8 +4976,20 @@
         "sha256": "1f602b05b9f5a43706a1d1a755770e55"
       },
       {
+        "file": "LANCAMENTOS/7146446010.png",
+        "sha256": "9b4da8358a910e9dc4ae00bee60a0acd"
+      },
+      {
         "file": "LANCAMENTOS/7146505810.png",
         "sha256": "aa345e3e9c2efe7144caab08299c7d32"
+      },
+      {
+        "file": "LANCAMENTOS/7146513001 - 7146513002.png",
+        "sha256": "51ea398773464ea5014a079982cb319e"
+      },
+      {
+        "file": "LANCAMENTOS/7146660001.png",
+        "sha256": "c39c641adae51fb2d110628c88613de8"
       },
       {
         "file": "LANCAMENTOS/7146675910.png",
@@ -4840,6 +5002,14 @@
       {
         "file": "LANCAMENTOS/7150616001.png",
         "sha256": "832880494566729ae2e515eb133e9d21"
+      },
+      {
+        "file": "LANCAMENTOS/7163223001 - 7163223002.png",
+        "sha256": "f41467c5d195635b6ac15653e61fef51"
+      },
+      {
+        "file": "LANCAMENTOS/7175273001 - 7175273002.png",
+        "sha256": "83ebb587ce35a9b6c5188b5197d0cd43"
       },
       {
         "file": "LANCAMENTOS/SEMI-EIXOS.png",
