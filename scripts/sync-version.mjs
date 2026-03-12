@@ -30,16 +30,19 @@ function writeJson(relPath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n");
 }
 
-function updateTextFile(relPath, updater) {
+function updateTextFile(relPath, pattern, replacement) {
   const filePath = path.join(root, relPath);
   const current = fs.readFileSync(filePath, "utf8");
-  const updated = updater(current);
+  const matched = pattern.test(current);
 
-  if (updated === current) {
+  if (!matched) {
     throw new Error(`Failed to update ${relPath}: version marker not found`);
   }
 
-  fs.writeFileSync(filePath, updated);
+  const updated = current.replace(pattern, replacement);
+  if (updated !== current) {
+    fs.writeFileSync(filePath, updated);
+  }
 }
 
 function updateEnvFile(relPath, fallbackRelPath) {
@@ -74,19 +77,17 @@ function updateEnvFile(relPath, fallbackRelPath) {
 }
 
 // src-tauri/Cargo.toml
-updateTextFile("src-tauri/Cargo.toml", (content) =>
-  content.replace(
-    /(\[package\][\s\S]*?^version\s*=\s*")[^"]+(")/m,
-    `$1${version}$2`
-  )
+updateTextFile(
+  "src-tauri/Cargo.toml",
+  /(\[package\][\s\S]*?^version\s*=\s*")[^"]+(")/m,
+  `$1${version}$2`
 );
 
 // src-tauri/Cargo.lock
-updateTextFile("src-tauri/Cargo.lock", (content) =>
-  content.replace(
-    /(\[\[package\]\]\r?\nname = "catalogo_ips"\r?\nversion = ")[^"]+(")/,
-    `$1${version}$2`
-  )
+updateTextFile(
+  "src-tauri/Cargo.lock",
+  /(\[\[package\]\]\r?\nname = "catalogo_ips"\r?\nversion = ")[^"]+(")/,
+  `$1${version}$2`
 );
 
 // .env files que expoem versao ao front; se .env.development nao existir (CI),
