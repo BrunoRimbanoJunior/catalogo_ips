@@ -29,11 +29,17 @@ jobs:
           fi
           echo "skip=false" >> $GITHUB_OUTPUT
 
-      - name: Set fixed tag
+      - name: Set tag from package.json
         if: steps.skip.outputs.skip == 'false'
         id: ver
+        shell: bash
         run: |
-          echo "next=v0.0.1" >> $GITHUB_OUTPUT
+          VERSION=$(node -p "require('./package.json').version")
+          if [ -z "$VERSION" ]; then
+            echo "package.json version not found" >&2
+            exit 1
+          fi
+          echo "next=v$VERSION" >> $GITHUB_OUTPUT
 
       - name: Configure git user
         if: steps.skip.outputs.skip == 'false'
@@ -41,16 +47,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Create/force-update tag
+      - name: Create tag if missing
         if: steps.skip.outputs.skip == 'false'
         env:
           NEXT: ${{ steps.ver.outputs.next }}
         run: |
-          # create or move the fixed tag to the current commit
           if git rev-parse "$NEXT" >/dev/null 2>&1; then
-            git tag -f "$NEXT"
-          else
-            git tag -a "$NEXT" -m "auto: $NEXT"
+            TAG_SHA=$(git rev-parse "$NEXT")
+            HEAD_SHA=$(git rev-parse HEAD)
+            if [ "$TAG_SHA" = "$HEAD_SHA" ]; then
+              echo "Tag $NEXT already points to HEAD."
+            else
+              echo "Tag $NEXT already exists on $TAG_SHA; skipping to avoid moving it."
+            fi
+            exit 0
           fi
-          git push origin ":refs/tags/$NEXT" || true
+
+          git tag -a "$NEXT" -m "auto: $NEXT"
           git push origin "$NEXT"

@@ -104,6 +104,10 @@ mod core {
         pub brand: String,
         pub application: Option<String>,
         pub details: Option<String>,
+        pub ean_gtin: Option<String>,
+        pub altura: Option<String>,
+        pub largura: Option<String>,
+        pub comprimento: Option<String>,
         pub similar: Option<String>,
         pub images: Vec<String>,
     }
@@ -199,6 +203,7 @@ mod core {
             CREATE TABLE IF NOT EXISTS products (
               id INTEGER PRIMARY KEY, brand_id INTEGER NOT NULL, code TEXT NOT NULL UNIQUE,
               description TEXT NOT NULL, application TEXT, details TEXT, oem TEXT, similar TEXT, pgroup TEXT,
+              ean_gtin TEXT, altura TEXT, largura TEXT, comprimento TEXT,
               FOREIGN KEY(brand_id) REFERENCES brands(id)
             );
             CREATE TABLE IF NOT EXISTS vehicle_makes (
@@ -247,6 +252,10 @@ mod core {
         let _ = conn.execute("ALTER TABLE products ADD COLUMN oem TEXT", []);
         let _ = conn.execute("ALTER TABLE products ADD COLUMN similar TEXT", []);
         let _ = conn.execute("ALTER TABLE products ADD COLUMN pgroup TEXT", []);
+        let _ = conn.execute("ALTER TABLE products ADD COLUMN ean_gtin TEXT", []);
+        let _ = conn.execute("ALTER TABLE products ADD COLUMN altura TEXT", []);
+        let _ = conn.execute("ALTER TABLE products ADD COLUMN largura TEXT", []);
+        let _ = conn.execute("ALTER TABLE products ADD COLUMN comprimento TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []);
         let _ = conn.execute(
@@ -876,11 +885,15 @@ mod core {
     ) -> Result<ProductDetails, String> {
         let conn =
             open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-        let mut stmt = conn.prepare("SELECT p.id, p.code, p.description, p.application, p.details, p.similar, b.name FROM products p JOIN brands b ON b.id = p.brand_id WHERE p.id = ?1").map_err(|e| e.to_string())?;
-        let (id, code, description, application, details, similar, brand): (
+        let mut stmt = conn.prepare("SELECT p.id, p.code, p.description, p.application, p.details, p.ean_gtin, p.altura, p.largura, p.comprimento, p.similar, b.name FROM products p JOIN brands b ON b.id = p.brand_id WHERE p.id = ?1").map_err(|e| e.to_string())?;
+        let (id, code, description, application, details, ean_gtin, altura, largura, comprimento, similar, brand): (
             i64,
             String,
             String,
+            Option<String>,
+            Option<String>,
+            Option<String>,
+            Option<String>,
             Option<String>,
             Option<String>,
             Option<String>,
@@ -895,6 +908,10 @@ mod core {
                     row.get(4)?,
                     row.get(5)?,
                     row.get(6)?,
+                    row.get(7)?,
+                    row.get(8)?,
+                    row.get(9)?,
+                    row.get(10)?,
                 ))
             })
             .map_err(|e| e.to_string())?;
@@ -913,6 +930,10 @@ mod core {
             brand,
             application,
             details,
+            ean_gtin,
+            altura,
+            largura,
+            comprimento,
             similar,
             images,
         })

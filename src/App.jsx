@@ -161,6 +161,50 @@ function vehicleLabel(name = "") {
   return first || name || "";
 }
 
+function readDetailValue(product, ...keys) {
+  if (!product) return null;
+  for (const key of keys) {
+    const value = product?.[key];
+    if (value === undefined || value === null) continue;
+    const text = String(value).trim();
+    if (text) return text;
+  }
+  return null;
+}
+
+function normalizeProductDetails(raw) {
+  if (!raw) return raw;
+  return {
+    ...raw,
+    code: readDetailValue(raw, "code") || "",
+    description: readDetailValue(raw, "description") || "",
+    brand: readDetailValue(raw, "brand") || "",
+    application: readDetailValue(raw, "application"),
+    details: readDetailValue(raw, "details"),
+    ean_gtin: readDetailValue(raw, "ean_gtin", "eanGtin", "ean", "gtin"),
+    altura: readDetailValue(raw, "altura"),
+    largura: readDetailValue(raw, "largura"),
+    comprimento: readDetailValue(raw, "comprimento"),
+    similar: readDetailValue(raw, "similar"),
+    images: Array.isArray(raw?.images) ? raw.images : [],
+  };
+}
+
+function productDetailRows(product) {
+  if (!product) return [];
+  return [
+    readDetailValue(product, "details") ? { label: null, value: readDetailValue(product, "details") } : null,
+    readDetailValue(product, "ean_gtin", "eanGtin", "ean", "gtin")
+      ? { label: "EAN/GTIN", value: readDetailValue(product, "ean_gtin", "eanGtin", "ean", "gtin") }
+      : null,
+    readDetailValue(product, "altura") ? { label: "Altura", value: readDetailValue(product, "altura") } : null,
+    readDetailValue(product, "largura") ? { label: "Largura", value: readDetailValue(product, "largura") } : null,
+    readDetailValue(product, "comprimento")
+      ? { label: "Comprimento", value: readDetailValue(product, "comprimento") }
+      : null,
+  ].filter(Boolean);
+}
+
 function App() {
   const fingerprint = useFingerprint();
   const cachedProfile = useMemo(() => safeParseProfile(localStorage.getItem("profile.cached")), []);
@@ -708,7 +752,7 @@ function App() {
 
   async function openDetails(productId) {
     try {
-      const detail = await getProductDetails(productId);
+      const detail = normalizeProductDetails(await getProductDetails(productId));
       setSelected(detail);
       if (!detail?.images) {
         setSelectedImages([]);
@@ -919,6 +963,7 @@ function App() {
     : undefined;
 
   const displayLogos = headerLogos.filter(Boolean);
+  const detailRows = productDetailRows(selected);
 
   if (!ready) {
     return (
@@ -1218,10 +1263,21 @@ function App() {
                     <div className="compat-list">{selected.application}</div>
                   </div>
                 )}
-                {selected.details ? (
+                {detailRows.length > 0 ? (
                   <>
                     <div className="sep" />
-                    <div className="details-text">{selected.details}</div>
+                    <div>
+                      <div className="subtitle">Detalhes:</div>
+                      <div className="details-text">
+                        {detailRows.map((row, idx) => (
+                          <div key={`${row.label || "texto"}-${idx}`}>
+                            {row.label ? <strong>{row.label}:</strong> : null}
+                            {row.label ? " " : ""}
+                            {row.value}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </>
                 ) : null}
                 {selected.similar ? (
