@@ -1,18 +1,24 @@
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use tauri::{Manager, Emitter};
+use tauri::{Emitter, Manager};
 
 mod call_img;
 mod db;
-mod importer;
 mod desc;
+mod importer;
 
 mod core {
     use super::*;
-    use std::collections::HashSet;
-    use reqwest::Client;
+    use crate::call_img::load_env_key;
+    use crate::db::{db_path, ensure_dirs, open_db, META_DB_VERSION_KEY, META_MANIFEST_HASH_KEY};
+    use reqwest::{
+        header::{ACCEPT_ENCODING, CONTENT_ENCODING},
+        Client,
+    };
     use rusqlite::{params, Connection, OptionalExtension};
+    use serde_json::json;
     use sha2::{Digest, Sha256};
+    use std::collections::HashSet;
     use std::fs;
     use std::path::Path;
     use std::sync::Arc;
@@ -21,9 +27,6 @@ mod core {
     use tokio::sync::Semaphore;
     use tokio::task::JoinSet;
     use walkdir::WalkDir;
-    use serde_json::json;
-    use crate::call_img::load_env_key;
-    use crate::db::{db_path, ensure_dirs, open_db, META_DB_VERSION_KEY, META_MANIFEST_HASH_KEY};
 
     const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
     const LAUNCH_CANON: &str = "lancamentos";
@@ -356,7 +359,6 @@ mod core {
         }
         let conn = open_db(&db_file).map_err(|e| e.to_string())?;
         migrate(&conn).map_err(|e| e.to_string())?;
-        
 
         // Normaliza montadoras e coluna make em vehicles
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []);
@@ -615,8 +617,6 @@ mod core {
         conn.execute(&sql, [])?;
         Ok(())
     }
-
-
 
     fn fetch_brand_groups(conn: &Connection, brand_id: Option<i64>) -> Result<Vec<String>> {
         let mut out = Vec::new();
@@ -886,7 +886,19 @@ mod core {
         let conn =
             open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
         let mut stmt = conn.prepare("SELECT p.id, p.code, p.description, p.application, p.details, p.ean_gtin, p.altura, p.largura, p.comprimento, p.similar, b.name FROM products p JOIN brands b ON b.id = p.brand_id WHERE p.id = ?1").map_err(|e| e.to_string())?;
-        let (id, code, description, application, details, ean_gtin, altura, largura, comprimento, similar, brand): (
+        let (
+            id,
+            code,
+            description,
+            application,
+            details,
+            ean_gtin,
+            altura,
+            largura,
+            comprimento,
+            similar,
+            brand,
+        ): (
             i64,
             String,
             String,
@@ -939,14 +951,69 @@ mod core {
         })
     }
 
-    async fn download_to_file(client: &Client, url: &str, dest: &Path) -> Result<()> {
-        let resp = client.get(url).send().await?.error_for_status()?;
-        let bytes = resp.bytes().await?;
+    fn looks_like_catalog_asset(bytes: &[u8]) -> bool {
+        bytes.starts_with(b"CIMG")
+            || bytes.starts_with(&[0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A])
+            || bytes.starts_with(&[0xFF, 0xD8, 0xFF])
+            || bytes.starts_with(b"GIF87a")
+            || bytes.starts_with(b"GIF89a")
+            || bytes.starts_with(b"BM")
+            || (bytes.len() >= 12 && &bytes[..4] == b"RIFF" && &bytes[8..12] == b"WEBP")
+    }
+
+    fn write_download_bytes(dest: &Path, bytes: &[u8]) -> Result<()> {
         if let Some(parent) = dest.parent() {
             fs::create_dir_all(parent)?;
         }
-        fs::write(dest, &bytes)?;
+        fs::write(dest, bytes)?;
         Ok(())
+    }
+
+    async fn download_to_file_raw(url: &str, dest: &Path) -> Result<()> {
+        let raw_client = Client::builder()
+            .timeout(Duration::from_secs(20))
+            .no_gzip()
+            .no_brotli()
+            .no_deflate()
+            .no_zstd()
+            .build()?;
+        let resp = raw_client
+            .get(url)
+            .header(ACCEPT_ENCODING, "identity")
+            .send()
+            .await?
+            .error_for_status()?;
+        let bytes = resp.bytes().await?;
+        if !looks_like_catalog_asset(bytes.as_ref()) {
+            anyhow::bail!(
+                "fallback bruto retornou payload inesperado para {}",
+                dest.display()
+            );
+        }
+        write_download_bytes(dest, bytes.as_ref())
+    }
+
+    async fn download_to_file(client: &Client, url: &str, dest: &Path) -> Result<()> {
+        let resp = client.get(url).send().await?.error_for_status()?;
+        let content_encoding = resp
+            .headers()
+            .get(CONTENT_ENCODING)
+            .and_then(|v| v.to_str().ok())
+            .map(|v| v.to_string());
+        let bytes = match resp.bytes().await {
+            Ok(bytes) => bytes,
+            Err(err) if err.is_decode() => {
+                eprintln!(
+                    "download_to_file: decode HTTP falhou para {} (content-encoding={:?}); tentando modo bruto: {}",
+                    url,
+                    content_encoding,
+                    err
+                );
+                return download_to_file_raw(url, dest).await;
+            }
+            Err(err) => return Err(err.into()),
+        };
+        write_download_bytes(dest, bytes.as_ref())
     }
 
     fn index_from_file_list(conn: &mut Connection, files: &[String]) -> Result<ImageIndexResult> {
@@ -1171,8 +1238,14 @@ mod core {
                 let imgs_dir_bg = imgs_dir.clone();
                 let db_bg = dbf.clone();
                 tauri::async_runtime::spawn(async move {
-                    let (down, errs) =
-                        download_images_sequential(&client_bg, &imgs_dir_bg, &db_bg, &imgs, manifest_changed).await;
+                    let (down, errs) = download_images_sequential(
+                        &client_bg,
+                        &imgs_dir_bg,
+                        &db_bg,
+                        &imgs,
+                        manifest_changed,
+                    )
+                    .await;
                     let _ = app_bg.emit(
                         "images_downloaded",
                         json!({ "downloaded": down, "errors": errs }),
@@ -1180,7 +1253,8 @@ mod core {
                 });
             } else {
                 let (down, _errs) =
-                    download_images_sequential(&client, &imgs_dir, &dbf, &imgs, manifest_changed).await;
+                    download_images_sequential(&client, &imgs_dir, &dbf, &imgs, manifest_changed)
+                        .await;
                 downloaded_images = down;
             }
         }
@@ -1633,13 +1707,15 @@ mod core {
             output: dest_path,
         })
     }
-    
 
     #[tauri::command]
-    pub fn import_excel(app: AppHandle, path: String) -> Result<crate::importer::ImportResult, String> {
+    pub fn import_excel(
+        app: AppHandle,
+        path: String,
+    ) -> Result<crate::importer::ImportResult, String> {
         crate::importer::import_excel(app, path)
     }
-fn candidate_codes(stem: &str) -> Vec<String> {
+    fn candidate_codes(stem: &str) -> Vec<String> {
         use std::collections::HashSet;
         let s = stem.trim();
         let up = s.to_ascii_uppercase();
@@ -1659,13 +1735,13 @@ fn candidate_codes(stem: &str) -> Vec<String> {
             }
         }
 
-            // somente caracteres alfanumericos
+        // somente caracteres alfanumericos
         let only_alnum: String = up.chars().filter(|c| c.is_ascii_alphanumeric()).collect();
         if !only_alnum.is_empty() {
             set.insert(only_alnum.clone());
         }
 
-            // prefixo numerico continuo (ex.: "7111043002LE" -> "7111043002")
+        // prefixo numerico continuo (ex.: "7111043002LE" -> "7111043002")
         let digits_prefix: String = up.chars().take_while(|c| c.is_ascii_digit()).collect();
         if !digits_prefix.is_empty() {
             set.insert(digits_prefix);
@@ -1782,12 +1858,3 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-
-
-
-
-
-
-
-

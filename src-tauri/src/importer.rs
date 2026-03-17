@@ -58,8 +58,7 @@ fn header_key(s: &str) -> &'static str {
         "altura"
     } else if n == "LARGURA" || n == "LARG" || n.starts_with("LARGURA") {
         "largura"
-    } else if ["COMPRIMENTO", "COMP", "COMPR"].contains(&n.as_str())
-        || n.starts_with("COMPRIMENTO")
+    } else if ["COMPRIMENTO", "COMP", "COMPR"].contains(&n.as_str()) || n.starts_with("COMPRIMENTO")
     {
         "comprimento"
     } else {
@@ -145,12 +144,18 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
     tx.execute("DELETE FROM brand_groups", []).ok();
     tx.execute("DELETE FROM brands", []).ok();
 
-    tx.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []).ok();
-    tx.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []).ok();
-    tx.execute("ALTER TABLE products ADD COLUMN ean_gtin TEXT", []).ok();
-    tx.execute("ALTER TABLE products ADD COLUMN altura TEXT", []).ok();
-    tx.execute("ALTER TABLE products ADD COLUMN largura TEXT", []).ok();
-    tx.execute("ALTER TABLE products ADD COLUMN comprimento TEXT", []).ok();
+    tx.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", [])
+        .ok();
+    tx.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", [])
+        .ok();
+    tx.execute("ALTER TABLE products ADD COLUMN ean_gtin TEXT", [])
+        .ok();
+    tx.execute("ALTER TABLE products ADD COLUMN altura TEXT", [])
+        .ok();
+    tx.execute("ALTER TABLE products ADD COLUMN largura TEXT", [])
+        .ok();
+    tx.execute("ALTER TABLE products ADD COLUMN comprimento TEXT", [])
+        .ok();
     tx.execute(
         "CREATE TABLE IF NOT EXISTS makes (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE)",
         [],
@@ -219,8 +224,11 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
             if let Some(id) = found {
                 id
             } else {
-                tx.execute("INSERT INTO brands(name) VALUES(TRIM(?1))", params![brand_name])
-                    .ok();
+                tx.execute(
+                    "INSERT INTO brands(name) VALUES(TRIM(?1))",
+                    params![brand_name],
+                )
+                .ok();
                 tx.query_row(
                     "SELECT id FROM brands WHERE UPPER(TRIM(name)) = UPPER(TRIM(?1))",
                     params![brand_name],
@@ -290,13 +298,22 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
         upserted += 1;
 
         let pid: i64 = tx
-            .query_row("SELECT id FROM products WHERE code=?1", params![code], |r| r.get(0))
+            .query_row(
+                "SELECT id FROM products WHERE code=?1",
+                params![code],
+                |r| r.get(0),
+            )
             .map_err(|e| e.to_string())?;
 
         if !vehicles_raw.is_empty() {
-            tx.execute("DELETE FROM product_vehicles WHERE product_id=?1", params![pid])
-                .ok();
-            for v in vehicles_raw.split(|c| c == ';' || c == ',' || c == '|' || c == '\n' || c == '\r') {
+            tx.execute(
+                "DELETE FROM product_vehicles WHERE product_id=?1",
+                params![pid],
+            )
+            .ok();
+            for v in
+                vehicles_raw.split(|c| c == ';' || c == ',' || c == '|' || c == '\n' || c == '\r')
+            {
                 let v = v.trim();
                 if v.is_empty() {
                     continue;
@@ -309,10 +326,15 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
                     .collect();
                 let mut make_ids: Vec<i64> = Vec::new();
                 for mf in make_tokens.iter() {
-                    tx.execute("INSERT OR IGNORE INTO makes(name) VALUES(?)", params![mf.clone()])
-                        .ok();
+                    tx.execute(
+                        "INSERT OR IGNORE INTO makes(name) VALUES(?)",
+                        params![mf.clone()],
+                    )
+                    .ok();
                     if let Some(mid) = tx
-                        .query_row("SELECT id FROM makes WHERE name=?1", params![mf], |r| r.get(0))
+                        .query_row("SELECT id FROM makes WHERE name=?1", params![mf], |r| {
+                            r.get(0)
+                        })
                         .optional()
                         .unwrap_or(None)
                     {
@@ -335,7 +357,9 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
                 )
                 .ok();
                 let vid: i64 = tx
-                    .query_row("SELECT id FROM vehicles WHERE name=?1", params![v], |r| r.get(0))
+                    .query_row("SELECT id FROM vehicles WHERE name=?1", params![v], |r| {
+                        r.get(0)
+                    })
                     .unwrap_or_else(|_| 0);
                 if vid != 0 {
                     for mid in make_ids.iter() {

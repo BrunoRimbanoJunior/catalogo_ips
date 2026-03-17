@@ -211,7 +211,10 @@ pub fn read_image_base64(app: &AppHandle, path_or_rel: String) -> Result<String,
         return Ok(to_data_url(&abs_try, bytes));
     }
 
-    eprintln!("read_image_base64: arquivo nao encontrado {}", abs_try.display());
+    eprintln!(
+        "read_image_base64: arquivo nao encontrado {}",
+        abs_try.display()
+    );
     Err(format!(
         "Falha ao ler imagem (nao encontrada): {}",
         abs_try.display()
