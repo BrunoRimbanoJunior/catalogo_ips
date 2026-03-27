@@ -9,8 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:build:signed": "node scripts/tauri-build-release.mjs",
-    "manifest": "node scripts/gen-manifest.mjs",
-    "manifest:onedrive": "node scripts/gen-manifest-onedrive.mjs",
+    "manifest": "node scripts/gen-manifest-r2.mjs --out manifest.json",
     "manifest:r2": "node scripts/gen-manifest-r2.mjs",
     "launches": "node scripts/gen-launches.mjs"
   },

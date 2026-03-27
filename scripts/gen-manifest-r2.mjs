@@ -1,11 +1,16 @@
-// Gera manifest.json listando objetos em um bucket R2 via S3 API
-// Requer envs:
-//   R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
-//   (Opcional) R2_ENDPOINT, R2_PUBLIC_BASE_URL
+// Gera manifest.json listando objetos em um bucket R2 via S3 API.
+// Em dev, se --version/--db-version/--db-url/--db-sha não forem passados,
+// o script tenta reaproveitar manifest.json atual e o data/catalog.db local.
 
 import { writeFile, readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, createReadStream } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { execSync } from 'node:child_process';
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
+
+const DEFAULT_DB_PATH = 'data/catalog.db';
+const DEFAULT_MANIFEST_PATH = 'manifest.json';
+const DEFAULT_RAW_DB_URL = 'https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db';
 
 function arg(name, def) {
   const i = process.argv.indexOf(`--${name}`);
@@ -19,6 +24,15 @@ function ensure(val, msg) {
     process.exit(1);
   }
   return val;
+}
+
+function ensureNumber(val, msg) {
+  const num = Number(val);
+  if (!Number.isFinite(num) || num <= 0) {
+    console.error(msg);
+    process.exit(1);
+  }
+  return num;
 }
 
 function parseDotenv(text) {
@@ -56,6 +70,45 @@ async function loadEnvFiles() {
   }
 }
 
+function toUtcVersionStamp(date = new Date()) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return Number(
+    `${pad(date.getUTCDate())}${pad(date.getUTCMonth() + 1)}${String(date.getUTCFullYear()).slice(-2)}${pad(date.getUTCHours())}`
+  );
+}
+
+async function sha256File(filePath) {
+  return new Promise((resolve, reject) => {
+    const hash = createHash('sha256');
+    const stream = createReadStream(filePath);
+    stream.on('error', reject);
+    stream.on('data', (chunk) => hash.update(chunk));
+    stream.on('end', () => resolve(hash.digest('hex')));
+  });
+}
+
+async function loadJsonIfExists(filePath) {
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(await readFile(filePath, 'utf8'));
+  } catch (_) {
+    return null;
+  }
+}
+
+function guessDbUrlFromGit() {
+  try {
+    const remote = execSync('git config --get remote.origin.url', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    const match = remote.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/i);
+    if (!match) return DEFAULT_RAW_DB_URL;
+    const owner = match[1];
+    const repo = match[2];
+    return `https://raw.githubusercontent.com/${owner}/${repo}/main/${DEFAULT_DB_PATH}`;
+  } catch (_) {
+    return DEFAULT_RAW_DB_URL;
+  }
+}
+
 function cleanETag(tag) {
   if (!tag) return null;
   return String(tag).replace(/^\"|\"$/g, '');
@@ -77,16 +130,32 @@ async function listAllObjects(s3, bucket, prefix) {
 async function main() {
   await loadEnvFiles();
 
-  const version = Number(arg('version'));
-  const dbVersion = Number(arg('db-version', version));
-  const dbSha = arg('db-sha', null);
-  const dbUrl = arg('db-url');
-  const outPath = arg('out', 'manifest.json');
-  const appVersion = arg('app-version', process.env.APP_VERSION || null);
-  const appDownloadUrl = arg('app-download-url', process.env.APP_DOWNLOAD_URL || null);
+  const outPath = arg('out', DEFAULT_MANIFEST_PATH);
+  const existingManifest = await loadJsonIfExists(outPath);
+  const localDbSha = existsSync(DEFAULT_DB_PATH) ? await sha256File(DEFAULT_DB_PATH) : null;
+  const existingDbVersion = Number(existingManifest?.db?.version);
+  const existingDbSha = existingManifest?.db?.sha256 || null;
+  const canReuseExistingVersion =
+    Number.isFinite(existingDbVersion) &&
+    existingDbVersion > 0 &&
+    ((!localDbSha && !!existingManifest?.db?.url) || (!!localDbSha && !!existingDbSha && localDbSha === existingDbSha));
+  const fallbackVersion =
+    canReuseExistingVersion ? existingDbVersion : toUtcVersionStamp();
+
+  const version = ensureNumber(
+    arg('version', process.env.MANIFEST_VERSION || fallbackVersion),
+    'Defina um --version válido ou MANIFEST_VERSION.'
+  );
+  const dbVersion = ensureNumber(
+    arg('db-version', process.env.MANIFEST_DB_VERSION || version),
+    'Defina um --db-version válido ou MANIFEST_DB_VERSION.'
+  );
+  const dbSha = arg('db-sha', process.env.MANIFEST_DB_SHA || localDbSha || existingDbSha || null);
+  const dbUrl = arg('db-url', process.env.MANIFEST_DB_URL || existingManifest?.db?.url || guessDbUrlFromGit());
+  const appVersion = arg('app-version', process.env.APP_VERSION || process.env.VITE_APP_VERSION || null);
+  const appDownloadUrl = arg('app-download-url', process.env.MANIFEST_APP_DOWNLOAD_URL || process.env.APP_DOWNLOAD_URL || null);
   const prefix = arg('prefix', '');
 
-  ensure(version, 'Faltou --version');
   ensure(dbUrl, 'Faltou --db-url');
 
   const accountId = ensure(process.env.R2_ACCOUNT_ID, 'Defina R2_ACCOUNT_ID');
@@ -109,6 +178,7 @@ async function main() {
     credentials: { accessKeyId, secretAccessKey },
   });
 
+  console.log('Gerando manifest R2...', { outPath, version, dbVersion, dbUrl });
   console.log('Listando objetos do R2...', { bucket, prefix, endpoint });
   let objects;
   try {

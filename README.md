@@ -40,14 +40,29 @@ Local (apenas dev) para aprovar cadastros sem expor service role no front:
 - `auto-tag.yml`: tagging automática básica (pode ser ajustada conforme a estratégia).
 
 ## Geração de manifest manual (dev)
+Fluxo suportado: apenas R2.
+
+Comando padrão:
 ```
-APP_VERSION=1.0.1 APP_DOWNLOAD_URL=https://github.com/<org>/<repo>/releases/download/v1.0.1/installer.exe \
-node scripts/gen-manifest-r2.mjs \
-  --version 25012518 \
-  --db-url https://raw.githubusercontent.com/<org>/<repo>/main/data/catalog.db \
-  --out manifest.json
+pnpm manifest
 ```
-Credenciais R2 vêm do ambiente (`R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BASE_URL`).
+
+Esse comando:
+- usa `scripts/gen-manifest-r2.mjs`;
+- lê `.env.development` e `.env` para as credenciais `R2_*`;
+- reaproveita `manifest.json` atual se o `data/catalog.db` não mudou;
+- calcula `db.sha256` a partir de `data/catalog.db` local quando o arquivo existe;
+- usa `MANIFEST_DB_URL` se definido; caso contrário, tenta inferir a URL raw do banco a partir do remote GitHub.
+
+Para forçar versão/URL específicas:
+```
+pnpm manifest -- --version 25012518 --db-version 25012518 --db-url https://raw.githubusercontent.com/<org>/<repo>/main/data/catalog.db --out manifest.json
+```
+
+Para incluir dados de release do app:
+```
+pnpm manifest -- --app-version 1.5.0 --app-download-url https://github.com/<org>/<repo>/releases/download/v1.5.0/catalogo_ips_x64-setup.exe
+```
 
 ## Build de release (assinada + updater)
 - Gere as chaves uma única vez: `pnpm tauri signer generate` (guarde a `private.key` fora do git; `public.key` fica no `tauri.conf.json`).
