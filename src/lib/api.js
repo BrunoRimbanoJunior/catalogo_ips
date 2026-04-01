@@ -107,3 +107,15 @@ export async function genManifestR2(params) {
   });
 }
 
+export async function runRcloneSync() {
+  return await invoke("run_rclone_sync");
+}
+
+export async function getAppVersionConfig() {
+  return await invoke("get_app_version_config");
+}
+
+export async function setAppVersionConfig(version) {
+  return await invoke("set_app_version_config", { version });
+}
+

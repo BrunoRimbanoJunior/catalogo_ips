@@ -13,6 +13,9 @@ import {
   exportDbTo,
   setBrandingImage,
   setHeaderLogos as setHeaderLogosApi,
+  runRcloneSync,
+  getAppVersionConfig,
+  setAppVersionConfig,
   fetchGroups,
   cleanupImagesFromManifest,
 } from "./lib/api";
@@ -218,6 +221,8 @@ function App() {
   const [dbPath, setDbPath] = useState("");
   const [dbVersion, setDbVersion] = useState(0);
   const [appVersion, setAppVersion] = useState("0.0.0");
+  const [configuredVersion, setConfiguredVersion] = useState("");
+  const [versionInfo, setVersionInfo] = useState(null);
 
   const [brands, setBrands] = useState([]);
   const [makes, setMakes] = useState([]);
@@ -252,6 +257,8 @@ function App() {
   const [statusMsg, setStatusMsg] = useState("");
   const [secondaryStatus, setSecondaryStatus] = useState("");
   const [syncing, setSyncing] = useState(false);
+  const [rcloneRunning, setRcloneRunning] = useState(false);
+  const [versionSaving, setVersionSaving] = useState(false);
   const [cleanupScheduled, setCleanupScheduled] = useState(false);
 
   const [updateInfo, setUpdateInfo] = useState(null);
@@ -448,6 +455,24 @@ function App() {
     setCleanupScheduled(true);
     return () => clearTimeout(timer);
   }, [ready, cleanupScheduled, manifestUrl]);
+
+  useEffect(() => {
+    if (!isDev) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const info = await getAppVersionConfig();
+        if (cancelled) return;
+        setVersionInfo(info);
+        setConfiguredVersion(info?.resolved_version || "");
+      } catch (e) {
+        if (!cancelled) setToolsMsg(`Falha ao carregar versao configurada: ${e}`);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isDev]);
 
   useEffect(() => {
     const src = toDisplaySrc(bgPath || DEFAULT_BACKGROUND);
@@ -860,6 +885,44 @@ function App() {
     }
   }
 
+  async function runRcloneUpload() {
+    setToolsMsg("Executando sincronizacao via rclone. O progresso aparece no terminal do dev...");
+    setRcloneRunning(true);
+    try {
+      const res = await runRcloneSync();
+      const exitCode = res?.exit_code ?? res?.exitCode;
+      if (res?.ok) {
+        setToolsMsg("Sincronizacao via rclone concluida.");
+      } else {
+        setToolsMsg(
+          `Rclone finalizado com erro${exitCode !== undefined && exitCode !== null ? ` (codigo ${exitCode})` : ""}.`
+        );
+      }
+    } catch (e) {
+      setToolsMsg(`Falha ao executar rclone: ${e}`);
+    } finally {
+      setRcloneRunning(false);
+    }
+  }
+
+  async function saveConfiguredAppVersion() {
+    const nextVersion = configuredVersion.trim();
+    if (!nextVersion) return;
+    setVersionSaving(true);
+    try {
+      const info = await setAppVersionConfig(nextVersion);
+      setVersionInfo(info);
+      setConfiguredVersion(info?.resolved_version || nextVersion);
+      setToolsMsg(
+        `Versao configurada atualizada para ${info?.resolved_version || nextVersion}. O executavel atual continua em ${appVersion} ate rebuild/release.`
+      );
+    } catch (e) {
+      setToolsMsg(`Falha ao salvar versao: ${e}`);
+    } finally {
+      setVersionSaving(false);
+    }
+  }
+
   async function runIndex(manUrl) {
     const target = manUrl || manifestUrl;
     if (!target) return;
@@ -964,6 +1027,8 @@ function App() {
 
   const displayLogos = headerLogos.filter(Boolean);
   const detailRows = productDetailRows(selected);
+  const configuredVersionCurrent = versionInfo?.resolved_version || "";
+  const versionDirty = configuredVersion.trim() && configuredVersion.trim() !== configuredVersionCurrent;
 
   if (!ready) {
     return (
@@ -1085,9 +1150,36 @@ function App() {
                   <button onClick={() => runIndex(manifestInput)} disabled={!manifestInput || syncing}>
                     Indexar imagens (manifest)
                   </button>
+                  <button onClick={runRcloneUpload} disabled={rcloneRunning || syncing}>
+                    {rcloneRunning ? "Sincronizando rclone..." : "Executar rclone"}
+                  </button>
                   <button onClick={() => loadLaunches(true)} disabled={launchState.loading}>
                     Abrir Lancamentos
                   </button>
+                </div>
+                <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#555" }}>
+                  O botao acima usa o comando salvo em rclone.txt e mostra o progresso no terminal do dev.
+                </span>
+                <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "1fr auto", gap: 8, alignItems: "center" }}>
+                  <input
+                    placeholder="Versao da proxima build"
+                    value={configuredVersion}
+                    onChange={(e) => setConfiguredVersion(e.target.value)}
+                  />
+                  <button onClick={saveConfiguredAppVersion} disabled={versionSaving || !configuredVersion.trim() || !versionDirty}>
+                    {versionSaving ? "Salvando versao..." : "Salvar versao"}
+                  </button>
+                  <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#555" }}>
+                    Executavel atual: {appVersion} | Configurada: {configuredVersionCurrent || "?"}{" "}
+                    {versionInfo?.consistent ? "(arquivos sincronizados)" : "(arquivos com versoes diferentes)"}
+                  </span>
+                  {versionInfo ? (
+                    <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#555" }}>
+                      package.json {versionInfo.package_json_version} | Cargo.toml {versionInfo.cargo_toml_version} | tauri.conf.json{" "}
+                      {versionInfo.tauri_conf_version}
+                      {versionInfo.cargo_lock_version ? ` | Cargo.lock ${versionInfo.cargo_lock_version}` : ""}
+                    </span>
+                  ) : null}
                 </div>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={runImportExcel}>Importar Excel</button>

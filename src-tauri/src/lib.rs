@@ -20,7 +20,8 @@ mod core {
     use sha2::{Digest, Sha256};
     use std::collections::HashSet;
     use std::fs;
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
+    use std::process::{Command as PCommand, Stdio};
     use std::sync::Arc;
     use std::time::Duration;
     use tauri::AppHandle;
@@ -139,6 +140,23 @@ mod core {
     pub struct ManifestImages {
         pub base_url: String,
         pub files: Vec<ManifestImageItem>,
+    }
+
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub struct RcloneSyncResult {
+        pub ok: bool,
+        pub exit_code: Option<i32>,
+        pub command_file: String,
+    }
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub struct AppVersionInfo {
+        pub resolved_version: String,
+        pub consistent: bool,
+        pub package_json_version: String,
+        pub cargo_toml_version: String,
+        pub tauri_conf_version: String,
+        pub cargo_lock_version: Option<String>,
+        pub app_root: String,
     }
     #[derive(Debug, Serialize, Deserialize)]
     pub struct CatalogManifest {
@@ -1466,6 +1484,337 @@ mod core {
         open::that(path).map_err(|e| e.to_string())
     }
 
+    fn find_app_root_upwards(start: &Path, max_levels: usize) -> Option<PathBuf> {
+        for dir in start.ancestors().take(max_levels + 1) {
+            if dir.join("package.json").exists()
+                && dir.join("src-tauri").join("Cargo.toml").exists()
+                && dir.join("src-tauri").join("tauri.conf.json").exists()
+            {
+                return Some(dir.to_path_buf());
+            }
+        }
+        None
+    }
+
+    fn find_file_upwards(start: &Path, file_name: &str, max_levels: usize) -> Option<PathBuf> {
+        let mut current = Some(start);
+        for _ in 0..=max_levels {
+            let dir = current?;
+            let candidate = dir.join(file_name);
+            if candidate.exists() {
+                return Some(candidate);
+            }
+            current = dir.parent();
+        }
+        None
+    }
+
+    fn read_command_line(path: &Path) -> Result<String, String> {
+        let contents = std::fs::read_to_string(path)
+            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
+        contents
+            .lines()
+            .map(str::trim)
+            .find(|line| !line.is_empty() && !line.starts_with('#') && !line.starts_with("//"))
+            .map(|line| line.to_string())
+            .ok_or_else(|| format!("Nenhum comando valido encontrado em {}", path.display()))
+    }
+
+    fn validate_version_string(version: &str) -> Result<String, String> {
+        let normalized = version.trim();
+        if normalized.is_empty() {
+            return Err("Informe uma versao".to_string());
+        }
+        if !normalized
+            .chars()
+            .next()
+            .map(|c| c.is_ascii_digit())
+            .unwrap_or(false)
+        {
+            return Err("A versao precisa comecar com numero".to_string());
+        }
+        if normalized.chars().any(|c| c.is_whitespace()) {
+            return Err("A versao nao pode conter espacos".to_string());
+        }
+        if normalized
+            .chars()
+            .any(|c| !(c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '+')))
+        {
+            return Err(
+                "Use apenas letras, numeros, ponto, hifen e sinal de mais na versao"
+                    .to_string(),
+            );
+        }
+        Ok(normalized.to_string())
+    }
+
+    fn extract_quoted_value(line: &str) -> Option<String> {
+        let start = line.find('"')?;
+        let rest = &line[start + 1..];
+        let end = rest.find('"')?;
+        Some(rest[..end].to_string())
+    }
+
+    fn read_json_version(path: &Path) -> Result<String, String> {
+        let raw = std::fs::read_to_string(path)
+            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
+        let parsed: serde_json::Value = serde_json::from_str(&raw)
+            .map_err(|e| format!("Falha ao interpretar {}: {}", path.display(), e))?;
+        parsed
+            .get("version")
+            .and_then(|v| v.as_str())
+            .map(|v| v.to_string())
+            .ok_or_else(|| format!("Campo version nao encontrado em {}", path.display()))
+    }
+
+    fn read_cargo_toml_version(path: &Path) -> Result<String, String> {
+        let raw = std::fs::read_to_string(path)
+            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
+        let mut in_package = false;
+        for line in raw.lines() {
+            let trimmed = line.trim();
+            if trimmed == "[package]" {
+                in_package = true;
+                continue;
+            }
+            if in_package && trimmed.starts_with('[') && trimmed != "[package]" {
+                break;
+            }
+            if in_package && trimmed.starts_with("version") {
+                return extract_quoted_value(trimmed).ok_or_else(|| {
+                    format!("Linha de versao invalida em {}", path.display())
+                });
+            }
+        }
+        Err(format!(
+            "Campo version nao encontrado na secao [package] de {}",
+            path.display()
+        ))
+    }
+
+    fn read_cargo_lock_version(path: &Path, package_name: &str) -> Result<Option<String>, String> {
+        if !path.exists() {
+            return Ok(None);
+        }
+        let raw = std::fs::read_to_string(path)
+            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
+        let mut in_package = false;
+        let mut current_name: Option<String> = None;
+        for line in raw.lines() {
+            let trimmed = line.trim();
+            if trimmed == "[[package]]" {
+                in_package = true;
+                current_name = None;
+                continue;
+            }
+            if in_package && trimmed.starts_with("[[") && trimmed != "[[package]]" {
+                in_package = false;
+                current_name = None;
+                continue;
+            }
+            if !in_package {
+                continue;
+            }
+            if trimmed.starts_with("name") {
+                current_name = extract_quoted_value(trimmed);
+                continue;
+            }
+            if current_name.as_deref() == Some(package_name) && trimmed.starts_with("version") {
+                return Ok(extract_quoted_value(trimmed));
+            }
+        }
+        Ok(None)
+    }
+
+    fn render_with_original_newline(lines: Vec<String>, original: &str) -> String {
+        let newline = if original.contains("\r\n") { "\r\n" } else { "\n" };
+        let mut rendered = lines.join(newline);
+        if original.ends_with("\r\n") {
+            rendered.push_str("\r\n");
+        } else if original.ends_with('\n') {
+            rendered.push('\n');
+        }
+        rendered
+    }
+
+    fn replace_first_json_version(contents: &str, new_version: &str) -> Result<String, String> {
+        let mut replaced = false;
+        let mut lines = Vec::new();
+        for line in contents.lines() {
+            let trimmed = line.trim_start();
+            if !replaced && trimmed.starts_with("\"version\"") {
+                let indent_len = line.len() - trimmed.len();
+                let indent = &line[..indent_len];
+                let suffix = if trimmed.trim_end().ends_with(',') { "," } else { "" };
+                lines.push(format!("{indent}\"version\": \"{new_version}\"{suffix}"));
+                replaced = true;
+            } else {
+                lines.push(line.to_string());
+            }
+        }
+        if !replaced {
+            return Err("Campo version nao encontrado no JSON".to_string());
+        }
+        Ok(render_with_original_newline(lines, contents))
+    }
+
+    fn replace_cargo_toml_version(contents: &str, new_version: &str) -> Result<String, String> {
+        let mut replaced = false;
+        let mut in_package = false;
+        let mut lines = Vec::new();
+        for line in contents.lines() {
+            let trimmed = line.trim_start();
+            let line_to_push = if trimmed == "[package]" {
+                in_package = true;
+                line.to_string()
+            } else if in_package && trimmed.starts_with('[') && trimmed != "[package]" {
+                in_package = false;
+                line.to_string()
+            } else if in_package && !replaced && trimmed.starts_with("version") {
+                let indent_len = line.len() - trimmed.len();
+                let indent = &line[..indent_len];
+                replaced = true;
+                format!("{indent}version = \"{new_version}\"")
+            } else {
+                line.to_string()
+            };
+            lines.push(line_to_push);
+        }
+        if !replaced {
+            return Err("Campo version nao encontrado na secao [package]".to_string());
+        }
+        Ok(render_with_original_newline(lines, contents))
+    }
+
+    fn replace_cargo_lock_package_version(
+        contents: &str,
+        package_name: &str,
+        new_version: &str,
+    ) -> Result<Option<String>, String> {
+        let mut replaced = false;
+        let mut in_package = false;
+        let mut current_name: Option<String> = None;
+        let mut lines = Vec::new();
+        for line in contents.lines() {
+            let trimmed = line.trim_start();
+            let line_to_push = if trimmed == "[[package]]" {
+                in_package = true;
+                current_name = None;
+                line.to_string()
+            } else if in_package && trimmed.starts_with("[[") && trimmed != "[[package]]" {
+                in_package = false;
+                current_name = None;
+                line.to_string()
+            } else if in_package && trimmed.starts_with("name") {
+                current_name = extract_quoted_value(trimmed);
+                line.to_string()
+            } else if in_package
+                && !replaced
+                && current_name.as_deref() == Some(package_name)
+                && trimmed.starts_with("version")
+            {
+                let indent_len = line.len() - trimmed.len();
+                let indent = &line[..indent_len];
+                replaced = true;
+                format!("{indent}version = \"{new_version}\"")
+            } else {
+                line.to_string()
+            };
+            lines.push(line_to_push);
+        }
+        if !replaced {
+            return Ok(None);
+        }
+        Ok(Some(render_with_original_newline(lines, contents)))
+    }
+
+    fn read_app_version_info() -> Result<AppVersionInfo, String> {
+        let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
+        let app_root = find_app_root_upwards(&cwd, 8).ok_or_else(|| {
+            format!(
+                "Raiz do app nao encontrada a partir de {}",
+                cwd.display()
+            )
+        })?;
+        let package_json_path = app_root.join("package.json");
+        let cargo_toml_path = app_root.join("src-tauri").join("Cargo.toml");
+        let tauri_conf_path = app_root.join("src-tauri").join("tauri.conf.json");
+        let cargo_lock_path = app_root.join("src-tauri").join("Cargo.lock");
+
+        let package_json_version = read_json_version(&package_json_path)?;
+        let cargo_toml_version = read_cargo_toml_version(&cargo_toml_path)?;
+        let tauri_conf_version = read_json_version(&tauri_conf_path)?;
+        let cargo_lock_version = read_cargo_lock_version(&cargo_lock_path, "catalogo_ips")?;
+
+        let consistent = package_json_version == cargo_toml_version
+            && package_json_version == tauri_conf_version
+            && cargo_lock_version
+                .as_ref()
+                .map(|v| v == &package_json_version)
+                .unwrap_or(true);
+
+        Ok(AppVersionInfo {
+            resolved_version: package_json_version.clone(),
+            consistent,
+            package_json_version,
+            cargo_toml_version,
+            tauri_conf_version,
+            cargo_lock_version,
+            app_root: app_root.display().to_string(),
+        })
+    }
+
+    fn split_command_line(input: &str) -> Result<Vec<String>, String> {
+        let mut parts = Vec::new();
+        let mut current = String::new();
+        let mut in_single = false;
+        let mut in_double = false;
+
+        for ch in input.chars() {
+            match ch {
+                '\'' if !in_double => in_single = !in_single,
+                '"' if !in_single => in_double = !in_double,
+                c if c.is_whitespace() && !in_single && !in_double => {
+                    if !current.is_empty() {
+                        parts.push(std::mem::take(&mut current));
+                    }
+                }
+                _ => current.push(ch),
+            }
+        }
+
+        if in_single || in_double {
+            return Err("Aspas nao fechadas no comando do rclone".to_string());
+        }
+        if !current.is_empty() {
+            parts.push(current);
+        }
+        if parts.is_empty() {
+            return Err("Comando do rclone vazio".to_string());
+        }
+        Ok(parts)
+    }
+
+    fn validate_rclone_command(parts: &[String]) -> Result<(), String> {
+        let executable = Path::new(&parts[0])
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or(parts[0].as_str())
+            .to_ascii_lowercase();
+        if executable != "rclone" && executable != "rclone.exe" {
+            return Err("O comando em rclone.txt precisa iniciar com rclone".to_string());
+        }
+        if parts
+            .get(1)
+            .map(|arg| arg.eq_ignore_ascii_case("sync"))
+            .unwrap_or(false)
+        {
+            Ok(())
+        } else {
+            Err("O comando em rclone.txt precisa usar a operacao sync".to_string())
+        }
+    }
+
     #[tauri::command]
     pub async fn gen_manifest_r2(
         _app: AppHandle,
@@ -1475,7 +1824,6 @@ mod core {
         r2: R2Creds,
     ) -> Result<String, String> {
         // Executa o script Node local para gerar o manifest a partir do R2
-        use std::process::Command as PCommand;
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
         // Resolve caminho do script considerando dev (../scripts) ou raiz (scripts)
         let script_path = if cwd.ends_with("src-tauri") {
@@ -1536,6 +1884,98 @@ mod core {
             return Err(format!("Manifest R2 falhou: {}\n{}", stderr, stdout));
         }
         Ok(out_path)
+    }
+
+    #[tauri::command]
+    pub async fn run_rclone_sync() -> Result<RcloneSyncResult, String> {
+        let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
+        let command_file = find_file_upwards(&cwd, "rclone.txt", 6).ok_or_else(|| {
+            format!(
+                "Arquivo rclone.txt nao encontrado a partir de {}",
+                cwd.display()
+            )
+        })?;
+        let command_line = read_command_line(&command_file)?;
+        let parts = split_command_line(&command_line)?;
+        validate_rclone_command(&parts)?;
+
+        let executable = parts[0].clone();
+        let args: Vec<String> = parts[1..].to_vec();
+        let workdir = command_file
+            .parent()
+            .map(|dir| dir.to_path_buf())
+            .unwrap_or_else(|| cwd.clone());
+
+        let status = tokio::task::spawn_blocking(move || {
+            let mut cmd = PCommand::new(&executable);
+            cmd.args(&args)
+                .current_dir(&workdir)
+                .stdin(Stdio::null())
+                .stdout(Stdio::inherit())
+                .stderr(Stdio::inherit());
+            cmd.status()
+                .map_err(|e| format!("Falha ao iniciar rclone: {}", e))
+        })
+        .await
+        .map_err(|e| format!("Falha ao aguardar processo do rclone: {}", e))??;
+
+        Ok(RcloneSyncResult {
+            ok: status.success(),
+            exit_code: status.code(),
+            command_file: command_file.display().to_string(),
+        })
+    }
+
+    #[tauri::command]
+    pub fn get_app_version_config() -> Result<AppVersionInfo, String> {
+        read_app_version_info()
+    }
+
+    #[tauri::command]
+    pub fn set_app_version_config(version: String) -> Result<AppVersionInfo, String> {
+        let next_version = validate_version_string(&version)?;
+        let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
+        let app_root = find_app_root_upwards(&cwd, 8).ok_or_else(|| {
+            format!(
+                "Raiz do app nao encontrada a partir de {}",
+                cwd.display()
+            )
+        })?;
+        let package_json_path = app_root.join("package.json");
+        let cargo_toml_path = app_root.join("src-tauri").join("Cargo.toml");
+        let tauri_conf_path = app_root.join("src-tauri").join("tauri.conf.json");
+        let cargo_lock_path = app_root.join("src-tauri").join("Cargo.lock");
+
+        let package_json_raw = std::fs::read_to_string(&package_json_path)
+            .map_err(|e| format!("Falha ao ler {}: {}", package_json_path.display(), e))?;
+        let cargo_toml_raw = std::fs::read_to_string(&cargo_toml_path)
+            .map_err(|e| format!("Falha ao ler {}: {}", cargo_toml_path.display(), e))?;
+        let tauri_conf_raw = std::fs::read_to_string(&tauri_conf_path)
+            .map_err(|e| format!("Falha ao ler {}: {}", tauri_conf_path.display(), e))?;
+
+        let package_json_updated = replace_first_json_version(&package_json_raw, &next_version)?;
+        let cargo_toml_updated = replace_cargo_toml_version(&cargo_toml_raw, &next_version)?;
+        let tauri_conf_updated = replace_first_json_version(&tauri_conf_raw, &next_version)?;
+
+        std::fs::write(&package_json_path, package_json_updated)
+            .map_err(|e| format!("Falha ao gravar {}: {}", package_json_path.display(), e))?;
+        std::fs::write(&cargo_toml_path, cargo_toml_updated)
+            .map_err(|e| format!("Falha ao gravar {}: {}", cargo_toml_path.display(), e))?;
+        std::fs::write(&tauri_conf_path, tauri_conf_updated)
+            .map_err(|e| format!("Falha ao gravar {}: {}", tauri_conf_path.display(), e))?;
+
+        if cargo_lock_path.exists() {
+            let cargo_lock_raw = std::fs::read_to_string(&cargo_lock_path)
+                .map_err(|e| format!("Falha ao ler {}: {}", cargo_lock_path.display(), e))?;
+            if let Some(cargo_lock_updated) =
+                replace_cargo_lock_package_version(&cargo_lock_raw, "catalogo_ips", &next_version)?
+            {
+                std::fs::write(&cargo_lock_path, cargo_lock_updated)
+                    .map_err(|e| format!("Falha ao gravar {}: {}", cargo_lock_path.display(), e))?;
+            }
+        }
+
+        read_app_version_info()
     }
 
     #[tauri::command]
@@ -1853,6 +2293,9 @@ pub fn run() {
             core::set_branding_image,
             core::set_header_logos,
             core::gen_manifest_r2,
+            core::run_rclone_sync,
+            core::get_app_version_config,
+            core::set_app_version_config,
             core::read_image_base64
         ])
         .run(tauri::generate_context!())
