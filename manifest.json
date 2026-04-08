@@ -2,9 +2,9 @@
   "appVersion": "1.5.0",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.0/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 27032620,
+    "version": 8042619,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "718c07530ae641fdc8b80f94f862357ec9449d95055d1792917c60d8855a1c51"
+    "sha256": "a66771b121f56226f43de5658b8f3ba4a99d502abd657fb78e3f0dc0f594045a"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -1282,6 +1282,14 @@
         "sha256": "6dd44c4e72e139867f37d3e1abc25801"
       },
       {
+        "file": "BANDEJAS/7117133001.png.cimg",
+        "sha256": "049606d3de4e7d9394cd052f3b0b01ba"
+      },
+      {
+        "file": "BANDEJAS/7117133002.png.cimg",
+        "sha256": "60a9aca6f936aac62aa806db790321f4"
+      },
+      {
         "file": "BANDEJAS/7117133003.png.cimg",
         "sha256": "afbd0cded6a5ba302fefe59b3375f492"
       },
@@ -1304,6 +1312,18 @@
       {
         "file": "BANDEJAS/7117203046.png.cimg",
         "sha256": "dad11053bbd7536864cc1d2f1f14ed8f"
+      },
+      {
+        "file": "BANDEJAS/7134013001.png.cimg",
+        "sha256": "d5cb2afd0b23d1edc37338a660ef409b"
+      },
+      {
+        "file": "BANDEJAS/7134203001.png.cimg",
+        "sha256": "a53a425ea8ff7c0545adeabb7ce1498c"
+      },
+      {
+        "file": "BANDEJAS/7134203002.png.cimg",
+        "sha256": "5ae971fccc90d3035f74d26ad9f8f741"
       },
       {
         "file": "BANDEJAS/7134283001.png.cimg",
@@ -1354,6 +1374,10 @@
         "sha256": "0ef425ef557554f1d478358722964b28"
       },
       {
+        "file": "BANDEJAS/7136703012.png.cimg",
+        "sha256": "dd1079f9269f5a7664cccf1fe90b9d0d"
+      },
+      {
         "file": "BANDEJAS/7146393001.png.cimg",
         "sha256": "36058306d4a6c25a5155daef0b8afd89"
       },
@@ -1368,6 +1392,18 @@
       {
         "file": "BANDEJAS/7146513002.png.cimg",
         "sha256": "5e719458638191ac5498c374c244ff3f"
+      },
+      {
+        "file": "BANDEJAS/7148453001.png.cimg",
+        "sha256": "f2c2e71b8483b8bc0482133b7275f5d5"
+      },
+      {
+        "file": "BANDEJAS/7148453002.png.cimg",
+        "sha256": "37ac94827b0cfbb40df25b76d6afc5bd"
+      },
+      {
+        "file": "BANDEJAS/7150303002.png.cimg",
+        "sha256": "2598df7d111833b158ec0f9e7362ed66"
       },
       {
         "file": "BANDEJAS/7150363001.png.cimg",
@@ -1706,6 +1742,18 @@
         "sha256": "6a51af1c64f9f50de89d4ad08b6a45d0"
       },
       {
+        "file": "BANDEJAS/7175263001.png.cimg",
+        "sha256": "d3d19ca7ef6b2c43fc20d08cb97395bc"
+      },
+      {
+        "file": "BANDEJAS/7175263002.png.cimg",
+        "sha256": "a7793523914f48188dbe2abf080cbc07"
+      },
+      {
+        "file": "BANDEJAS/7175263012.png.cimg",
+        "sha256": "c1897b62022ef76bb6dfc3a4c1111031"
+      },
+      {
         "file": "BANDEJAS/7175263041.png.png.cimg",
         "sha256": "7bd40b5a021786a691143af8c9297988"
       },
@@ -1786,12 +1834,44 @@
         "sha256": "a7cf0c1c08d84e02583c7fba9c03efff"
       },
       {
+        "file": "BOMBAS/7111032801.png.cimg",
+        "sha256": "5d5446dd40f6f9cd4335a75cf1b2e4ea"
+      },
+      {
+        "file": "BOMBAS/7111042801.png.cimg",
+        "sha256": "b53ef423e6b928b0283954ab1edf202d"
+      },
+      {
+        "file": "BOMBAS/7111042802.png.cimg",
+        "sha256": "9be87e9683bbe094d878ca2bcff556e7"
+      },
+      {
+        "file": "BOMBAS/7111042803.png.cimg",
+        "sha256": "c73ad940439fab10e7ede2844bc53aa1"
+      },
+      {
         "file": "BOMBAS/7111045810.png.cimg",
         "sha256": "def5442cdc63c83587d7e6f5f847d19a"
       },
       {
+        "file": "BOMBAS/7111052801.png.cimg",
+        "sha256": "5a01cdbbf0d0f62f022d87ce12642603"
+      },
+      {
+        "file": "BOMBAS/7111062801.png.cimg",
+        "sha256": "887f70a9f27df9c154d9f2593fc9db4b"
+      },
+      {
         "file": "BOMBAS/7111065810.png.cimg",
         "sha256": "f8cfc4cfa6b7985359d497a4e39813ed"
+      },
+      {
+        "file": "BOMBAS/7111302801.png.cimg",
+        "sha256": "944d5a3ea970e7f633d7d75b41b6473b"
+      },
+      {
+        "file": "BOMBAS/7111302802.png.cimg",
+        "sha256": "b3950efa51da95153a50ae9a2dff2037"
       },
       {
         "file": "BOMBAS/7111305810.png.cimg",
@@ -2315,7 +2395,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7115466802.png.cimg",
-        "sha256": "6a668c6683f1c445da02d2a27efc9f37"
+        "sha256": "e10d1e6b12c0fec48973275e440adc34"
       },
       {
         "file": "CAIXA_DIRECAO/7115486801.png.cimg",
@@ -2323,7 +2403,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7115486802.png.cimg",
-        "sha256": "ddb1064333f172064b76d4373bebff48"
+        "sha256": "20ba9cddde5c9f47f08812c1e5c500c8"
       },
       {
         "file": "CAIXA_DIRECAO/7115505900.png.cimg",
@@ -2774,6 +2854,14 @@
         "sha256": "f9fd87e80776fa78e2541f322f17e870"
       },
       {
+        "file": "CAIXA_DIRECAO/7149805800.png.cimg",
+        "sha256": "c632b89e3d90eaa8b4e348a81ad96996"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7149805810.png.cimg",
+        "sha256": "0cff6d068b0e430dd0c717c1f9cb3421"
+      },
+      {
         "file": "CAIXA_DIRECAO/7149806010.png.cimg",
         "sha256": "aed782206789e5b1f9094264a1f6e205"
       },
@@ -2907,7 +2995,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7156425901.png.cimg",
-        "sha256": "ab480d7264b7de12d5fd31c9df25ac07"
+        "sha256": "6012078c7d7fc93fe702e9078b00b037"
       },
       {
         "file": "CAIXA_DIRECAO/7156425910.png.cimg",
@@ -3075,7 +3163,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7170205820.png.cimg",
-        "sha256": "9e444d8ce17acb6b465e46cac2d93c62"
+        "sha256": "b78dd1cfeb2458794b411144c7d04545"
       },
       {
         "file": "CAIXA_DIRECAO/7170206030.png.cimg",
@@ -3103,7 +3191,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7170556010.png.cimg",
-        "sha256": "9134b4566aeb7caeb56be7d2bc85194a"
+        "sha256": "65509a48529fe5b43963ee66b61b1606"
       },
       {
         "file": "CAIXA_DIRECAO/7170606010.png.cimg",
@@ -3226,6 +3314,10 @@
         "sha256": "687ba6e37e82903b3b63dd313ccb8ca3"
       },
       {
+        "file": "CAIXA_DIRECAO/7175906803.png.cimg",
+        "sha256": "d2c92396d8f973fb0155258c4b2518ed"
+      },
+      {
         "file": "CAIXA_DIRECAO/7176106010.png.cimg",
         "sha256": "a0be4899459573419f3225b95b7997ad"
       },
@@ -3271,7 +3363,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7183915801.png.cimg",
-        "sha256": "1d39f55a3d37ba9123494928bf013484"
+        "sha256": "f5b5186c96930e556bcac0cf0926f38a"
       },
       {
         "file": "CAIXA_DIRECAO/7183925801.png.cimg",
@@ -3295,11 +3387,11 @@
       },
       {
         "file": "CAIXA_DIRECAO/7185946801.png.cimg",
-        "sha256": "eee5358001067aafb47808a51544f0ad"
+        "sha256": "5f66357f25cafcefe75ba35a11e72c4b"
       },
       {
         "file": "CAIXA_DIRECAO/7188106801.png.cimg",
-        "sha256": "1b6ff338890ada2708f83298e22e157b"
+        "sha256": "2773209815376d4649d2d6b48dccab04"
       },
       {
         "file": "CAIXA_DIRECAO/8134900202.png.cimg",
@@ -3307,11 +3399,11 @@
       },
       {
         "file": "CAIXA_DIRECAO/8175520510.png.cimg",
-        "sha256": "72f236b0a8d5b75d84997996d85e4118"
+        "sha256": "15515f811127ab7ac2d5b465daeca669"
       },
       {
         "file": "CAIXA_DIRECAO/8175520530.png.cimg",
-        "sha256": "eb5548a9e0534f4bae9fb916c92c1d27"
+        "sha256": "5cd4620ef2addc9985dd69ceb4f8650f"
       },
       {
         "file": "CAIXA_DIRECAO/8273562410.png.cimg",
@@ -3982,6 +4074,14 @@
         "sha256": "560ef7d0fa4ff5e9aad9483de4d412c0"
       },
       {
+        "file": "FAROIS/6138102211.png.cimg",
+        "sha256": "fa3a03379b79bd998ac4be892d2e124e"
+      },
+      {
+        "file": "FAROIS/6138102212.png.cimg",
+        "sha256": "a5df017ebd2a60f4530bbb0883adf3c0"
+      },
+      {
         "file": "FAROIS/6149802221.png.cimg",
         "sha256": "848ee1daced11d6a58cf3add076286e5"
       },
@@ -4078,6 +4178,14 @@
         "sha256": "8ae996caa320508e62a8adba906babef"
       },
       {
+        "file": "FAROIS/6170202321.png.cimg",
+        "sha256": "5ab70c10b5fd11691a1201aade02aaa8"
+      },
+      {
+        "file": "FAROIS/6170202322.png.cimg",
+        "sha256": "4ac8bb4533e6dae859a0d5345c032874"
+      },
+      {
         "file": "FAROIS/6170202331.png.cimg",
         "sha256": "6fc9416033043ac29a92e9cd7fd7a1cc"
       },
@@ -4092,6 +4200,14 @@
       {
         "file": "FAROIS/6170202334.png.cimg",
         "sha256": "d3f76a854794b999d20656231e44f426"
+      },
+      {
+        "file": "FAROIS/6170422201.png.cimg",
+        "sha256": "a10ea48564f74dce57fecfa37c60cbdb"
+      },
+      {
+        "file": "FAROIS/6170422202.png.cimg",
+        "sha256": "f9b66fa446e24cd86d76e796227ff53c"
       },
       {
         "file": "FAROIS/6170422211.JPG.cimg",
@@ -4182,6 +4298,14 @@
         "sha256": "e6222a084b9db8f96cf2fea3e20cdbba"
       },
       {
+        "file": "FAROIS/6170702201.png.cimg",
+        "sha256": "fe8ddd4a33344b2e04add7ad2ea3ed6e"
+      },
+      {
+        "file": "FAROIS/6170702202.png.cimg",
+        "sha256": "f925ced9260353181eccab1fd5641df3"
+      },
+      {
         "file": "FAROIS/6170862201.JPG.cimg",
         "sha256": "5b9afd8fdcbfa1171b8b8070d45480c8"
       },
@@ -4200,6 +4324,26 @@
       {
         "file": "FAROIS/6170862202.png.cimg",
         "sha256": "2542a54df520167c381bd68c66a9e908"
+      },
+      {
+        "file": "FAROIS/6170862212.png.cimg",
+        "sha256": "dd81856dbde3bc5f28a8d54b2a02493d"
+      },
+      {
+        "file": "FAROIS/6170862221.png.cimg",
+        "sha256": "4b41ed5385e1bc0918c3df05740e17e3"
+      },
+      {
+        "file": "FAROIS/6170862222.png.cimg",
+        "sha256": "bc06e271c6ea08369a511f4843cf6e65"
+      },
+      {
+        "file": "FAROIS/6170862301.png.cimg",
+        "sha256": "af714945fe3525e84321e70b8683df2a"
+      },
+      {
+        "file": "FAROIS/6170862302.png.cimg",
+        "sha256": "866b094db01fa0ce9b45499fb51371d4"
       },
       {
         "file": "FAROIS/6170862311.png.cimg",
@@ -4290,6 +4434,14 @@
         "sha256": "eec94a9ac214542f0f79aeeef6eecd1b"
       },
       {
+        "file": "FAROIS/6175522371.png.cimg",
+        "sha256": "7cc170badde29286459ca96b7da0a8e5"
+      },
+      {
+        "file": "FAROIS/6175522372.png.cimg",
+        "sha256": "f7412ba7d4558beef52d9fe914bd8614"
+      },
+      {
         "file": "FAROIS/6175522381.png.cimg",
         "sha256": "fc2b6a40a41312efae210dad00bbab8c"
       },
@@ -4304,6 +4456,14 @@
       {
         "file": "FAROIS/6175522384.png.cimg",
         "sha256": "120f2bf5de4f8ec4eab8bc29c1254d3b"
+      },
+      {
+        "file": "FAROIS/6175522850.png.cimg",
+        "sha256": "01026d25d56389c982c5711f8d94e53f"
+      },
+      {
+        "file": "FAROIS/6175522870.png.cimg",
+        "sha256": "33ebd53170740a7f9d8b4f6f822c2aee"
       },
       {
         "file": "FAROIS/6175852201.png.cimg",
@@ -4330,6 +4490,10 @@
         "sha256": "a8b3b33f8e1695224bc7d0a659e37868"
       },
       {
+        "file": "FAROIS/6175852801.png.cimg",
+        "sha256": "ae601c7918acf1c54d8e4f6a98d6846b"
+      },
+      {
         "file": "FAROIS/6275852201.png.cimg",
         "sha256": "a70278285c5e7b3e89060a0110a95195"
       },
@@ -4344,6 +4508,14 @@
       {
         "file": "FAROIS/6275852302.png.cimg",
         "sha256": "34b681e8d6d6219657e6a98532cbf364"
+      },
+      {
+        "file": "FAROIS/6275852303.png.cimg",
+        "sha256": "db3804d1565961fc1adaa55b043a69bd"
+      },
+      {
+        "file": "FAROIS/6275852304.png.cimg",
+        "sha256": "0ec471ae63b96fdb766d0995adcb0453"
       },
       {
         "file": "FAROIS/68930d3c-75fc-48b6-88a4-3470e4ffaa8d.png.cimg",
@@ -5022,6 +5194,30 @@
         "sha256": "f27d6dd659ee059a85450e85b0f8df08"
       },
       {
+        "file": "LATARIA/3111301600.png.cimg",
+        "sha256": "05002c11d0b0b6ab40d780a14d8678ed"
+      },
+      {
+        "file": "LATARIA/3111441600.png.cimg",
+        "sha256": "0b59ff099c90a0128e6a84154a5d7249"
+      },
+      {
+        "file": "LATARIA/3111821000.png.cimg",
+        "sha256": "2e56e9acb048eb13275b92d6b1a304a3"
+      },
+      {
+        "file": "LATARIA/3111821010.png.cimg",
+        "sha256": "75ff92c2bb06a89261de1ccb9459bc4a"
+      },
+      {
+        "file": "LATARIA/3111821101.png.cimg",
+        "sha256": "010209b088b069c205ddf8938348c264"
+      },
+      {
+        "file": "LATARIA/3111821102.png.cimg",
+        "sha256": "37eed20e21b9b4747d271e1b096c3190"
+      },
+      {
         "file": "LATARIA/3111821201.png.cimg",
         "sha256": "f036e2dd3c7061ddc857d40221f4617a"
       },
@@ -5046,8 +5242,72 @@
         "sha256": "dd83d33573f37c8de05b579d4cbb4855"
       },
       {
+        "file": "LATARIA/3150361601.png.cimg",
+        "sha256": "c0fbdccccc60004076b6299e47d4b6af"
+      },
+      {
+        "file": "LATARIA/3150611600.png.cimg",
+        "sha256": "50bfbb9a3da2e15ed6eb766281427447"
+      },
+      {
+        "file": "LATARIA/3156021201.png.cimg",
+        "sha256": "4592367094a919225fefeddaf55b30e6"
+      },
+      {
+        "file": "LATARIA/3156021202.png.cimg",
+        "sha256": "1ecd9add70c8f920237d4f341686b8d5"
+      },
+      {
+        "file": "LATARIA/3156021203.png.cimg",
+        "sha256": "3bdd2610227ff3dc237802726fb80aa6"
+      },
+      {
+        "file": "LATARIA/3156021204.png.cimg",
+        "sha256": "718f28879f7ce45b7c10548851a32c16"
+      },
+      {
+        "file": "LATARIA/3156021600.png.cimg",
+        "sha256": "6e8e370a9b015b8c6b5eb43954043ea0"
+      },
+      {
+        "file": "LATARIA/3156421600.png.cimg",
+        "sha256": "6b3752692e9aa6132d770caa97c2f7e5"
+      },
+      {
+        "file": "LATARIA/3156421610.png.cimg",
+        "sha256": "278cf84215c617eb30c5a692f2f99780"
+      },
+      {
+        "file": "LATARIA/3156421631.png.cimg",
+        "sha256": "6616af192d229e978a4c8af3ca8c31cc"
+      },
+      {
+        "file": "LATARIA/3156421632.png.cimg",
+        "sha256": "91a455d2c3c0e15ab4582ef3026f3b98"
+      },
+      {
+        "file": "LATARIA/3156501600.png.cimg",
+        "sha256": "b9a8ca378bb11725d7033ab341b641bd"
+      },
+      {
+        "file": "LATARIA/3156881600.png.cimg",
+        "sha256": "6cf1b965796923171c27420886c905a4"
+      },
+      {
+        "file": "LATARIA/3156881610.png.cimg",
+        "sha256": "7d75123d4816829987b4959826eaa9a1"
+      },
+      {
+        "file": "LATARIA/3156881620.png.cimg",
+        "sha256": "202e0461e4d4169c8806cb8e637f9a2b"
+      },
+      {
         "file": "LATARIA/3156881630.png.cimg",
-        "sha256": "72f6b57fa0260f33630d974eca7d511b"
+        "sha256": "7998223a4073e3fcff2923fc2fe14ba6"
+      },
+      {
+        "file": "LATARIA/3163101601.png.cimg",
+        "sha256": "7ec1be80452db513cd70743d228c0940"
       },
       {
         "file": "LATARIA/3169381600.png.cimg",
@@ -5062,8 +5322,44 @@
         "sha256": "69fff162a972d0b4f6b7c0689c0daac2"
       },
       {
+        "file": "LATARIA/3169381611.png.cimg",
+        "sha256": "ab1187e16ba89fbd8efe9ed5c31b1e4e"
+      },
+      {
         "file": "LATARIA/3169381620.png.cimg",
         "sha256": "66a7af6c14a1b201b3c6ae1ff944a109"
+      },
+      {
+        "file": "LATARIA/3170201203.png.cimg",
+        "sha256": "3d10d00f077a762b27839a55c1781bd9"
+      },
+      {
+        "file": "LATARIA/3170201213.png.cimg",
+        "sha256": "49fc9da692e1646ee0614aa990a1b836"
+      },
+      {
+        "file": "LATARIA/3170201214.png.cimg",
+        "sha256": "155e0ea8f35edcc9c837b4bc5b080714"
+      },
+      {
+        "file": "LATARIA/3170201600.png.cimg",
+        "sha256": "a0a3f0642da1cdfd6b76d3a13841e3c2"
+      },
+      {
+        "file": "LATARIA/3170201610.png.cimg",
+        "sha256": "33ab826009b68ad19dd3fe5247e5f285"
+      },
+      {
+        "file": "LATARIA/3170301600.png.cimg",
+        "sha256": "2f1404e159efec4cc088e0c372c21471"
+      },
+      {
+        "file": "LATARIA/3170421203.png.cimg",
+        "sha256": "abeaa920423960b488144d8ed15b6016"
+      },
+      {
+        "file": "LATARIA/3170421204.png.cimg",
+        "sha256": "6fc0fc98ae9173f8b07c6bd0eda54139"
       },
       {
         "file": "LATARIA/3170421600.png.cimg",
@@ -5078,6 +5374,34 @@
         "sha256": "983821031245aabf3ee3cfd111d64d62"
       },
       {
+        "file": "LATARIA/3170501001.png.cimg",
+        "sha256": "c1a102faa801af896ee1643c2f663705"
+      },
+      {
+        "file": "LATARIA/3170501101.png.cimg",
+        "sha256": "474394296f8328f1efff3728fc2e25c2"
+      },
+      {
+        "file": "LATARIA/3170501102.png.cimg",
+        "sha256": "0019d3c47a91fef0df85445008e1b5d2"
+      },
+      {
+        "file": "LATARIA/3170501201.png.cimg",
+        "sha256": "cf44bc222524a6fc631b86f541742434"
+      },
+      {
+        "file": "LATARIA/3170501202.png.cimg",
+        "sha256": "a467eb320a630e173a8da2034bb845c5"
+      },
+      {
+        "file": "LATARIA/3170501203.png.cimg",
+        "sha256": "05303f90fe369fe6fe20305615bcf2e6"
+      },
+      {
+        "file": "LATARIA/3170501204.png.cimg",
+        "sha256": "7ad47d2a9b1ddb42fa61005f92eaf12f"
+      },
+      {
         "file": "LATARIA/3170501601.png.cimg",
         "sha256": "7a5f2f51eb25f3dfdec1deb1f741617f"
       },
@@ -5086,16 +5410,104 @@
         "sha256": "c47baa63649377b7e162dc12f3918a6d"
       },
       {
+        "file": "LATARIA/3170701202.png.cimg",
+        "sha256": "68c4f06f1f86e5c7b2d4a66b03acff7e"
+      },
+      {
+        "file": "LATARIA/3170701600.png.cimg",
+        "sha256": "b926f7eafd71a9d108e2a9bb756d0fa4"
+      },
+      {
+        "file": "LATARIA/3170861011.png.cimg",
+        "sha256": "548b5f1bc208319d0b5de46f4ead1b5d"
+      },
+      {
+        "file": "LATARIA/3170861111.png.cimg",
+        "sha256": "34faaa658d03e0eabd51e97b74f84f57"
+      },
+      {
+        "file": "LATARIA/3170861112.png.cimg",
+        "sha256": "fd584057bd84b627d76cfba4db973422"
+      },
+      {
+        "file": "LATARIA/3170861202.png.cimg",
+        "sha256": "6f664c4912ae4d64f5a6c2b7282f3b0c"
+      },
+      {
+        "file": "LATARIA/3170861204.png.cimg",
+        "sha256": "f3917701883c0a3735bc9e3921d97265"
+      },
+      {
+        "file": "LATARIA/3170861600.png.cimg",
+        "sha256": "1333ad2d16570b24b6c13287209138e9"
+      },
+      {
         "file": "LATARIA/3170861611.png.cimg",
         "sha256": "0b50d0aede24c85fbeaed0e2294622e2"
       },
       {
+        "file": "LATARIA/3173571601.png.cimg",
+        "sha256": "27f69f4d0393154ab2e020af043ff850"
+      },
+      {
+        "file": "LATARIA/3175261600.png.cimg",
+        "sha256": "2f8588fc57d8776f7c7aeb66028c2dbf"
+      },
+      {
+        "file": "LATARIA/3175261610.png.cimg",
+        "sha256": "66da0d9e714d6a7304b35132788b8307"
+      },
+      {
         "file": "LATARIA/3175261620.png.cimg",
-        "sha256": "0823bf005a7bb79631cb341bd5744479"
+        "sha256": "37425d9fb81d3d915171d80e8d16c2d0"
+      },
+      {
+        "file": "LATARIA/3175271011.png.cimg",
+        "sha256": "1bb68a4f603ac754c2d65deb658bd27d"
+      },
+      {
+        "file": "LATARIA/3175271111.png.cimg",
+        "sha256": "479d482d6c3e4fe608df164081f5bac8"
+      },
+      {
+        "file": "LATARIA/3175271112.png.cimg",
+        "sha256": "605246bd4801bccfeb185be6ba3631a0"
+      },
+      {
+        "file": "LATARIA/3175271211.png.cimg",
+        "sha256": "56676405b19216c9d941e4834b3ed1d4"
+      },
+      {
+        "file": "LATARIA/3175271212.png.cimg",
+        "sha256": "6e7e96cdce32ade15ec0edeb8d7c5070"
+      },
+      {
+        "file": "LATARIA/3175271213.png.cimg",
+        "sha256": "f736273d5333cc55545a9d1f9e779dfa"
+      },
+      {
+        "file": "LATARIA/3175271214.png.cimg",
+        "sha256": "6de67aff456dc811e6a73fc57b81f563"
       },
       {
         "file": "LATARIA/3175271610.png.cimg",
         "sha256": "9b539d49d1a39c8a195a33199fcf98a0"
+      },
+      {
+        "file": "LATARIA/3175521600.png.cimg",
+        "sha256": "90b01edb68a9f55468b1c3a15055f184"
+      },
+      {
+        "file": "LATARIA/3175521601.png.cimg",
+        "sha256": "05da436781595b1663fc8c56cb1151e9"
+      },
+      {
+        "file": "LATARIA/3175521611.png.cimg",
+        "sha256": "5909af3ea9ab295e89a6d281e89d3844"
+      },
+      {
+        "file": "LATARIA/3175521612.png.cimg",
+        "sha256": "fad8e0ed331307358cb8843ca082c08b"
       },
       {
         "file": "LATARIA/3175851201.png.cimg",
@@ -5112,6 +5524,14 @@
       {
         "file": "LATARIA/3175851204.png.cimg",
         "sha256": "36f4e07dfa13dc261c8320f94ef15d0a"
+      },
+      {
+        "file": "LATARIA/3175851601.png.cimg",
+        "sha256": "219d287e2aae130c9a4b01d1941a1aeb"
+      },
+      {
+        "file": "LATARIA/3275261030.png.cimg",
+        "sha256": "c6883c09fac7a510901ad087c85c4f5d"
       },
       {
         "file": "MOTOR DE ARRANQUE/4270201230.png.cimg",
