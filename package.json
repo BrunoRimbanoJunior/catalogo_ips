@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "organizar-imagens": "node ../scripts/organizar-imagens-por-grupo.mjs",
+    "resolver-sem-cadastro": "node ../scripts/resolver-sem-cadastro.mjs",
     "tauri:build:signed": "node scripts/tauri-build-release.mjs",
     "manifest": "node scripts/gen-manifest-r2.mjs --out manifest.json",
     "manifest:r2": "node scripts/gen-manifest-r2.mjs",
