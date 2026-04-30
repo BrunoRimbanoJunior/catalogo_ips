@@ -2,9 +2,9 @@
   "appVersion": "1.5.0",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.0/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 29042620,
+    "version": 30042620,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "48b66cf15d0d61254048c868dab6a9cb096c09d32c244ce4665958367f6e853a"
+    "sha256": "fc608b1a56a1af45470ff4cf67e44d548a0c9539582f9b126a99af1b08053d33"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -4570,532 +4570,540 @@
         "sha256": "0ec471ae63b96fdb766d0995adcb0453"
       },
       {
+        "file": "KIT CORRENTE/7142900204.png.cimg",
+        "sha256": "97afad43aba2f06f9e17231acae905ff"
+      },
+      {
+        "file": "KIT CORRENTE/7142900205.png.cimg",
+        "sha256": "8baa1e918243b28f4a27ed5d20ffe64a"
+      },
+      {
         "file": "KIT CORRENTE/8111300201.png.cimg",
-        "sha256": "bafe24229134019505a1674684916900"
+        "sha256": "2126d0071baefdee409f637412c4f2a0"
       },
       {
         "file": "KIT CORRENTE/8111300202.png.cimg",
-        "sha256": "46071e44d0994d7c969b1024a0076a20"
+        "sha256": "8050e4fe4916bf265089bdeb44160db9"
       },
       {
         "file": "KIT CORRENTE/8111300203.png.cimg",
-        "sha256": "1681b1ac870e00fa99c9f5eaf4ce4aef"
+        "sha256": "85975e3a7a3eea271675f0709dfc89eb"
       },
       {
         "file": "KIT CORRENTE/8111820201.png.cimg",
-        "sha256": "38d7a857daea0d34d351fd195e96b0eb"
+        "sha256": "7c071bd5ceea9ec55c21dd6550104098"
       },
       {
         "file": "KIT CORRENTE/8113900201.png.cimg",
-        "sha256": "958726d0a1d9b7e27b35569ac4724e33"
+        "sha256": "a327e7a4d168745c7569957339402086"
       },
       {
         "file": "KIT CORRENTE/8113900203.png.cimg",
-        "sha256": "5fa8c62cf55bf7943ab793d65630c816"
+        "sha256": "a18b1c8711f72dc8250bef57685d8cd1"
       },
       {
         "file": "KIT CORRENTE/8113900204.png.cimg",
-        "sha256": "641cd9f41ef90abe5fbe82d82f51dce0"
+        "sha256": "1eb656a8749c8423098ee7d15f485ab7"
       },
       {
         "file": "KIT CORRENTE/8113900205.png.cimg",
-        "sha256": "0710c950113461f63bdd8e41e92b9f8c"
+        "sha256": "c7a8917b693645e71a54eda212838250"
       },
       {
         "file": "KIT CORRENTE/8114100201.png.cimg",
-        "sha256": "29dca093b554166bdf7e8f3dcae69497"
+        "sha256": "b7110721f304be62836aa6a61367e023"
       },
       {
         "file": "KIT CORRENTE/8114100202.png.cimg",
-        "sha256": "6353e6949f789d77e2127acfb753e324"
+        "sha256": "ad634358491ab31ef4f07e408d431dbf"
       },
       {
         "file": "KIT CORRENTE/8115300201.png.cimg",
-        "sha256": "af3b82014eff99061a581565117bb0d1"
+        "sha256": "10854fd6a350f5245e70710a5436d930"
       },
       {
         "file": "KIT CORRENTE/8115800201.png.cimg",
-        "sha256": "afbc8d32d65aaaa13e03445f411d1023"
+        "sha256": "3fdc07109f5a7abef3206038d082095d"
       },
       {
         "file": "KIT CORRENTE/8115800202.png.cimg",
-        "sha256": "47df4096604a29099bce5ed87f914311"
+        "sha256": "4963d1bd934daa0e8ad9373911913434"
       },
       {
         "file": "KIT CORRENTE/8115800203.png.cimg",
-        "sha256": "2e36e7f5ce8536f0815a5ad2679e7f4e"
+        "sha256": "49185a43cf52b4ddc61f7389dc525b27"
       },
       {
         "file": "KIT CORRENTE/8115800204.png.cimg",
-        "sha256": "e6d363be58554862efa5a5cda9f90612"
+        "sha256": "ab4743720bf6826a2669559dc3f85abf"
       },
       {
         "file": "KIT CORRENTE/8115800205.png.cimg",
-        "sha256": "18e16f43ff23e333cfbf882f08f931d0"
+        "sha256": "6b547bcda87e2acef3674d48b16c2d0e"
       },
       {
         "file": "KIT CORRENTE/8115800206.png.cimg",
-        "sha256": "b4d19f0de6752e4fcc4891c4e20b535e"
+        "sha256": "cd10a71404fd8c4169cffa360bf45ab7"
       },
       {
         "file": "KIT CORRENTE/8115800207.png.cimg",
-        "sha256": "241bcb49c94bdb13e3c018bc66fed94a"
+        "sha256": "974fe68cc3869ddd8b999f47801128cf"
       },
       {
         "file": "KIT CORRENTE/8115800208.png.cimg",
-        "sha256": "78d1ffe2ced806853ceaeb27a6ec3bd4"
+        "sha256": "022ac35c1b9b5b7c9ee9a103e07f6cfd"
       },
       {
         "file": "KIT CORRENTE/8115800209.png.cimg",
-        "sha256": "b6843609931a500a849eb081962b1791"
+        "sha256": "8c7b8a24221d725195d8675589ff51bb"
       },
       {
         "file": "KIT CORRENTE/8115800210.png.cimg",
-        "sha256": "4190cb7d3843ec81848bca309ce1df09"
+        "sha256": "3c26170b0a670f2d7e64129b524d735f"
       },
       {
         "file": "KIT CORRENTE/8115800211.png.cimg",
-        "sha256": "32f5bfc1afcd6e1f5fc7d1c624d47d7a"
+        "sha256": "abbc4c11271e72e9f7f2e24272234b4a"
       },
       {
         "file": "KIT CORRENTE/8115800212.png.cimg",
-        "sha256": "b36c2165cc80a1d981542babed609c8e"
+        "sha256": "a3d69b1140881f474f4aec84d0cdc285"
       },
       {
         "file": "KIT CORRENTE/8115800213.png.cimg",
-        "sha256": "fc68c1d9185bae204295969660612e90"
+        "sha256": "aa460f5e710d084e0b85170e56046b6f"
       },
       {
         "file": "KIT CORRENTE/8115900201.png.cimg",
-        "sha256": "ead2ee424be0a1e76acd680160ec3cca"
+        "sha256": "8405c6119a33567d44188164ca0dd594"
       },
       {
         "file": "KIT CORRENTE/8115900202.png.cimg",
-        "sha256": "149f60c73c9b733c1e103967878bf08f"
+        "sha256": "0e5b0b8a2dbf8dea1c07134fc10d357d"
       },
       {
         "file": "KIT CORRENTE/8115900203.png.cimg",
-        "sha256": "6b957cc614588eab66e430a43ef3e4c6"
+        "sha256": "66d93fa4cc73bba14f1b98f289995592"
       },
       {
         "file": "KIT CORRENTE/8115900204.png.cimg",
-        "sha256": "ce7b3b9bd5ad0a7531738ba2ae995e3b"
+        "sha256": "4834719447b28a463f1921f867e54ea4"
       },
       {
         "file": "KIT CORRENTE/8115900205.png.cimg",
-        "sha256": "f253b9b1505bf15077d5469b35bcf7f5"
+        "sha256": "53376c3e637350d099d56c440bb85cc2"
       },
       {
         "file": "KIT CORRENTE/8115900208.png.cimg",
-        "sha256": "e2e367f9e5a9716cc52b1a80427f3efe"
+        "sha256": "15418fe2222bc98a2f43c897cb0d1361"
       },
       {
         "file": "KIT CORRENTE/8115900209.png.cimg",
-        "sha256": "a133e36f198b08922be07418087d3ef7"
+        "sha256": "eea76eaf02d988675b3c262b85dba5b8"
       },
       {
         "file": "KIT CORRENTE/8115900210.png.cimg",
-        "sha256": "85ec97ce374b4f6d875e3a845f2785b5"
+        "sha256": "71a224688aa48cc6a530c7b91562fa78"
       },
       {
         "file": "KIT CORRENTE/8115900211.png.cimg",
-        "sha256": "729d2ed4a0f2f48456be2fa5ec673b92"
+        "sha256": "63cf7e5d54f2db737402ce01b8581015"
       },
       {
         "file": "KIT CORRENTE/8115900212.png.cimg",
-        "sha256": "973449abf0ce5befa61d4f5eaf938d39"
+        "sha256": "00253f4ecc131f76d8195073335d0518"
       },
       {
         "file": "KIT CORRENTE/8115900213.png.cimg",
-        "sha256": "04cf205cb6b293fc2e95815327816ec8"
+        "sha256": "9b0ebd68460ce57a13df38291485fd73"
       },
       {
         "file": "KIT CORRENTE/8115900214.png.cimg",
-        "sha256": "b90dcf03f3e50e985989a277c47944fa"
+        "sha256": "de83e67f3365948bb1089466b926779d"
       },
       {
         "file": "KIT CORRENTE/8115900215.png.cimg",
-        "sha256": "0444905deece3533bb48a73c0a121f8a"
+        "sha256": "39b38393ecfd718548d0bf27ed086503"
       },
       {
         "file": "KIT CORRENTE/8115900216.png.cimg",
-        "sha256": "5de364081e57671c721b614f00bed1a9"
+        "sha256": "dcae99ea745fee286ce5587b17474201"
       },
       {
         "file": "KIT CORRENTE/8115900217.png.cimg",
-        "sha256": "50c022c23c2f7a8696505371ca6d93fe"
+        "sha256": "018f13038bfa3e78556e63f2ed9ed500"
       },
       {
         "file": "KIT CORRENTE/8117200201.png.cimg",
-        "sha256": "af548eccf0e52778318a2bc041ab30b0"
+        "sha256": "6b0b4659d77e73275c47fae0bb830df0"
       },
       {
         "file": "KIT CORRENTE/8134900201.png.cimg",
-        "sha256": "634ab6150772f511b6bcb70e77657afc"
+        "sha256": "8dffbcab15c7479f0b9dde6ad1197761"
       },
       {
         "file": "KIT CORRENTE/8134900202.png.cimg",
-        "sha256": "aa87fe7b9f0a60db09aed8362cae3659"
+        "sha256": "cbcf9fab6758d330a35a12d3280fe3cb"
       },
       {
         "file": "KIT CORRENTE/8134900203.png.cimg",
-        "sha256": "71caf87a4d91904377ee5dc1a9a97916"
+        "sha256": "9744cbcee206a7e686e6809972dafc86"
       },
       {
         "file": "KIT CORRENTE/8134900204.png.cimg",
-        "sha256": "a2f5ecc3ad3b5cece76adccc6515b3b5"
+        "sha256": "6250f92b7d7a7bdef50076421ba06fb3"
       },
       {
         "file": "KIT CORRENTE/8134900205.png.cimg",
-        "sha256": "ffaa233150dfd11f63696ee441cbe93d"
+        "sha256": "c7276e2f17989e5d7c9be4da4bff28da"
       },
       {
         "file": "KIT CORRENTE/8134900206.png.cimg",
-        "sha256": "b9ce85ef30dd4011f2377f8f47254b15"
+        "sha256": "3275404a4b5b7bbdebae4a2414e56624"
       },
       {
         "file": "KIT CORRENTE/8138900201.png.cimg",
-        "sha256": "60b874b9d677ff9ffb1e23999ce44233"
+        "sha256": "3be5e77149bcb181d88285813695f0c7"
       },
       {
         "file": "KIT CORRENTE/8141900201.png.cimg",
-        "sha256": "9ac1d9a5c60491df84b0b4e9f07172f9"
+        "sha256": "4b98a1caa928d79f7bede9d88521e088"
       },
       {
         "file": "KIT CORRENTE/8141900202.png.cimg",
-        "sha256": "3b8e1d2fc2f87ba1c5cd55973c02da2d"
+        "sha256": "24ca24a20ee31243fd81f80ba6b3c9bf"
       },
       {
         "file": "KIT CORRENTE/8141900203.png.cimg",
-        "sha256": "8db3d32a2dd229fb9b1ed545b81f1fde"
+        "sha256": "867bb8910ad679ee4ee6ff60787b931a"
       },
       {
         "file": "KIT CORRENTE/8141900204.png.cimg",
-        "sha256": "d16c90785063b76076a8228ccd4d8192"
+        "sha256": "ff8d1c6429b5db54c6d52c50c6cd295f"
       },
       {
         "file": "KIT CORRENTE/8141900205.png.cimg",
-        "sha256": "af3e7ae84ce75c76066e4c164d1b827c"
+        "sha256": "4018cf0ec00690315bb213b9f935b9f6"
       },
       {
         "file": "KIT CORRENTE/8141900206.png.cimg",
-        "sha256": "2e959b86ab1bb1f37e629551d25d635b"
+        "sha256": "11202d511a0bec4cd51798361623eb05"
       },
       {
         "file": "KIT CORRENTE/8141900207.png.cimg",
-        "sha256": "29da5bc2f49e05526b4cfd05227a0b9a"
+        "sha256": "d1c8835af2e245fd9a8a55793610cd1a"
       },
       {
         "file": "KIT CORRENTE/8141900208.png.cimg",
-        "sha256": "31d5e6c0b53303e92edb3641675258d2"
+        "sha256": "4ab3524824faaff06e5d4c25bccbbb84"
       },
       {
         "file": "KIT CORRENTE/8141900209.png.cimg",
-        "sha256": "3944ca02e10042559b7941f10dd7880e"
+        "sha256": "c00edf72a36ad15ff2bb6b5dad0e7071"
       },
       {
         "file": "KIT CORRENTE/8142900201.png.cimg",
-        "sha256": "32db8732c27dc5d4cf45923bb051fe23"
+        "sha256": "e526abf56019b945cdd6dfe6ce1e17bc"
       },
       {
         "file": "KIT CORRENTE/8142900202.png.cimg",
-        "sha256": "93d6982d9921ca8ec7543b5bb7009c0e"
+        "sha256": "9c879c519d3766a478dfa73e18db6a0a"
       },
       {
         "file": "KIT CORRENTE/8142900203.png.cimg",
-        "sha256": "c401d3f71452727dfacf08cea11df206"
+        "sha256": "fc39230fd3bc0ef037a06cef067c59a0"
       },
       {
         "file": "KIT CORRENTE/8142900212.png.cimg",
-        "sha256": "621cc049b25d61ca7da47f84b5a5f5d3"
+        "sha256": "09e43b7c03a16136564add34abfd8466"
       },
       {
         "file": "KIT CORRENTE/8146330201.png.cimg",
-        "sha256": "a1312749b0714ef1e22b550aaadde794"
+        "sha256": "b770e818bebe21ec1475792d41b3169a"
       },
       {
         "file": "KIT CORRENTE/8146900201.png.cimg",
-        "sha256": "76102b2f76678fc96dd8c54b3fa25e5b"
+        "sha256": "4137f3e99d2dfc03cd52039bc2aae303"
       },
       {
         "file": "KIT CORRENTE/8146900202.png.cimg",
-        "sha256": "38a397a0bb1c2343f0a34f2b6086718e"
+        "sha256": "afc18e6258f436d3de60936df55d071d"
       },
       {
         "file": "KIT CORRENTE/8146900204.png.cimg",
-        "sha256": "3860cd4dd6e0f4b80d767ed91fd6d455"
+        "sha256": "044e3e6d9a3f79eb31fbb458bbadb36e"
       },
       {
         "file": "KIT CORRENTE/8146900205.png.cimg",
-        "sha256": "fd2041a54196329e92ccbcfa04ec2df3"
+        "sha256": "8e4261f25304e7a2c0d8e64132b537bf"
       },
       {
         "file": "KIT CORRENTE/8146900206.png.cimg",
-        "sha256": "02cbbf01f605368faee00f0892b93db7"
+        "sha256": "cd5290540343f1e0a02a11b7da33cd9a"
       },
       {
         "file": "KIT CORRENTE/8146900207.png.cimg",
-        "sha256": "6b810760f19f7f4075e7956cde7d5307"
+        "sha256": "d79ac2e8d9c47213443523438649478a"
       },
       {
         "file": "KIT CORRENTE/8146900208.png.cimg",
-        "sha256": "6683e74457e7ff9cffbad595ee7fe701"
+        "sha256": "08a97ae11e5c032b3a2b8233a3787a53"
       },
       {
         "file": "KIT CORRENTE/8146900211.png.cimg",
-        "sha256": "c67d66ccd1a4e4ed93e92640cd7bacf9"
+        "sha256": "280f7f2e4bc7af9bacf1f485b3a1557c"
       },
       {
         "file": "KIT CORRENTE/8146900212.png.cimg",
-        "sha256": "cc188199a2bdc0877a60517f5c72a483"
+        "sha256": "5c3567359914ec942838bba1dc5ddf22"
       },
       {
         "file": "KIT CORRENTE/8146900213.png.cimg",
-        "sha256": "e9688ba083d5eeb3df7e7b28b071945c"
+        "sha256": "9b3638045fdbfc273dbdab646f5e8acb"
       },
       {
         "file": "KIT CORRENTE/8147010201.png.cimg",
-        "sha256": "fe44d8e3c3548a45951a3a8c748953d3"
+        "sha256": "606dbee893b0b74eb2af5766afcdddb7"
       },
       {
         "file": "KIT CORRENTE/8148900201.png.cimg",
-        "sha256": "7b0e14538a8361e98b1730e1e0f7468f"
+        "sha256": "8e8386028880d30604912a1c41569659"
       },
       {
         "file": "KIT CORRENTE/8149800201.png.cimg",
-        "sha256": "a158394c9f8464cad0740afbf08e64b1"
+        "sha256": "57cfe48e1eac9c7e5175c2d8b66e200f"
       },
       {
         "file": "KIT CORRENTE/8149800202.png.cimg",
-        "sha256": "a0d126dca4d8d35a9ef7fb65c327001c"
+        "sha256": "2ac816ea627f296b7b21a9da9cc76e6b"
       },
       {
         "file": "KIT CORRENTE/8149800203.png.cimg",
-        "sha256": "61b6b9262a0bcf8f974a99d12b293ce6"
+        "sha256": "286d93b0795b992088d89af79a6cf7a4"
       },
       {
         "file": "KIT CORRENTE/8149800204.png.cimg",
-        "sha256": "e698ed01777683e506f35b6314215422"
+        "sha256": "479dfd5d3582af1f37f890412aca6889"
       },
       {
         "file": "KIT CORRENTE/8149900201.png.cimg",
-        "sha256": "9d8818dc2242c50e1013ecd1a85629da"
+        "sha256": "5ff5712cf09e3aa33f5686d490fc1a70"
       },
       {
         "file": "KIT CORRENTE/8149900202.png.cimg",
-        "sha256": "14a495db0df67ce01247ddf3774df3af"
+        "sha256": "c981559a4c4c3936610ded5d098800a3"
       },
       {
         "file": "KIT CORRENTE/8149900203.png.cimg",
-        "sha256": "898f872fa276435d3c5cf290f91a4176"
+        "sha256": "d0f2deca5261d53a2ebbcdf618519023"
       },
       {
         "file": "KIT CORRENTE/8149900204.png.cimg",
-        "sha256": "9561a0a5e3bf08d540b30bb577a8e2b9"
+        "sha256": "38e38e58922b2205e4a4d5d4b98396eb"
       },
       {
         "file": "KIT CORRENTE/8149900205.png.cimg",
-        "sha256": "21d5094b0bd68e7b48a4b70d9591c574"
+        "sha256": "610ee409ec49c09fc334ace5f1276d64"
       },
       {
         "file": "KIT CORRENTE/8149900206.png.cimg",
-        "sha256": "b997f1877f1a4fdb5d68e203a5a50cc9"
+        "sha256": "34d169edcd17dca06a2f8345f07b4eaa"
       },
       {
         "file": "KIT CORRENTE/8150640201.png.cimg",
-        "sha256": "7f083cb1a62fae519d9da32927d4ec36"
+        "sha256": "9939333114ecd6cd712d4ef549409cab"
       },
       {
         "file": "KIT CORRENTE/8150900201.png.cimg",
-        "sha256": "ab6f9dc78a542ec24c7309be27bedc68"
+        "sha256": "74c413115f8a32b6b30f5204f8debadb"
       },
       {
         "file": "KIT CORRENTE/8156020201.png.cimg",
-        "sha256": "5316d5dee457fb472a2471d074ee2269"
+        "sha256": "6a59d7795d2391f5d5637db523e703cc"
       },
       {
         "file": "KIT CORRENTE/8156900201.png.cimg",
-        "sha256": "16461f35d4573e947702d9f3aadd106f"
+        "sha256": "ee73c3d1c882faf22c0bf82b970fd3af"
       },
       {
         "file": "KIT CORRENTE/8156900202.png.cimg",
-        "sha256": "3f18b634dd7c8f89466214dc1d628f8c"
+        "sha256": "e110c33878817ab7ada2fc49d7769f6a"
       },
       {
         "file": "KIT CORRENTE/8163900201.png.cimg",
-        "sha256": "f0a271dee95c93ee1d73172e2a8a88b3"
+        "sha256": "ef32267496bd3ff6db1bf430cc21b846"
       },
       {
         "file": "KIT CORRENTE/8163900202.png.cimg",
-        "sha256": "9bb320c54fa7b094e0899f61ae37e029"
+        "sha256": "9e164ef609638ce106949df04f9319dc"
       },
       {
         "file": "KIT CORRENTE/8163900203.png.cimg",
-        "sha256": "a47d46a600c3378b2490589cdfbfa21e"
+        "sha256": "ff35bff3fe8224d26d52b79a430a6db6"
       },
       {
         "file": "KIT CORRENTE/8163900204.png.cimg",
-        "sha256": "d4a72286db6404ff6e10d1907d69d092"
+        "sha256": "4e3266fc66e1f2bb08b8e1fcbed30ff9"
       },
       {
         "file": "KIT CORRENTE/8163900205.png.cimg",
-        "sha256": "5bb47807c94474ce0c3cfdb79792f477"
+        "sha256": "5984f10675e2550ea4b01f9af8d890e0"
       },
       {
         "file": "KIT CORRENTE/8163900206.png.cimg",
-        "sha256": "604bf6fbd5c9736a3c55dcd603f1f0d1"
+        "sha256": "ff5fcffcaeb4190d63fa68dcc42d909c"
       },
       {
         "file": "KIT CORRENTE/8169380201.png.cimg",
-        "sha256": "9ad90d434f492aadf254d23d59fdbc23"
+        "sha256": "4d365e3138bf951355bb08956fcb0495"
       },
       {
         "file": "KIT CORRENTE/8169380202.png.cimg",
-        "sha256": "e0c7890e8de92fb9865d1b6fcef41b8c"
+        "sha256": "acf11c590acd94946e697ef6fe538ffb"
       },
       {
         "file": "KIT CORRENTE/8169760201.png.cimg",
-        "sha256": "ca6953dc2f93a049711e844040703292"
+        "sha256": "e4f69bbd047197533f09eca902fe1ede"
       },
       {
         "file": "KIT CORRENTE/8169760202.png.cimg",
-        "sha256": "2368776a4026a9e3f56b2708b01e5aeb"
+        "sha256": "f8cfbd7c972a1c6af74a46d088e1cb7a"
       },
       {
         "file": "KIT CORRENTE/8169760211.png.cimg",
-        "sha256": "0521a5c1e6e0406b3d19cbb5b948e8dd"
+        "sha256": "20ddf753b1be1676d51ff6ae2d592b52"
       },
       {
         "file": "KIT CORRENTE/8169900201.png.cimg",
-        "sha256": "3a11a71d6a006e7c3669ba1c62a93d18"
+        "sha256": "5102a573048e476b9e9fc5cdb848041c"
       },
       {
         "file": "KIT CORRENTE/8169900202.png.cimg",
-        "sha256": "d5ceb4ebf0a35a1e17357b17a8b105be"
+        "sha256": "d646005417664d9d49f202ecfeb3217e"
       },
       {
         "file": "KIT CORRENTE/8169900203.png.cimg",
-        "sha256": "d761f74a2685e6733b4638ee8f4e45b5"
+        "sha256": "308af81d55e6affd68b5450bd8325388"
       },
       {
         "file": "KIT CORRENTE/8169900204.png.cimg",
-        "sha256": "5f5939dd17c6e16f972a7ca573620ef7"
+        "sha256": "5b40fbab71c4397b3cb48d8e042c326b"
       },
       {
         "file": "KIT CORRENTE/8169900205.png.cimg",
-        "sha256": "983b9148251040419c6e09864846421e"
+        "sha256": "74ffc7e62fcf2141848b692cdbd9e2fb"
       },
       {
         "file": "KIT CORRENTE/8170200201.png.cimg",
-        "sha256": "d4978c1776fc4f88ebebb8c78f288c58"
+        "sha256": "97deb0cf708edff9fe6d37e88c263d07"
       },
       {
         "file": "KIT CORRENTE/8170200202.png.cimg",
-        "sha256": "aa1e543ebfbeb174ce25a55ea6712e18"
+        "sha256": "77bc19924d28960bf1668d80eac7bc03"
       },
       {
         "file": "KIT CORRENTE/8170200203.png.cimg",
-        "sha256": "fefe06c5c00e313bea87f18b530043a9"
+        "sha256": "e2a622e74a20dce575cc710703b290c5"
       },
       {
         "file": "KIT CORRENTE/8170200204.png.cimg",
-        "sha256": "e0c98a1ff9623963da3b8e92751c8488"
+        "sha256": "18c29db60717ed97f39706888809459e"
       },
       {
         "file": "KIT CORRENTE/8170200205.png.cimg",
-        "sha256": "4b150aa4a9786eb3cb78a1f8c0a80638"
+        "sha256": "f5bb3e567ccd4e7077212f1e279c6ae4"
       },
       {
         "file": "KIT CORRENTE/8170200206.png.cimg",
-        "sha256": "ffb6bf4a2c073a8662110d37294dd6ff"
+        "sha256": "057e1f27c88c746c7caa303bf8446f96"
       },
       {
         "file": "KIT CORRENTE/8170860201.png.cimg",
-        "sha256": "00ce7b5013657bdc11fd0bf7524b80c2"
+        "sha256": "58562c14b116a7865e030d9946af9d03"
       },
       {
         "file": "KIT CORRENTE/8170900201.png.cimg",
-        "sha256": "d4a65f82d7c5c2a0efa39eee70b5cbea"
+        "sha256": "7ee05c26c872a698d5cd934d369fddf1"
       },
       {
         "file": "KIT CORRENTE/8170900202.png.cimg",
-        "sha256": "e8e0bb3829bb3f74b94e1e0ef3b40c9f"
+        "sha256": "e6210343227b444abf5f759edb31d0ba"
       },
       {
         "file": "KIT CORRENTE/8170900203.png.cimg",
-        "sha256": "2395ab2c4a1ba736757fd853fab0fb84"
+        "sha256": "480ea7483965a0f6275be7a128fe505e"
       },
       {
         "file": "KIT CORRENTE/8170900204.png.cimg",
-        "sha256": "0bea8cb3f95417cf4170aaaef6c1fe45"
+        "sha256": "0f5de845117b2edfdd2df979b15526b1"
       },
       {
         "file": "KIT CORRENTE/8170900205.png.cimg",
-        "sha256": "084a134d06fc51662f07c77e0d131c79"
+        "sha256": "60728bb093fbd58ad21d3b9225dbe0f5"
       },
       {
         "file": "KIT CORRENTE/8170900206.png.cimg",
-        "sha256": "6e3aa4016366d42221f047b18237bbae"
+        "sha256": "758be78aca3b93a8b2a458b0b945d145"
       },
       {
         "file": "KIT CORRENTE/8173560201.png.cimg",
-        "sha256": "2a9c4dd3be636cb69da2930774b3c0a0"
+        "sha256": "c602dfff7980b87366fee25cc3fb275f"
       },
       {
         "file": "KIT CORRENTE/8173600201.png.cimg",
-        "sha256": "702f9b846ef3a9f75dd443424bf8bd28"
+        "sha256": "39db1260704eb65b5d1b1d2d00c202f0"
       },
       {
         "file": "KIT CORRENTE/8175260201.png.cimg",
-        "sha256": "66edb8354a63269b96cd5a5ba27c80d9"
+        "sha256": "eff4c111b420c64cfcc6615ddf602670"
       },
       {
         "file": "KIT CORRENTE/8175260202.png.cimg",
-        "sha256": "49966b0dc6ef0025296e22fc56dab436"
+        "sha256": "afa367243703c9ab39ea1901de2dab59"
       },
       {
         "file": "KIT CORRENTE/8175520201.png.cimg",
-        "sha256": "09659ca3d0f65266c7efe34606ad3337"
+        "sha256": "e88db6659fcd8436d18b0e6e013e6cb9"
       },
       {
         "file": "KIT CORRENTE/8175520203.png.cimg",
-        "sha256": "2f338c62fbf24c7543947345e2bd7c88"
+        "sha256": "cf5c484ca0073e9a8bcdcfa0df77f8e7"
       },
       {
         "file": "KIT CORRENTE/8175520204.png.cimg",
-        "sha256": "17f1101592812fb24606b58f86cc80c4"
+        "sha256": "7fc8748af8e5233f314c61f603c49177"
       },
       {
         "file": "KIT CORRENTE/8175900201.png.cimg",
-        "sha256": "a56b0f65522ecbc6feebf970acd6c5f1"
+        "sha256": "94b7b80feb5570025bcfed231bc0a22e"
       },
       {
         "file": "KIT CORRENTE/8175900202.png.cimg",
-        "sha256": "fd15dce80a068ed8727d3f487b0e23f7"
+        "sha256": "82be6603127e41a6791e25ffbe692158"
       },
       {
         "file": "KIT CORRENTE/8175900206.png.cimg",
-        "sha256": "153d82a8a163b2612991927c25e8f035"
+        "sha256": "f905adc7822b6b66be178b08dabf6a5f"
       },
       {
         "file": "KIT CORRENTE/8175900207.png.cimg",
-        "sha256": "87e0809970d9f72be789116509263c5a"
+        "sha256": "4139b0bdbd6ada875fec4685e411671e"
       },
       {
         "file": "KIT CORRENTE/8175900208.png.cimg",
-        "sha256": "61701bac239c08826b4ffed74f5c4afd"
+        "sha256": "c70df26e199cac0f6593ef2d914d73d4"
       },
       {
         "file": "KIT CORRENTE/8175900212.png.cimg",
-        "sha256": "898f69e1463318ed94ab1c6afbe437ae"
+        "sha256": "cea1ab27dc012fbf6f836fd208fb029d"
       },
       {
         "file": "KIT CORRENTE/8175900213.png.cimg",
-        "sha256": "4f244bfd7b3a4587b201901d07191584"
+        "sha256": "0936f68fdb1c8af16c08ada07a9ff802"
       },
       {
         "file": "KIT CORRENTE/8175900214.png.cimg",
-        "sha256": "7edd572a6fdeb95e8f7f7b347e0cc419"
+        "sha256": "7bc2bee36f8a064cc0d70caae934173b"
       },
       {
         "file": "LANCAMENTOS/7111006801.png",
@@ -5578,2988 +5586,3064 @@
         "sha256": "b66dabf34c9e9cdb9fd288290507c876"
       },
       {
+        "file": "POLIAS E TENSORES/470990109.png.cimg",
+        "sha256": "619fd574051b5fe7d62268bc5e781eda"
+      },
+      {
+        "file": "POLIAS E TENSORES/6124990608.png.cimg",
+        "sha256": "95776745289d34c347c54941c0413b30"
+      },
+      {
+        "file": "POLIAS E TENSORES/7111990617.png.cimg",
+        "sha256": "f709548e5a93856b0b1d31bf7e3e996a"
+      },
+      {
+        "file": "POLIAS E TENSORES/7115990112.png.cimg",
+        "sha256": "4734e45b49d8c8ab074ef2e416d53518"
+      },
+      {
+        "file": "POLIAS E TENSORES/7115990114.png.cimg",
+        "sha256": "ca48fbec309373111677b0b770831123"
+      },
+      {
+        "file": "POLIAS E TENSORES/7117990105.png.cimg",
+        "sha256": "413807505c50295c3dcfe4eb2ef48905"
+      },
+      {
+        "file": "POLIAS E TENSORES/7134990604.png.cimg",
+        "sha256": "0198c2b222e9a5575b4b72e06132439c"
+      },
+      {
+        "file": "POLIAS E TENSORES/7163990104.png.cimg",
+        "sha256": "ee64aaf24199820e2507cba6a834da76"
+      },
+      {
+        "file": "POLIAS E TENSORES/7169990106.png.cimg",
+        "sha256": "e2eed5471ba5f59b2cab057f173e058c"
+      },
+      {
+        "file": "POLIAS E TENSORES/7169990607.png.cimg",
+        "sha256": "6aa27733c84a5bec827d58dff479941e"
+      },
+      {
+        "file": "POLIAS E TENSORES/7175990110.png.cimg",
+        "sha256": "8147f3953f897e825ed5f25b8b39ebcc"
+      },
+      {
+        "file": "POLIAS E TENSORES/7175990113.png.cimg",
+        "sha256": "3ccf5885097225e5cc5817acb12f71c0"
+      },
+      {
+        "file": "POLIAS E TENSORES/7175990610.png.cimg",
+        "sha256": "33f6e0d0e8d39bdb15575398b6a5c76c"
+      },
+      {
         "file": "POLIAS E TENSORES/8111990101.png.cimg",
-        "sha256": "3160571084d582ef3aa5045393fc3970"
+        "sha256": "4accab0e596e7d8ef8802b71b8e6fcf5"
       },
       {
         "file": "POLIAS E TENSORES/8111990102.png.cimg",
-        "sha256": "26479d5e420b42ecc077a1c8e1051d15"
+        "sha256": "498da23cada308249efa01cd137b634a"
       },
       {
         "file": "POLIAS E TENSORES/8111990103.png.cimg",
-        "sha256": "1f45e26b68c698f86cdac550d148da5d"
+        "sha256": "7c89f052a222a1044b21a9775e11d9f9"
       },
       {
         "file": "POLIAS E TENSORES/8111990104.png.cimg",
-        "sha256": "62840828791f7e35d4bad378d70b91c9"
+        "sha256": "0a2b2352ac52a6cc336fba85d06c2fd5"
       },
       {
         "file": "POLIAS E TENSORES/8111990105.png.cimg",
-        "sha256": "0eaee348590c440c59a60e972b2f4101"
+        "sha256": "b83a8592e95d0cf9141b385ea27f532d"
       },
       {
         "file": "POLIAS E TENSORES/8111990106.png.cimg",
-        "sha256": "713822764e309f11dfdb5b3b53b889cd"
+        "sha256": "bb54c74e3188fa7d19b63ad2ef9dbaf6"
       },
       {
         "file": "POLIAS E TENSORES/8111990107.png.cimg",
-        "sha256": "7637a92002a3e6a4e8a7493115f3caf2"
+        "sha256": "ae166b8dd990c10e161d7f2b91faf0c7"
       },
       {
         "file": "POLIAS E TENSORES/8111990108.png.cimg",
-        "sha256": "eb39dd34d560c0ea92fceab08bf06591"
+        "sha256": "3478523070a010b602240e02d59876f5"
       },
       {
         "file": "POLIAS E TENSORES/8111990109.png.cimg",
-        "sha256": "3beec9ed724459d68f9d93b6275e9bf9"
+        "sha256": "8bf3a2ce823e75e5d67552125f8a06f2"
       },
       {
         "file": "POLIAS E TENSORES/8111990110.png.cimg",
-        "sha256": "018f35210fc096193f370518699e5cb5"
+        "sha256": "898a87245131a41026bcfa2c4e537e11"
       },
       {
         "file": "POLIAS E TENSORES/8111990111.png.cimg",
-        "sha256": "eaf0db760a76a1d4bd1841504bd1e592"
+        "sha256": "6762c73ef85df3f48f233c263e208ea8"
       },
       {
         "file": "POLIAS E TENSORES/8111990112.png.cimg",
-        "sha256": "80335e3289605fb311c0cd48ec9b0996"
+        "sha256": "df299af034434ad11440f41b43426c13"
       },
       {
         "file": "POLIAS E TENSORES/8111990113.png.cimg",
-        "sha256": "679da5ef5d21eaaabf687c67ebb95b23"
+        "sha256": "25afa2b8b9258f89d4bfcca98f071172"
       },
       {
         "file": "POLIAS E TENSORES/8111990114.png.cimg",
-        "sha256": "70c4c9a6c590940e78e37107baf96d21"
+        "sha256": "c0d5e3a146fc75be2b9bb01fb739e34e"
       },
       {
         "file": "POLIAS E TENSORES/8111990115.png.cimg",
-        "sha256": "4ce3fc77724f5353b3696a022c1541c2"
+        "sha256": "29b0fb78bde3928fc3575017528102db"
       },
       {
         "file": "POLIAS E TENSORES/8111990116.png.cimg",
-        "sha256": "8ebce0b3784a5742855a3faadb2e0cfb"
+        "sha256": "3e502f2edb925c0cf235313af5d78423"
       },
       {
         "file": "POLIAS E TENSORES/8111990117.png.cimg",
-        "sha256": "f8b63aeda8b974f649456b6936a80bcb"
+        "sha256": "23e2a96b26cd5fb79586ec9a66db9b66"
       },
       {
         "file": "POLIAS E TENSORES/8111990118.png.cimg",
-        "sha256": "9788af8f3893652ef8a2eefbedf589e5"
+        "sha256": "0bf64261f7870903847a78cee9ba557f"
       },
       {
         "file": "POLIAS E TENSORES/8111990119.png.cimg",
-        "sha256": "4476610664cbd5ed499685a7fa2c999e"
+        "sha256": "59f24afc9f835d30bf5c9b2038df793e"
       },
       {
         "file": "POLIAS E TENSORES/8111990121.png.cimg",
-        "sha256": "255bdf38c1f2dada026675f01551152b"
+        "sha256": "4874fbb9a979de515cf9a79ad612c146"
       },
       {
         "file": "POLIAS E TENSORES/8111990122.png.cimg",
-        "sha256": "55a7a1a203decd5f849be0a396ad35f2"
+        "sha256": "347f4830e0c0c11e3debb659e142466b"
       },
       {
         "file": "POLIAS E TENSORES/8111990123.png.cimg",
-        "sha256": "93272eb0a97c4a10b81724105b25fa8e"
+        "sha256": "159c5a1cda648e47ded8a90b8449c4dd"
       },
       {
         "file": "POLIAS E TENSORES/8111990124.png.cimg",
-        "sha256": "7cfb25e2a4f45a4af9dcf0513106d30e"
+        "sha256": "a246648ba583cc81d6bdd92c644df8f6"
       },
       {
         "file": "POLIAS E TENSORES/8111990125.png.cimg",
-        "sha256": "30ce626e52ee351849356487b9d81b37"
+        "sha256": "ec8b907eaf440ea2af02f2707e4cca4c"
       },
       {
         "file": "POLIAS E TENSORES/8111990126.png.cimg",
-        "sha256": "304ab8f9d301cb64a2e6c932fe10de87"
+        "sha256": "5028dc6d3508d2d756094fd22de1cfd5"
       },
       {
         "file": "POLIAS E TENSORES/8111990127.png.cimg",
-        "sha256": "34518387a16a31fc577a41b2f894809a"
+        "sha256": "31b5c0d7d779737d7af43377f541acd9"
       },
       {
         "file": "POLIAS E TENSORES/8111990128.png.cimg",
-        "sha256": "41dcad29dda2708db2929f6e490b1327"
+        "sha256": "8f711d77b13763799f057787a7c6d862"
       },
       {
         "file": "POLIAS E TENSORES/8111990129.png.cimg",
-        "sha256": "5f061d26b083aeb3cfdfbfc1bc5dd1c5"
+        "sha256": "0e9f6c57250abde4b3a73c1ce36dd82b"
       },
       {
         "file": "POLIAS E TENSORES/8111990130.png.cimg",
-        "sha256": "90f67cfed81a3942181752a2bb13f3a0"
+        "sha256": "1644630aede44a46dd9270c2ae473cdf"
       },
       {
         "file": "POLIAS E TENSORES/8111990131.png.cimg",
-        "sha256": "1d71521a8cc147c9b633838d84128934"
+        "sha256": "cd7f1af1425397996486b7535fc62578"
       },
       {
         "file": "POLIAS E TENSORES/8111990132.png.cimg",
-        "sha256": "0ece7fe7a2905218d8b339dd18a39c60"
+        "sha256": "a4d9e857c1334df3d92d3f1ced46b040"
       },
       {
         "file": "POLIAS E TENSORES/8111990133.png.cimg",
-        "sha256": "1ebe2fc832ad02bf8eccca21e5b615fa"
+        "sha256": "9911d32aa879919744a254e7b182bc03"
       },
       {
         "file": "POLIAS E TENSORES/8111990401.png.cimg",
-        "sha256": "b74e994e087e5cc9863d165f072840b5"
+        "sha256": "8f66efbf3a470693d030a7526a0aacd5"
       },
       {
         "file": "POLIAS E TENSORES/8111990402.png.cimg",
-        "sha256": "305aac6afca113012d134194ba898853"
+        "sha256": "910af34261cbec6fd6ebe3db47adc6b9"
       },
       {
         "file": "POLIAS E TENSORES/8111990403.png.cimg",
-        "sha256": "1f89d489cbe21402dc330f0411fb0619"
+        "sha256": "838659e32862a8f96dae13628dbee772"
       },
       {
         "file": "POLIAS E TENSORES/8111990601.png.cimg",
-        "sha256": "b7bf57a5ed0cc68235f96079a808f92a"
+        "sha256": "36c4c01e6d9347b989f78ff0af6406c2"
       },
       {
         "file": "POLIAS E TENSORES/8111990602.png.cimg",
-        "sha256": "b7afa3478711f82cb22357280ba6bb22"
+        "sha256": "22cc916f139696ae4c72bfceb360a91f"
       },
       {
         "file": "POLIAS E TENSORES/8111990603.png.cimg",
-        "sha256": "02714c761577194f88c3714158c4f17a"
+        "sha256": "0dc3d3ac5bb2f2dcbe9c591d512d406c"
       },
       {
         "file": "POLIAS E TENSORES/8111990604.png.cimg",
-        "sha256": "cfa5e299d5035e3be3eaafa3a64e9578"
+        "sha256": "ca9322e247317593b0e321bb4c31ff93"
       },
       {
         "file": "POLIAS E TENSORES/8111990605.png.cimg",
-        "sha256": "2610436ef9814ba47ecf89107fdd65f8"
+        "sha256": "a11c94874818746a391ae98fe413c4e9"
       },
       {
         "file": "POLIAS E TENSORES/8111990606.png.cimg",
-        "sha256": "a8e5f5aa728017b60b896ad051a694f6"
+        "sha256": "132fee61f125cb25319bfd7c0f22fd56"
       },
       {
         "file": "POLIAS E TENSORES/8111990607.png.cimg",
-        "sha256": "7b181b2d4d97d0ad8ae0e97002356e81"
+        "sha256": "f28462c6c55da70f555d32d5312ad7df"
       },
       {
         "file": "POLIAS E TENSORES/8111990608.png.cimg",
-        "sha256": "9d86bd38328305dc28501500ab3e37a2"
+        "sha256": "a9ea02ef18a13dedca51589d917b5780"
       },
       {
         "file": "POLIAS E TENSORES/8111990609.png.cimg",
-        "sha256": "eadc0e38197e1fecaf956cafe66e5e45"
+        "sha256": "480a7016955934b98b64937a16c50b11"
       },
       {
         "file": "POLIAS E TENSORES/8111990610.png.cimg",
-        "sha256": "32e3e1bf4931b03b73072cb1c5698840"
+        "sha256": "731332cfa5ce0d21aedac892ffbed786"
       },
       {
         "file": "POLIAS E TENSORES/8111990611.png.cimg",
-        "sha256": "60f941c217c89de1c3a4edc0793eefcb"
+        "sha256": "7da8a32309c259918081ffb271d93641"
       },
       {
         "file": "POLIAS E TENSORES/8111990612.png.cimg",
-        "sha256": "edf596db2caca6237e8bd119383a599f"
+        "sha256": "31292425f53a351e47989c819d912c9f"
       },
       {
         "file": "POLIAS E TENSORES/8111990613.png.cimg",
-        "sha256": "389cf40d7fd70276a995e8003997cdc6"
+        "sha256": "d4590995de44d13f6a4d439793de8291"
       },
       {
         "file": "POLIAS E TENSORES/8111990614.png.cimg",
-        "sha256": "460a0050b079c1ea5dffe016266ce631"
+        "sha256": "ce0217389682729d7ee9896b4fb29c74"
       },
       {
         "file": "POLIAS E TENSORES/8111990615.png.cimg",
-        "sha256": "5e5f209fa0f4ed1b48a7184abf77b53a"
+        "sha256": "76f2dd7bd8ba71f360022128350f7f67"
       },
       {
         "file": "POLIAS E TENSORES/8111990616.png.cimg",
-        "sha256": "e368e24ef9e2b3a7780cdd1e28d8ee02"
+        "sha256": "4312e548006cc039f95a88dd13faf1d3"
       },
       {
         "file": "POLIAS E TENSORES/8111990617.png.cimg",
-        "sha256": "6bfa6f2c1e492cab99a1186a37713418"
+        "sha256": "6e9056f1016947a008cb46652ac06e13"
       },
       {
         "file": "POLIAS E TENSORES/8111990618.png.cimg",
-        "sha256": "b7e6e07706d3f47abb62dc77f47f10ca"
+        "sha256": "66f70f7da2d51252a504ef0b1dcd2e22"
       },
       {
         "file": "POLIAS E TENSORES/8111990619.png.cimg",
-        "sha256": "455a206525ea47a22bd8b7301eb190f2"
+        "sha256": "69e36e44a3acfdbef6e6235f483dabc0"
       },
       {
         "file": "POLIAS E TENSORES/8111990620.png.cimg",
-        "sha256": "7b55c05aee18fab19b52fdd2d73193e3"
+        "sha256": "64441899aa037c7db0c0cf029faf7720"
       },
       {
         "file": "POLIAS E TENSORES/8111990621.png.cimg",
-        "sha256": "30ce3de98293cd775fea2f4374a90dc7"
+        "sha256": "ce03f593dcfc05490371c00d9174e4bb"
       },
       {
         "file": "POLIAS E TENSORES/8111990622.png.cimg",
-        "sha256": "c6736bf9b71c91da1e6a16f25f33e139"
+        "sha256": "7969f8ae4e204a3ab98caf4e2cc2d41d"
       },
       {
         "file": "POLIAS E TENSORES/8111990624.png.cimg",
-        "sha256": "f007488f5556af5cc84903208c408148"
+        "sha256": "2f3a894b66fb4b268fd483754bfb5c95"
       },
       {
         "file": "POLIAS E TENSORES/8111990626.png.cimg",
-        "sha256": "c24a0a1467f41dc2eaf3457016313d63"
+        "sha256": "108c5c2cda0f84e376ff82aa687b78d7"
       },
       {
         "file": "POLIAS E TENSORES/8111990627.png.cimg",
-        "sha256": "696ef95e2674e0d06cde3575d0444dc9"
+        "sha256": "bfc9e96223dd8d39e56c30f80d33eabe"
       },
       {
         "file": "POLIAS E TENSORES/8111990628.png.cimg",
-        "sha256": "ed65847bc7d781ca63d6d4d84c42d40d"
+        "sha256": "801e405f2c192d585f3cf6f5a6b93b25"
       },
       {
         "file": "POLIAS E TENSORES/8111990629.png.cimg",
-        "sha256": "f938287dc1e01b88e49c78502a652383"
+        "sha256": "22234014bc7b8a23e9cea6aa2b86fbf5"
       },
       {
         "file": "POLIAS E TENSORES/8111990630.png.cimg",
-        "sha256": "a63f94c3a71af0b87f3f1fef3b22b2da"
+        "sha256": "515f34b7652f72c0baaf0550645b4359"
       },
       {
         "file": "POLIAS E TENSORES/8111990631.png.cimg",
-        "sha256": "2faf85ae679a43b549d1da75a1001787"
+        "sha256": "8f8ad8598dab5c537b18ec1a30de32f5"
       },
       {
         "file": "POLIAS E TENSORES/8111990632.png.cimg",
-        "sha256": "9f1b52a4e7c461dc82cdfff97482b1ef"
+        "sha256": "7415517b2104607efd21901201299ad0"
       },
       {
         "file": "POLIAS E TENSORES/8111990633.png.cimg",
-        "sha256": "e2719d55835bbf9e8bae307d32d6e8a3"
+        "sha256": "8538b953f5310e298c1b06085f8d84d1"
       },
       {
         "file": "POLIAS E TENSORES/8111990634.png.cimg",
-        "sha256": "baf43b15fbde8f16b1c075c3dc898477"
+        "sha256": "0af322a96d2bf3dbd6cdd8ae803331e4"
       },
       {
         "file": "POLIAS E TENSORES/8114990101.png.cimg",
-        "sha256": "a555c9334c172cee50565efd453e4c04"
+        "sha256": "9fd5ea20de4f56f349a1466376b93b7e"
       },
       {
         "file": "POLIAS E TENSORES/8114990102.png.cimg",
-        "sha256": "027c5af438b7266e5e9d4b1f342f6cbb"
+        "sha256": "e2ff18982f7ba05858932628ba753af3"
       },
       {
         "file": "POLIAS E TENSORES/8114990103.png.cimg",
-        "sha256": "cdf273d8cc05b45f5b87683f99dfcd65"
+        "sha256": "ebbc96ed2a706fb86e479ebd796d164a"
       },
       {
         "file": "POLIAS E TENSORES/8114990601.png.cimg",
-        "sha256": "6e4ed9416c3faed92869d648ee8eb7a1"
+        "sha256": "b7fb6016be8e935017ed7d37742022a3"
       },
       {
         "file": "POLIAS E TENSORES/8114990602.png.cimg",
-        "sha256": "66a66c6b050992e113718f9115e21fb0"
+        "sha256": "1220a51cffcab7bdbe0cadaea78e8881"
       },
       {
         "file": "POLIAS E TENSORES/8114990603.png.cimg",
-        "sha256": "5c8daa684bf6bafddd4bcfd00ef8d17d"
+        "sha256": "c6c9c63145159f86dda36c80df634c69"
       },
       {
         "file": "POLIAS E TENSORES/8114990604.png.cimg",
-        "sha256": "a30fce284889bc60ac63845255402b7e"
+        "sha256": "6bae54d7d958497ba893e6be10f8d0e6"
       },
       {
         "file": "POLIAS E TENSORES/8115990101.png.cimg",
-        "sha256": "bc40084a387dc4c8e8556b4f2251b7fd"
+        "sha256": "58805e8202a9f79f5f0239ad81d6200c"
       },
       {
         "file": "POLIAS E TENSORES/8115990102.png.cimg",
-        "sha256": "462ab2ef4f4c74fced672fa1094438f2"
+        "sha256": "04765e8adb4f9c807918bd27ddc601b3"
       },
       {
         "file": "POLIAS E TENSORES/8115990103.png.cimg",
-        "sha256": "9b548dd544b1ccf2eedac8bf45d5ca99"
+        "sha256": "0c8ee5e14441ad9e5a8329ae1b4219d9"
       },
       {
         "file": "POLIAS E TENSORES/8115990104.png.cimg",
-        "sha256": "fb79add320aea05967eefc816df9c0f7"
+        "sha256": "19b9bf80040e1856da6235eab9b80d9a"
       },
       {
         "file": "POLIAS E TENSORES/8115990105.png.cimg",
-        "sha256": "7b3871899450fc9a83a2c0cf198ff730"
+        "sha256": "c0db1c9cf285a8d4da4ff39943ab4062"
       },
       {
         "file": "POLIAS E TENSORES/8115990106.png.cimg",
-        "sha256": "981ef0f817b0a2f2a948c28742fa9c41"
+        "sha256": "3d460f13a969aa4a93aa3b68b436b293"
       },
       {
         "file": "POLIAS E TENSORES/8115990107.png.cimg",
-        "sha256": "8fb8bb4f03fe37c216aa5ee45ca4d082"
+        "sha256": "79f88c7a91c1c448391fa3cbe77e34c2"
       },
       {
         "file": "POLIAS E TENSORES/8115990108.png.cimg",
-        "sha256": "54c3d3af04d05c6d4e15f24cf39690e6"
+        "sha256": "c3345c37a233d50f6b1201f4417bb57b"
       },
       {
         "file": "POLIAS E TENSORES/8115990109.png.cimg",
-        "sha256": "e11e4e794e3156ac0675f0dc1dfb1524"
+        "sha256": "a95a9e86ecc3f624bdab18ab1c99c342"
       },
       {
         "file": "POLIAS E TENSORES/8115990110.png.cimg",
-        "sha256": "9bb144decc41088ba6db63fb628f8e4f"
+        "sha256": "bdef53434aeb33c80844db17d9be6ba3"
       },
       {
         "file": "POLIAS E TENSORES/8115990111.png.cimg",
-        "sha256": "5d722538a6a5685ffefdfbc7dd1d33ce"
+        "sha256": "c1076ac33923b6a1cc1fcffa3295c689"
       },
       {
         "file": "POLIAS E TENSORES/8115990112.png.cimg",
-        "sha256": "f0435e4226b3d6fb5c5b891f2cddcd42"
+        "sha256": "5b7d410e811bdbbaec8aee835e0e251a"
       },
       {
         "file": "POLIAS E TENSORES/8115990113.png.cimg",
-        "sha256": "093b4f48dc1d7a85ec260e3aa325fdff"
+        "sha256": "064b5ce2435e407d863fd5d996ead2f7"
       },
       {
         "file": "POLIAS E TENSORES/8115990114.png.cimg",
-        "sha256": "c379487fbc162a28a2b1e0c06d7cb26f"
+        "sha256": "ce097ad8078f3a7b35e3e6054f6f2435"
       },
       {
         "file": "POLIAS E TENSORES/8115990115.png.cimg",
-        "sha256": "49c6e10d89e64f97a1c67e246728d0ab"
+        "sha256": "d2cde182332fab12f4ef1e353db00593"
       },
       {
         "file": "POLIAS E TENSORES/8115990116.png.cimg",
-        "sha256": "542069812889405db2e55f296006d459"
+        "sha256": "3018e475112e4341413090ea741893a0"
       },
       {
         "file": "POLIAS E TENSORES/8115990117.png.cimg",
-        "sha256": "ebd53aeb94172719876a05060c2db8e5"
+        "sha256": "a9ac796eed954274e28e4dd5d19a1f16"
       },
       {
         "file": "POLIAS E TENSORES/8115990118.png.cimg",
-        "sha256": "7ffd8473420528832e7e489fa24a8453"
+        "sha256": "9c2fe0b9e1636317c8e8db703ae393e9"
       },
       {
         "file": "POLIAS E TENSORES/8115990119.png.cimg",
-        "sha256": "c8c0084e289b463b95f6197d031f8324"
+        "sha256": "673531527f4f1380200f5b53d5bd5beb"
       },
       {
         "file": "POLIAS E TENSORES/8115990120.png.cimg",
-        "sha256": "92b45540820c1c44ae48d703073363b9"
+        "sha256": "01ba077f6eee0721703882c26a69af76"
       },
       {
         "file": "POLIAS E TENSORES/8115990121.png.cimg",
-        "sha256": "6ad7a32c0336b8185a24245d7ee1a42c"
+        "sha256": "77c26ea579d7a3b7791892c5ec69ffc1"
       },
       {
         "file": "POLIAS E TENSORES/8115990122.png.cimg",
-        "sha256": "37dd68b4ff175782f246d8cd6cfc1d82"
+        "sha256": "01875804e0c0d6311a99d62ec227a129"
       },
       {
         "file": "POLIAS E TENSORES/8115990123.png.cimg",
-        "sha256": "1c040d7eec594483943f49f2fadd0ad2"
+        "sha256": "fd39ec5868422d44a76da76561eb0a60"
       },
       {
         "file": "POLIAS E TENSORES/8115990124.png.cimg",
-        "sha256": "edcd277b44d56286141a43d90e3f064a"
+        "sha256": "59b58ec02b87f17cf4fa961c65c90bba"
       },
       {
         "file": "POLIAS E TENSORES/8115990125.png.cimg",
-        "sha256": "a8cb3cf878e9140fca9172e6fcf250d1"
+        "sha256": "a46f5b4728e49a642764ffc814ddf9f9"
       },
       {
         "file": "POLIAS E TENSORES/8115990126.png.cimg",
-        "sha256": "bd45e855e238cbba2e089d157b849bb7"
+        "sha256": "efa043ee85cc2d4bae9a162843d6eb50"
       },
       {
         "file": "POLIAS E TENSORES/8115990127.png.cimg",
-        "sha256": "2f6e3406d18a6cc5ee8cab1e41382bda"
+        "sha256": "a2bdda166776f0167c50f54440eb4634"
       },
       {
         "file": "POLIAS E TENSORES/8115990128.png.cimg",
-        "sha256": "271ce83b7aa2eaaada15c6a875f35a83"
+        "sha256": "ab4172333183f602a0089dd7667ca52a"
       },
       {
         "file": "POLIAS E TENSORES/8115990601.png.cimg",
-        "sha256": "2ec913ccff487c236606c9899eb503d7"
+        "sha256": "59288f9596aa01d2cc8c4b1734b99476"
       },
       {
         "file": "POLIAS E TENSORES/8115990602.png.cimg",
-        "sha256": "526df3396468af2c75a87ec8357040eb"
+        "sha256": "f2c9ba9bc8c6f1012b16a193f77c2895"
       },
       {
         "file": "POLIAS E TENSORES/8115990603.png.cimg",
-        "sha256": "f59b8ed855c4502c1784ab4c0e120791"
+        "sha256": "e59e1265bd79d754b8b4c0525a18c103"
       },
       {
         "file": "POLIAS E TENSORES/8115990604.png.cimg",
-        "sha256": "453326495ca2e9568a3733d8fbef5ae3"
+        "sha256": "694c46150607b35d97a4ec75b3c8676b"
       },
       {
         "file": "POLIAS E TENSORES/8115990605.png.cimg",
-        "sha256": "9cc555e3d7b366619e3b931cec5b84f3"
+        "sha256": "eb9fe290255d6c4d389c0be52f27442c"
       },
       {
         "file": "POLIAS E TENSORES/8115990606.png.cimg",
-        "sha256": "b6c768816a4fc940438797d6905abf16"
+        "sha256": "df54d05459c093dd07debabf07e26c38"
       },
       {
         "file": "POLIAS E TENSORES/8115990607.png.cimg",
-        "sha256": "80e442156a9960c8be1165cc5f227cba"
+        "sha256": "76770f0ee9e818f93592534d05966661"
       },
       {
         "file": "POLIAS E TENSORES/8115990608.png.cimg",
-        "sha256": "cc64fb60d9bbd30e33daba3ddc53627a"
+        "sha256": "e71ebdd683215b56753ab9bba095b994"
       },
       {
         "file": "POLIAS E TENSORES/8115990609.png.cimg",
-        "sha256": "51650e0405b13cad4f2fd61e01befb71"
+        "sha256": "08a74bbb9077c0891f7d09408577f484"
       },
       {
         "file": "POLIAS E TENSORES/8115990610.png.cimg",
-        "sha256": "6696f3a04c93fb22154fb7e7f1a32fba"
+        "sha256": "2de941d11ba712699c057a2d2f9c27dd"
       },
       {
         "file": "POLIAS E TENSORES/8115990611.png.cimg",
-        "sha256": "9a4f1c99b6b2a1d0fbfd83b485c3cf74"
+        "sha256": "8ce15b7d06931f0c88c210e245586a82"
       },
       {
         "file": "POLIAS E TENSORES/8115990612.png.cimg",
-        "sha256": "a1218474384c989397180298a9474fb3"
+        "sha256": "e04984b344392d3a0f4821414f88b5e7"
       },
       {
         "file": "POLIAS E TENSORES/8115990613.png.cimg",
-        "sha256": "b0bb4bdd2f44893e42295fa939de7904"
+        "sha256": "334e1aaa79aa39890efd0c7200487c51"
       },
       {
         "file": "POLIAS E TENSORES/8115990614.png.cimg",
-        "sha256": "04df65a8958cd044ccb95f9b1064c381"
+        "sha256": "e328ac210fee135c2120aa2cea4e6bde"
       },
       {
         "file": "POLIAS E TENSORES/8115990615.png.cimg",
-        "sha256": "b6722f013da934dac16c4c51d5495975"
+        "sha256": "a22935ab95cec999372e511dac69b412"
       },
       {
         "file": "POLIAS E TENSORES/8115990616 (2).png.cimg",
-        "sha256": "9a2cda27fe9cf7074c19f871b29b48ea"
+        "sha256": "af9c8632885929553c94979f8b13360e"
       },
       {
         "file": "POLIAS E TENSORES/8115990616.png.cimg",
-        "sha256": "1796220d769b4d5a3e53f30fa2bcfb26"
+        "sha256": "a4ac2d5f6be5f4646217b879a9db1652"
       },
       {
         "file": "POLIAS E TENSORES/8115990616_p52.png.cimg",
-        "sha256": "0d068ed8d4d13bedf378e900df062428"
+        "sha256": "d1e47237d609e74e39718a1cd51c276f"
       },
       {
         "file": "POLIAS E TENSORES/8115990617.png.cimg",
-        "sha256": "c07eb49fbde979dc8897603b6c5c6d68"
+        "sha256": "1ae264efcdc642bd0526fa33c6c2a90b"
       },
       {
         "file": "POLIAS E TENSORES/8115990618.png.cimg",
-        "sha256": "6ad4d1d0158ca6de92af1c293885291f"
+        "sha256": "8725331d8ad69eef74df2e357a07d8b9"
       },
       {
         "file": "POLIAS E TENSORES/8115990619.png.cimg",
-        "sha256": "9963d5e0290945604fb280106e7004e1"
+        "sha256": "d189167ae44a75c02ac3b5bead3f2fbd"
       },
       {
         "file": "POLIAS E TENSORES/8115990620.png.cimg",
-        "sha256": "da9b0659b53c34210ac554545100f7e0"
+        "sha256": "c184099afb622829db777319a2ecdfc9"
       },
       {
         "file": "POLIAS E TENSORES/8115990621.png.cimg",
-        "sha256": "11c54b1684b81432ae63ba2aa7e6085f"
+        "sha256": "8fc2d5f7417b2b79e0867e2161181045"
       },
       {
         "file": "POLIAS E TENSORES/8115990622.png.cimg",
-        "sha256": "aafc3fc0b97a382620d4f734f2519c8e"
+        "sha256": "03f860a5e21c24a77534edf5b04d8d2c"
       },
       {
         "file": "POLIAS E TENSORES/8115990623.png.cimg",
-        "sha256": "6eaf0d8a434dde21000f9e4b4aef72a7"
+        "sha256": "45486be86923c565a0dca21b9af39b43"
       },
       {
         "file": "POLIAS E TENSORES/8115990624.png.cimg",
-        "sha256": "d0d29ad25f6273260255edf302b89001"
+        "sha256": "2859ecae3ba1ac3e1b6474bdf1474cac"
       },
       {
         "file": "POLIAS E TENSORES/8115990625.png.cimg",
-        "sha256": "7b2349608e0e9c3ff594a1a5ba0da1a5"
+        "sha256": "bcab5fd6d70163841d4a63b35750da5e"
       },
       {
         "file": "POLIAS E TENSORES/8115990626.png.cimg",
-        "sha256": "d9b082d5f51ad5971d4a0a1a7eab4d7e"
+        "sha256": "d9371339883dfae0c12296962a9b833d"
       },
       {
         "file": "POLIAS E TENSORES/8115990628.png.cimg",
-        "sha256": "cb0a834b7eb1afef64f4c62200777641"
+        "sha256": "12c36ca1b1b9fb562e6499077d91cf30"
       },
       {
         "file": "POLIAS E TENSORES/8115990629.png.cimg",
-        "sha256": "a6ae6ae7aeaf0abd97d4cfa624df54e8"
+        "sha256": "6d5402b7b234099ef035110dccd1b5d9"
       },
       {
         "file": "POLIAS E TENSORES/8115990630.png.cimg",
-        "sha256": "e61d86af838a403a397deedf7ae4d81f"
+        "sha256": "238b8f3b1e8e7f9e1f7318d7f3719758"
       },
       {
         "file": "POLIAS E TENSORES/8115990631.png.cimg",
-        "sha256": "6573f92e1626c5fc7a9291e27b379cd0"
+        "sha256": "3e81c0a9cc10368716ba22cb06eb0f2c"
       },
       {
         "file": "POLIAS E TENSORES/8115990632.png.cimg",
-        "sha256": "b8222d019691879b12d17bb54ad12e8d"
+        "sha256": "42226a0d455228d78b28a0a3e441fcd5"
       },
       {
         "file": "POLIAS E TENSORES/8115990633.png.cimg",
-        "sha256": "966ce120d511119d172bfb5c8215a5f0"
+        "sha256": "7f73caa8240c8c87030d5cedbd0e8efc"
       },
       {
         "file": "POLIAS E TENSORES/8115990634.png.cimg",
-        "sha256": "5ae46320d35017ecd8e9ae993e5db9dc"
+        "sha256": "f24dea26662f2782817419df61aa32f7"
       },
       {
         "file": "POLIAS E TENSORES/8115990635.png.cimg",
-        "sha256": "0488210e6b23e3d28d3dc137ef8a415a"
+        "sha256": "939fc15b385e2591bfef53bd220738be"
       },
       {
         "file": "POLIAS E TENSORES/8115990636.png.cimg",
-        "sha256": "b3e080370b574844a13169f920488fc2"
+        "sha256": "1c1f54f7bb693344a8727ae4cf7547c0"
       },
       {
         "file": "POLIAS E TENSORES/8115990637.png.cimg",
-        "sha256": "6aa0facb78efbdd64810f4825a1f18a7"
+        "sha256": "937b6f6ace84252c57ec00c1ea2d5546"
       },
       {
         "file": "POLIAS E TENSORES/8115990638.png.cimg",
-        "sha256": "254838e4e98b31a1907cab39bbe7acca"
+        "sha256": "67b072bc55f8e004962193977f5d7fe6"
       },
       {
         "file": "POLIAS E TENSORES/8115990639.png.cimg",
-        "sha256": "c55984b7e6d82b33fc2982a9989b6df6"
+        "sha256": "6b4e1da672ad085d34555f68b1fbf629"
       },
       {
         "file": "POLIAS E TENSORES/8115990640.png.cimg",
-        "sha256": "44535c4894e23e206f7426fe1dde644b"
+        "sha256": "161a4f54e3c239aaf3ddb70192efb7ce"
       },
       {
         "file": "POLIAS E TENSORES/8115990641.png.cimg",
-        "sha256": "7bbaf31db2ffd395cb5a9dc6923fa67b"
+        "sha256": "7c336c75742f7316ef8ee3ac0372e9e7"
       },
       {
         "file": "POLIAS E TENSORES/8115990642.png.cimg",
-        "sha256": "d502f476efe370d5a4631bfbbe539802"
+        "sha256": "82706e6433653155c9ef8251204ce010"
       },
       {
         "file": "POLIAS E TENSORES/8115990643.png.cimg",
-        "sha256": "459f151b9954106c66b78d943c734b36"
+        "sha256": "2f2d9ec349b627ee02c5d54bb36ba087"
       },
       {
         "file": "POLIAS E TENSORES/8115990644.png.cimg",
-        "sha256": "45a3f06b5b836349433950c0a47ad2de"
+        "sha256": "8a98b111b54971f84d35ed019cb0284e"
       },
       {
         "file": "POLIAS E TENSORES/8115990645.png.cimg",
-        "sha256": "f608c78df91997fda351116be9c0542b"
+        "sha256": "eaf84b448d0a5b9563e13064263f0d5f"
       },
       {
         "file": "POLIAS E TENSORES/8115990646.png.cimg",
-        "sha256": "f6c3dbce59d997c9f4427ebe640dad30"
+        "sha256": "228a3ee6aa29e15a23abd8ea8fed769b"
       },
       {
         "file": "POLIAS E TENSORES/8115990647.png.cimg",
-        "sha256": "88f49eb9ae8808db05ab050222ac4907"
+        "sha256": "8bedb0453812b0dd61426dc8f2ccb6fe"
       },
       {
         "file": "POLIAS E TENSORES/8115990648.png.cimg",
-        "sha256": "1fa5a4fd135ffff5ac506c3bbe2d15a4"
+        "sha256": "c737ed372fa048a79e4d48b9bb4a3d14"
       },
       {
         "file": "POLIAS E TENSORES/8115990650.png.cimg",
-        "sha256": "9d45562d847d8ff8176e2edb451c16c3"
+        "sha256": "b088ba36a9e472f22cde211bd64c5447"
       },
       {
         "file": "POLIAS E TENSORES/8115990651.png.cimg",
-        "sha256": "e653e4dd3bf93d328c29d2e90fe682d3"
+        "sha256": "27fb5a2ce85d9c98325ace5651bcc6b2"
       },
       {
         "file": "POLIAS E TENSORES/8115990653.png.cimg",
-        "sha256": "7b7247a62ebfd9fdf41a4905b7d9dcec"
+        "sha256": "f520a417e763bafdf358f3b205dd97e5"
       },
       {
         "file": "POLIAS E TENSORES/8115990654.png.cimg",
-        "sha256": "c01a65f98e4d2797ce5e85d52f839312"
+        "sha256": "f3176e5221bb68c8c0a12d6cb8545240"
       },
       {
         "file": "POLIAS E TENSORES/8115990655.png.cimg",
-        "sha256": "e71db471b77fca163c24493d094cd69e"
+        "sha256": "1dc20b2fb3d5960ddddc3da5c9448fcd"
       },
       {
         "file": "POLIAS E TENSORES/8115990656.png.cimg",
-        "sha256": "7eebbba859ed6d838200ef75c1ffa719"
+        "sha256": "3fa45dc80d060ceef68a122660ccf31a"
       },
       {
         "file": "POLIAS E TENSORES/8115990657.png.cimg",
-        "sha256": "edb69671babfd958f71a3e7fa23904b2"
+        "sha256": "30164a390c144a865a7b3a4cba72c11b"
       },
       {
         "file": "POLIAS E TENSORES/8117990101.png.cimg",
-        "sha256": "2727a3dd85d12c7058a8a97a3d2bf9b9"
+        "sha256": "0a110064158853614e7a54a07d858fab"
       },
       {
         "file": "POLIAS E TENSORES/8117990102.png.cimg",
-        "sha256": "9dac3fd3512083802bddafdfa4857f20"
+        "sha256": "7400e1166790f6107fd6ff8617615564"
       },
       {
         "file": "POLIAS E TENSORES/8117990103.png.cimg",
-        "sha256": "2b4d35f20252bcfba821925502250ad7"
+        "sha256": "ad2dfb9fff6735310a9960b8f4da5f1c"
       },
       {
         "file": "POLIAS E TENSORES/8117990104.png.cimg",
-        "sha256": "9c62090f01cf22c726db93340d538486"
+        "sha256": "1bb3ca383f660795e204061c64c580ad"
       },
       {
         "file": "POLIAS E TENSORES/8117990105.png.cimg",
-        "sha256": "4733757a02824b211a5bdaa32181b3c0"
+        "sha256": "b11811d0d80d3bb62e6682132ff2ecdc"
       },
       {
         "file": "POLIAS E TENSORES/8117990106.png.cimg",
-        "sha256": "909f77c075b028df7a03cbf515ce5f13"
+        "sha256": "0c9a463bbf1cf3af0cf56df614485181"
       },
       {
         "file": "POLIAS E TENSORES/8117990601.png.cimg",
-        "sha256": "f1a18f6056dcb8b29f3a1b318240094b"
+        "sha256": "18b789fb47063bfd77c913413675762b"
       },
       {
         "file": "POLIAS E TENSORES/8117990602.png.cimg",
-        "sha256": "ceebcd1573471734b809586293fffc01"
+        "sha256": "74162e2908ece8e451d78d96af074d99"
       },
       {
         "file": "POLIAS E TENSORES/8117990603.png.cimg",
-        "sha256": "57fdf71c778ba9693e39e2f6c26e124e"
+        "sha256": "069b588ad29235b7e9b7f8f51fced6ba"
       },
       {
         "file": "POLIAS E TENSORES/8117990604.png.cimg",
-        "sha256": "2e7cc0b9e0001405448f6f387003295d"
+        "sha256": "a13cd8db45d89566e951e91649f84e0d"
       },
       {
         "file": "POLIAS E TENSORES/8117990605.png.cimg",
-        "sha256": "f2ec7889618c1201e3b2c86f999d5eda"
+        "sha256": "0a9f5451b4d0d56f5ba4e19edbcf3e46"
       },
       {
         "file": "POLIAS E TENSORES/8117990606.png.cimg",
-        "sha256": "944ed52b39b997e711e953232283c60f"
+        "sha256": "a287e6f2c0e60d5a4b972b5aa35b561b"
       },
       {
         "file": "POLIAS E TENSORES/8117990607.png.cimg",
-        "sha256": "788f08108d2d640fd36800f6095055d2"
+        "sha256": "dc24d9e2c1c3d6e8496a81f72eb7db0f"
       },
       {
         "file": "POLIAS E TENSORES/8117990608.png.cimg",
-        "sha256": "7f2196188a59f24b3829946f4ce36f85"
+        "sha256": "85035d9d288b03e3b6f300f9e357ea39"
       },
       {
         "file": "POLIAS E TENSORES/8117990609.png.cimg",
-        "sha256": "7ca9469213b527f7b36b72eb2d4e7abf"
+        "sha256": "7d57d160d688c02a61d34cdfcf90ff76"
       },
       {
         "file": "POLIAS E TENSORES/8117990610.png.cimg",
-        "sha256": "0ae53b9a805f83b9131eb92bfe92572f"
+        "sha256": "0eb4f7b372097c62271c596ae9dde014"
       },
       {
         "file": "POLIAS E TENSORES/8117990611.png.cimg",
-        "sha256": "bcf312324b680970f325dc507d455c79"
+        "sha256": "25d7f3c7eaf1ba4208f683cf28556327"
       },
       {
         "file": "POLIAS E TENSORES/8123990101.png.cimg",
-        "sha256": "9168cb90c99b83c638b10a38203cd9b8"
+        "sha256": "c64b5050e724df84559e2a240700199c"
       },
       {
         "file": "POLIAS E TENSORES/8123990102.png.cimg",
-        "sha256": "7322849c992a5a97b45b4fe7c1b6340c"
+        "sha256": "ff757ee7e36860ad5cbde8d9f90d135e"
       },
       {
         "file": "POLIAS E TENSORES/8123990103.png.cimg",
-        "sha256": "5be7a5acda1efaa343661cb2944ea469"
+        "sha256": "7a0ec30dbd7216d87890bfd039417ac6"
       },
       {
         "file": "POLIAS E TENSORES/8123990601.png.cimg",
-        "sha256": "0990f7b459edd1a833d6b9bfa9a88118"
+        "sha256": "d4b923c8e39218d7df3700b1cd807e70"
       },
       {
         "file": "POLIAS E TENSORES/8123990602.png.cimg",
-        "sha256": "fe3162dc22ec8e53cbe27680840b1852"
+        "sha256": "c3719b6ee65a72b722e9b49efbfbc911"
       },
       {
         "file": "POLIAS E TENSORES/8123990603.png.cimg",
-        "sha256": "268d80c02318ee7fa629b97d4c61c4f7"
+        "sha256": "95b18aca4897f5299f192fa9193d5995"
       },
       {
         "file": "POLIAS E TENSORES/8123990604.png.cimg",
-        "sha256": "c9db844208b3ec2d1cc54639ccab1f51"
+        "sha256": "30822089dcac88715e7122a3b7408cb6"
       },
       {
         "file": "POLIAS E TENSORES/8123990605.png.cimg",
-        "sha256": "83f0e2b3c3f0bb0f3206aef0a6074791"
+        "sha256": "76d1c4f202006d98e95327b0829f3068"
       },
       {
         "file": "POLIAS E TENSORES/8123990606.png.cimg",
-        "sha256": "37fa93eb51943dbb59ad829c998c80b3"
+        "sha256": "954927017c737f4b79006a11ea37a65c"
       },
       {
         "file": "POLIAS E TENSORES/8123990607.png.cimg",
-        "sha256": "58eb65d58d6abe79a92fb7ee96dc91dc"
+        "sha256": "3424c64ec94ab7b3c624e59bf79f8c58"
       },
       {
         "file": "POLIAS E TENSORES/8124990101.png.cimg",
-        "sha256": "e8fa9fa591a26ab03907133a61aff4c6"
+        "sha256": "d339eb85af8ace0b90d774d7844f8d16"
+      },
+      {
+        "file": "POLIAS E TENSORES/8124990622.png.cimg",
+        "sha256": "6f7eba0b12f856a5e2ba38729a7dbb75"
       },
       {
         "file": "POLIAS E TENSORES/8128990601.png.cimg",
-        "sha256": "bc25bcfd7fd0ae9b9d50b7e02c715b6d"
+        "sha256": "847f61ab3e5042d14c7e68722a1f5b08"
+      },
+      {
+        "file": "POLIAS E TENSORES/8133990101.png.cimg",
+        "sha256": "d0027b385e8875be2af44af1212520f9"
       },
       {
         "file": "POLIAS E TENSORES/8133990601.png.cimg",
-        "sha256": "67ae9d094462592fcfe94522a0282120"
+        "sha256": "7eab6ae48a41c346a7a8c9bb4e7543db"
       },
       {
         "file": "POLIAS E TENSORES/8134990101.png.cimg",
-        "sha256": "c423d0dbc78aa6f45ce4b9be48e29565"
+        "sha256": "9e5964b88e358ed1e65bcbcef698d91f"
       },
       {
         "file": "POLIAS E TENSORES/8134990102.png.cimg",
-        "sha256": "d3f7fc7adbdda23f37e3de788a6fe2a8"
+        "sha256": "c60fc294bf7b81c8397ab3d916f5ee07"
       },
       {
         "file": "POLIAS E TENSORES/8134990103.png.cimg",
-        "sha256": "85d62b086c111e2bf6f1e38b418815a4"
+        "sha256": "eeaef25f684f413031ef764c1601781f"
       },
       {
         "file": "POLIAS E TENSORES/8134990104.png.cimg",
-        "sha256": "e30dfa31ca9df617328ca148bf84435a"
+        "sha256": "b7114d4e9462b8213290f7973ffe679d"
       },
       {
         "file": "POLIAS E TENSORES/8134990105.png.cimg",
-        "sha256": "6abd95de1feb53265ebfc81b3a10ade6"
+        "sha256": "5e57a8ce32577d0ba5d3b9ea06dc2967"
       },
       {
         "file": "POLIAS E TENSORES/8134990106.png.cimg",
-        "sha256": "f9142d38a0e0e65c61dc6e9be1c38d23"
+        "sha256": "7a044d1e6fe93440d02480f04104e20b"
       },
       {
         "file": "POLIAS E TENSORES/8134990107.png.cimg",
-        "sha256": "6488db247dc8ace111d92abc3e22f0ce"
+        "sha256": "31a411a3001adbe59552f970a3e0a53a"
       },
       {
         "file": "POLIAS E TENSORES/8134990108.png.cimg",
-        "sha256": "a7d2ef77f1a80488f50b4815399fcd86"
+        "sha256": "93e6e25ef67599ea9a6fbb62d234b27f"
       },
       {
         "file": "POLIAS E TENSORES/8134990109.png.cimg",
-        "sha256": "d400c82fbf45e72893d0fbe3651be94a"
+        "sha256": "b7681a1a2fc7f16dce16cbdaeb4b84b4"
       },
       {
         "file": "POLIAS E TENSORES/8134990110.png.cimg",
-        "sha256": "24fb1b24f6f974492515fd08fbc742a6"
+        "sha256": "10ac64fc85d7e38caba9534f59133175"
       },
       {
         "file": "POLIAS E TENSORES/8134990111.png.cimg",
-        "sha256": "db25714a1c6ff76a9472baca50337614"
+        "sha256": "18d5777cf1002869f928a745482a470c"
       },
       {
         "file": "POLIAS E TENSORES/8134990112.png.cimg",
-        "sha256": "20a8eb479c2b675f48b262745acc7c23"
+        "sha256": "a4ebd0c08031552727654703061182d8"
       },
       {
         "file": "POLIAS E TENSORES/8134990113.png.cimg",
-        "sha256": "78c54ef3d9dabedeb90b73c0014a7016"
+        "sha256": "b360b39aefb96f652e58367b9581a2b7"
       },
       {
         "file": "POLIAS E TENSORES/8134990114.png.cimg",
-        "sha256": "69ba09d0a7e4fdfd77a02f9897035c8a"
+        "sha256": "d7ef6aa2a06287f77c2e545e81288ba2"
       },
       {
         "file": "POLIAS E TENSORES/8134990115.png.cimg",
-        "sha256": "91987cc875c1753846d417d332864311"
+        "sha256": "fe1d7771c90e0b38b1ae4b9eed0a7f33"
       },
       {
         "file": "POLIAS E TENSORES/8134990116.png.cimg",
-        "sha256": "bcd1ccb7cbe842eb9fa9ff03e6b2d177"
+        "sha256": "750443daa120e22df80f19a1dc4d6a87"
       },
       {
         "file": "POLIAS E TENSORES/8134990117.png.cimg",
-        "sha256": "dd94c3127d38465fadd30cb82fabcb74"
+        "sha256": "59660facf756499329230468de03794b"
       },
       {
         "file": "POLIAS E TENSORES/8134990118.png.cimg",
-        "sha256": "22b5c9c080c9df9cddf5499d68406afc"
+        "sha256": "6105f203680f4791f903106e79f1b62d"
       },
       {
         "file": "POLIAS E TENSORES/8134990119.png.cimg",
-        "sha256": "50bd89dc890ab020598504c29e8cdae9"
+        "sha256": "01d79198e995b13d2b17117aa98c4261"
       },
       {
         "file": "POLIAS E TENSORES/8134990120.png.cimg",
-        "sha256": "65644771752bbd6385720810042e4696"
+        "sha256": "f34e83ada327bdb3fcd1fe6a807a5f5e"
       },
       {
         "file": "POLIAS E TENSORES/8134990121.png.cimg",
-        "sha256": "f034d7be1e608df927b75650abd86e99"
+        "sha256": "533708663097dce47413fd6a3f09ab2e"
       },
       {
         "file": "POLIAS E TENSORES/8134990122.png.cimg",
-        "sha256": "020eeab26bafe605f0e8090f96636f06"
+        "sha256": "3a1b777cc411e8d91ce69adb43610cb9"
       },
       {
         "file": "POLIAS E TENSORES/8134990123.png.cimg",
-        "sha256": "ac027f89db5e9f632112f2144e8f67a6"
+        "sha256": "84066d255f0ac2364bf991355a148f08"
       },
       {
         "file": "POLIAS E TENSORES/8134990124.png.cimg",
-        "sha256": "ffc614a81064462ba52dc11d4e2a3453"
+        "sha256": "7ad6e3283ff517ac8f6a0a97fa1c9e8e"
       },
       {
         "file": "POLIAS E TENSORES/8134990125.png.cimg",
-        "sha256": "305b61cc4e30042698c833b86d588e08"
+        "sha256": "5ec2781a1e4d5982ac0da665126667fb"
       },
       {
         "file": "POLIAS E TENSORES/8134990601.png.cimg",
-        "sha256": "0b6f7eeca82f899d118b17c54632a7d1"
+        "sha256": "1eaff66042ec2ad1e64dc09d3d424124"
       },
       {
         "file": "POLIAS E TENSORES/8134990602.png.cimg",
-        "sha256": "f02d766148bd1957dcc86210c060d92f"
+        "sha256": "b38b67a33a3fdb739e17ebc5bab6188d"
       },
       {
         "file": "POLIAS E TENSORES/8134990603.png.cimg",
-        "sha256": "257da699636c71926bf68f414a535ecc"
+        "sha256": "edb2092b5128447ed155937c492c9e7e"
       },
       {
         "file": "POLIAS E TENSORES/8134990604.png.cimg",
-        "sha256": "55369d214975a37a699f1cabc9f9c8ad"
+        "sha256": "0d956ac74b26f2e698fd75515741d5a6"
+      },
+      {
+        "file": "POLIAS E TENSORES/8134990604_1.png.cimg",
+        "sha256": "2e07dbde5f46920f1f143bb5d99010d5"
       },
       {
         "file": "POLIAS E TENSORES/8134990605.png.cimg",
-        "sha256": "683ab7a19ed9adafd37e596a4b28fdb7"
+        "sha256": "984d673d13df0fcfb5952778a6c81724"
       },
       {
         "file": "POLIAS E TENSORES/8134990606.png.cimg",
-        "sha256": "61094178c3026ba2fab62ef6a630233e"
+        "sha256": "4ce36c1956339ae408ce0e81dcd500d8"
       },
       {
         "file": "POLIAS E TENSORES/8134990607.png.cimg",
-        "sha256": "6411ba17f36f18ce391539614bde5a7b"
+        "sha256": "2fd137e28f9b22e51767328b17c4977f"
       },
       {
         "file": "POLIAS E TENSORES/8134990608.png.cimg",
-        "sha256": "4ce0f38be803fd8354908a12babbeade"
+        "sha256": "efa60fad39c7db308c822b7d8a6af236"
       },
       {
         "file": "POLIAS E TENSORES/8134990609.png.cimg",
-        "sha256": "a113eba89d548f9f85ec6eaac7dbccca"
+        "sha256": "94c3ba732199ddaf062a4dde97e74f35"
       },
       {
         "file": "POLIAS E TENSORES/8134990610.png.cimg",
-        "sha256": "8e16379a806c08330cfaf9dc6512d2ad"
+        "sha256": "6fa1587327da7187cad5fe70f44b92a5"
       },
       {
         "file": "POLIAS E TENSORES/8134990611.png.cimg",
-        "sha256": "f24c1693861fd949fd1b32c96aad2df9"
+        "sha256": "92e5994db611accc46095ce81f068566"
       },
       {
         "file": "POLIAS E TENSORES/8134990612.png.cimg",
-        "sha256": "a7cc032b57f0aa18b3e5239399059b72"
+        "sha256": "1560f29ba958f4b12388359945e4af26"
       },
       {
         "file": "POLIAS E TENSORES/8134990613.png.cimg",
-        "sha256": "4577167dd2b46c77ec1adee9ac79b115"
+        "sha256": "0a86a3173c48703bbfc7ed2a60cf3c0e"
       },
       {
         "file": "POLIAS E TENSORES/8134990614.png.cimg",
-        "sha256": "36628aa9f7f8b7a48481ccc63ee992ca"
+        "sha256": "1e6a76e90ce08b77a6e44133e611a789"
       },
       {
         "file": "POLIAS E TENSORES/8134990615.png.cimg",
-        "sha256": "1818b05c272dead774904332438c62eb"
+        "sha256": "652fabff75e2311c4d4efdbaf4bb9923"
       },
       {
         "file": "POLIAS E TENSORES/8134990616.png.cimg",
-        "sha256": "c0dae4f57181ee3c7631e830bd90208a"
+        "sha256": "678cf2e971b2bca828c8b264be969cf8"
       },
       {
         "file": "POLIAS E TENSORES/8134990617.png.cimg",
-        "sha256": "15d2f2ffa61fe5f833f77f71767603cd"
+        "sha256": "17e6e8211f1dff225334af6ddcf8aa98"
       },
       {
         "file": "POLIAS E TENSORES/8134990618.png.cimg",
-        "sha256": "38627fe0876e6fd1c49810c7cd0aaa79"
+        "sha256": "7cc73bbe80f169f5dd9f61bb079e302a"
       },
       {
         "file": "POLIAS E TENSORES/8134990619.png.cimg",
-        "sha256": "c8301a85012c2faebf5a44a8bf73455f"
+        "sha256": "d96041196c31a4bd9423c510d04cc9ed"
       },
       {
         "file": "POLIAS E TENSORES/8134990620.png.cimg",
-        "sha256": "5ecb75e4b2a1bb34a6ee796d6159624a"
+        "sha256": "d90cf8e1d87536d3cad8ec7e4383e5da"
       },
       {
         "file": "POLIAS E TENSORES/8134990621.png.cimg",
-        "sha256": "8de01dcccb51c2541dfe90711be9d32b"
+        "sha256": "bcdf25167443d92098795952ada20b44"
       },
       {
         "file": "POLIAS E TENSORES/8134990622.png.cimg",
-        "sha256": "f29103a5aba4f799bab59414ad46bee2"
+        "sha256": "10f30607b51baedebed837a272b04aa7"
       },
       {
         "file": "POLIAS E TENSORES/8134990623.png.cimg",
-        "sha256": "8e2b3d00b46c6cbc752130e4fb84799d"
+        "sha256": "9e16417f9d4b6301c12256f20d80796a"
       },
       {
         "file": "POLIAS E TENSORES/8134990624.png.cimg",
-        "sha256": "2c0b9d4a0de4d6eb09f4116f6852ac9a"
+        "sha256": "d62c3936f26bb38dbfaa9a23807863fa"
       },
       {
         "file": "POLIAS E TENSORES/8134990625.png.cimg",
-        "sha256": "054fbf74c878392917d5126e84bdda76"
+        "sha256": "0622ddd58ae3b63b51fab0167bdacf38"
       },
       {
         "file": "POLIAS E TENSORES/8134990626.png.cimg",
-        "sha256": "cef1cb820c31893da13ea0c452ac1324"
+        "sha256": "f83d4837ee06a1d8a386a6f76f5d18a2"
       },
       {
         "file": "POLIAS E TENSORES/8134990627.png.cimg",
-        "sha256": "3271e18fbd7973ad4be1f8f734c18b10"
+        "sha256": "0a993edf94dc24dc79be05aaf40b3228"
       },
       {
         "file": "POLIAS E TENSORES/8134990628.png.cimg",
-        "sha256": "62a71e81a8edf8242ce25a161460a8d1"
+        "sha256": "3511308155f7c651cc35dceac8fb5eae"
       },
       {
         "file": "POLIAS E TENSORES/8134990630.png.cimg",
-        "sha256": "6d0a1cd503ca1e10df2d296a2fe1e8fc"
+        "sha256": "b22ea486aac90958b038f0e5019b744d"
       },
       {
         "file": "POLIAS E TENSORES/8134990631.png.cimg",
-        "sha256": "c806bd8dd57bc19041d2825741202280"
+        "sha256": "ad02547ad54752159747677c4884c669"
       },
       {
         "file": "POLIAS E TENSORES/8134990633.png.cimg",
-        "sha256": "5531d58e6a2300d1a33c832b68a7c24c"
+        "sha256": "e155692f9564b75b3244e8a893c3ff53"
       },
       {
         "file": "POLIAS E TENSORES/8134990634.png.cimg",
-        "sha256": "95d2f20eec530b86659737b3ece56a69"
+        "sha256": "b52d7411cbacdbedcd892690eb281470"
       },
       {
         "file": "POLIAS E TENSORES/8138990101.png.cimg",
-        "sha256": "631811577fda20537f4318b6d35524f1"
+        "sha256": "f413b222960bf637ddc23a9011d5e97d"
       },
       {
         "file": "POLIAS E TENSORES/8138990601.png.cimg",
-        "sha256": "1ae22e66d4bbfcecf13d8071d3452e95"
+        "sha256": "06e898371fba7fb679e4f8bb327340ef"
       },
       {
         "file": "POLIAS E TENSORES/8138990602.png.cimg",
-        "sha256": "d5d649451d9814e616990d8ac7a01693"
+        "sha256": "9446002326f6e77eb80c250388953970"
       },
       {
         "file": "POLIAS E TENSORES/8138990603.png.cimg",
-        "sha256": "31ccd35c19cc02fbf52d1d55975aaaaf"
+        "sha256": "ad932103db73bf5fa70b2025174450e9"
       },
       {
         "file": "POLIAS E TENSORES/8140990101.png.cimg",
-        "sha256": "d7f1552b1d3f4c11ace10a4a996e741c"
+        "sha256": "572580baaade40f14393367478700d42"
       },
       {
         "file": "POLIAS E TENSORES/8140990102.png.cimg",
-        "sha256": "fb4b139c951a1b9205427bad97171f7f"
+        "sha256": "a36b515030fd91dabcfaecaa84fdb580"
       },
       {
         "file": "POLIAS E TENSORES/8140990103.png.cimg",
-        "sha256": "0b3e9b07a3aade4d474ce631c9d44387"
+        "sha256": "1cf5c0bca00e6a078b85b3640a0fb8bb"
       },
       {
         "file": "POLIAS E TENSORES/8140990601.png.cimg",
-        "sha256": "06409a8d7849f72edc6ea1a0c7d9500c"
+        "sha256": "b8c6bd122b61cb7f684cbd166dbbceb7"
       },
       {
         "file": "POLIAS E TENSORES/8140990602.png.cimg",
-        "sha256": "a32b66a6d1df82e53448d5a456d1ac23"
+        "sha256": "7663935c179767c0cc1fdcd4cce3a7ca"
       },
       {
         "file": "POLIAS E TENSORES/8140990603.png.cimg",
-        "sha256": "f613b1417bc73c8084ac29342bf80d0f"
+        "sha256": "4d90c172c01d1aaf4afb63f51f031dca"
       },
       {
         "file": "POLIAS E TENSORES/8140990604.png.cimg",
-        "sha256": "abd4248ae8726576e74f2c1b191cbed5"
+        "sha256": "83e2d78e7220e98d6d1d88ac982cad31"
       },
       {
         "file": "POLIAS E TENSORES/8140990605.png.cimg",
-        "sha256": "8b2f34e72442719549d9fd81dbe2d9b3"
+        "sha256": "3a278376e50ebe3769a891f180bdc532"
       },
       {
         "file": "POLIAS E TENSORES/8140990606.png.cimg",
-        "sha256": "060785987c3d9fc8eeae1c99f919ce2a"
+        "sha256": "0506a2890f59af6d5fb50ee634212026"
       },
       {
         "file": "POLIAS E TENSORES/8140990607.png.cimg",
-        "sha256": "e345309017a3a8ba85fe4b2ed4cceda2"
+        "sha256": "adc83b0c4eb24014e2c205f28c115197"
       },
       {
         "file": "POLIAS E TENSORES/8141990101.png.cimg",
-        "sha256": "815aaebe4dce84f27161ebe726351833"
+        "sha256": "516484382387d54831773a9bafc84b8e"
       },
       {
         "file": "POLIAS E TENSORES/8141990102.png.cimg",
-        "sha256": "3b971a51c0aa97abb27d67b25db51087"
+        "sha256": "be031472296110e012832844b0e12c15"
       },
       {
         "file": "POLIAS E TENSORES/8141990103.png.cimg",
-        "sha256": "43c113b16ced91ae9ec82c1448ea3cde"
+        "sha256": "0d6ace2914e6244dddbfee5442ae7401"
       },
       {
         "file": "POLIAS E TENSORES/8141990104.png.cimg",
-        "sha256": "c4fb34803ba2d481965d5a5d7eb1044f"
+        "sha256": "82001b532dc55012c3c55e792c37cdfb"
       },
       {
         "file": "POLIAS E TENSORES/8141990105.png.cimg",
-        "sha256": "b0b1390d728f0814775d491b0005c072"
+        "sha256": "1c446f57b003bfbb3c457da483614282"
       },
       {
         "file": "POLIAS E TENSORES/8141990106.png.cimg",
-        "sha256": "c729a013f940585751f601cc043bef77"
+        "sha256": "6faf15eb0ea2e40acdefbf5a43a2ae0f"
       },
       {
         "file": "POLIAS E TENSORES/8141990107.png.cimg",
-        "sha256": "9a139565f4aff4a2a9714bdb476a9a3a"
+        "sha256": "8f23fcc838d86f9da28573f170b823c1"
       },
       {
         "file": "POLIAS E TENSORES/8141990108.png.cimg",
-        "sha256": "9ed382329a9e89fbbf1baf0b1479fbb4"
+        "sha256": "2ae873ec5964dcd500844e6bf35f5631"
       },
       {
         "file": "POLIAS E TENSORES/8141990109.png.cimg",
-        "sha256": "a2ea9f4268686584611bbac97b8ba10a"
+        "sha256": "bab7b25248e282d5b25c5a07329a85ab"
       },
       {
         "file": "POLIAS E TENSORES/8141990110.png.cimg",
-        "sha256": "e23d4eaed748dc9d6ae70a71110eb9a9"
+        "sha256": "c23abb3246007b35543737d277017dec"
       },
       {
         "file": "POLIAS E TENSORES/8141990111.png.cimg",
-        "sha256": "dc9e9de7624d0abd3e89062281504761"
+        "sha256": "720c3270682b592ceb6e7b573e4c02ef"
       },
       {
         "file": "POLIAS E TENSORES/8141990601.png.cimg",
-        "sha256": "007a83e520d03dd0f3f5e7d30a4f90d2"
+        "sha256": "42b6a11b0f0e290c7bfe39b9cb08fc6c"
       },
       {
         "file": "POLIAS E TENSORES/8141990602.png.cimg",
-        "sha256": "95c5022782c4cb857383c6376bc6c75f"
+        "sha256": "b3a2a1393c87cebba89c2fb0c5dd0365"
       },
       {
         "file": "POLIAS E TENSORES/8141990603.png.cimg",
-        "sha256": "5f620134087c35fe4a0da0a7eb9d4332"
+        "sha256": "6b691a8916b6521011549bcdac73aa6c"
       },
       {
         "file": "POLIAS E TENSORES/8141990604.png.cimg",
-        "sha256": "9f9f08dca734b78edfd515f03e15e6a7"
+        "sha256": "372e243a982965ed4d546abdd9dba7e0"
       },
       {
         "file": "POLIAS E TENSORES/8141990605.png.cimg",
-        "sha256": "d5029df969b35c6ea6ea9dd7559fb271"
+        "sha256": "b8aeca6492094ab890ad7891f54a739d"
       },
       {
         "file": "POLIAS E TENSORES/8141990606.png.cimg",
-        "sha256": "3ef234764e2153c87ef3070522a83078"
+        "sha256": "988b603c10e98fa0cb1ce6a21427e3b7"
       },
       {
         "file": "POLIAS E TENSORES/8141990607.png.cimg",
-        "sha256": "cbf15a7ef30e5aa61304aaaa263cb3cd"
+        "sha256": "5a74193e3f3cf0c60528ef5165c126f2"
       },
       {
         "file": "POLIAS E TENSORES/8141990608.png.cimg",
-        "sha256": "966f58b85722e9f8e60269f1b9681274"
+        "sha256": "d733e1246720076c8a8bbff1ff859fde"
       },
       {
         "file": "POLIAS E TENSORES/8141990609.png.cimg",
-        "sha256": "b053cc6e76af62c2443e9f00b7cceacc"
+        "sha256": "67c300a6f6572b0c15dad876b681431c"
       },
       {
         "file": "POLIAS E TENSORES/8141990610.png.cimg",
-        "sha256": "26fe7fd4fa619112e5c8f44d5b2b0dd4"
+        "sha256": "079aafb89954c839bcb224b4567870af"
       },
       {
         "file": "POLIAS E TENSORES/8141990611.png.cimg",
-        "sha256": "e15e0fbaa6607301511e15724479cdae"
+        "sha256": "d750ac2e1cb5646288bb99510b1d45ac"
       },
       {
         "file": "POLIAS E TENSORES/8141990612.png.cimg",
-        "sha256": "fae65eb1aa1e0fcf0e54405fdedc441f"
+        "sha256": "637b75493958ab85dacd4d54b8cc5e75"
       },
       {
         "file": "POLIAS E TENSORES/8141990613.png.cimg",
-        "sha256": "291354bf9f22280c805ede6576083f29"
+        "sha256": "22d58bd342e529532f0ac551d2e96f28"
       },
       {
         "file": "POLIAS E TENSORES/8141990614.png.cimg",
-        "sha256": "9158f98f7fb624d3b5829edd9b78a7f8"
+        "sha256": "2ae37e75488ea7af1a4b90606a7b15ba"
+      },
+      {
+        "file": "POLIAS E TENSORES/8143990101.png.cimg",
+        "sha256": "74bf5f9ef665ddf6d6c749f08bd9a52d"
       },
       {
         "file": "POLIAS E TENSORES/8145990101.png.cimg",
-        "sha256": "cb4ef255e60fc636af80b5878c3ca299"
+        "sha256": "5eb50fda88b2a606e24446ae5b590632"
       },
       {
         "file": "POLIAS E TENSORES/8145990102.png.cimg",
-        "sha256": "b59faa11eb2a7146c75fe46434bd6b32"
+        "sha256": "a8a3dc9785c57104e8d52dfa83ac50c7"
       },
       {
         "file": "POLIAS E TENSORES/8145990103.png.cimg",
-        "sha256": "daf20ee6fcedba857ba1f3c420d27e81"
+        "sha256": "7b0086681ba866e61495a1d114f4ffef"
       },
       {
         "file": "POLIAS E TENSORES/8145990104.png.cimg",
-        "sha256": "be97c2b621b672c91a1852fb4ab0ec7c"
+        "sha256": "ccefd6dc029fa64f2fdba7f40cc5a5d5"
       },
       {
         "file": "POLIAS E TENSORES/8145990105.png.cimg",
-        "sha256": "acd95a01cbe1edfab605be1439318e77"
+        "sha256": "df176508d4f6188a1deaa5c26bf18de8"
       },
       {
         "file": "POLIAS E TENSORES/8145990601.png.cimg",
-        "sha256": "1285d1feedc761822ac08d9134ab3a19"
+        "sha256": "7745ae1eacb57d81946b9dc61fc8700f"
       },
       {
         "file": "POLIAS E TENSORES/8145990602.png.cimg",
-        "sha256": "e0d7c726f4e3c2a4d617de0df85bfa19"
+        "sha256": "1f72422ec964541f72d2bf831e75717e"
       },
       {
         "file": "POLIAS E TENSORES/8145990603.png.cimg",
-        "sha256": "eb94e8eeae07b4f3d5ac8970723df01e"
+        "sha256": "42844dd4717e061e5fe841e1de59685a"
       },
       {
         "file": "POLIAS E TENSORES/8145990604.png.cimg",
-        "sha256": "2afc1faff82de15f679de7a3c7d90b99"
+        "sha256": "6247d84908f0ad78bbeed87546cd6b22"
       },
       {
         "file": "POLIAS E TENSORES/8145990605.png.cimg",
-        "sha256": "627457bfbcd5084f451edb5f9a94ad2b"
+        "sha256": "b2b1e65f30c0a4500ad9249fc098f9d1"
       },
       {
         "file": "POLIAS E TENSORES/8145990606.png.cimg",
-        "sha256": "a0ea5a4643473f1f6a9209cf28385475"
+        "sha256": "920ef2e384ac4a1c00367ba8619d39d8"
       },
       {
         "file": "POLIAS E TENSORES/8145990607.png.cimg",
-        "sha256": "9b34bd8a825761563cc73fbc7110ff0e"
+        "sha256": "fdade573434f47639ae7e3d2ed5e41ef"
       },
       {
         "file": "POLIAS E TENSORES/8145990608.png.cimg",
-        "sha256": "27557e94a22506f89a92c5d288057e4e"
+        "sha256": "76d505275e6eea403da0ba875ffdeb01"
       },
       {
         "file": "POLIAS E TENSORES/8146990101.png.cimg",
-        "sha256": "8fdd6c8278a1f2b039b7a61d5c8d97c0"
+        "sha256": "f68d3d8e1c699f4deefc7251b33abff0"
       },
       {
         "file": "POLIAS E TENSORES/8146990102.png.cimg",
-        "sha256": "d5466dbb7ac8f926dcca7c21caecf7f4"
+        "sha256": "f406b9ecaee63c77dd0463fb2cc6bfbe"
       },
       {
         "file": "POLIAS E TENSORES/8146990103.png.cimg",
-        "sha256": "b8f3c94a43a8f6853696c302502929ef"
+        "sha256": "4c6015dc1beb9a0d37ccf66898eb6fe5"
       },
       {
         "file": "POLIAS E TENSORES/8146990104.png.cimg",
-        "sha256": "41952aa34ea125c47c119a99fe3a50a2"
+        "sha256": "b94c5a3f59c4e46e9c49db355031135e"
       },
       {
         "file": "POLIAS E TENSORES/8146990105.png.cimg",
-        "sha256": "a6edf59ec0f13495b2ef7ee1d2e286b0"
+        "sha256": "7e698bb44be6051177b2da12494509a6"
       },
       {
         "file": "POLIAS E TENSORES/8146990106.png.cimg",
-        "sha256": "0c4fd92ee626777ec999bf4ba2409aba"
+        "sha256": "5df9257f09f83d4566d25d156d06e126"
       },
       {
         "file": "POLIAS E TENSORES/8146990107.png.cimg",
-        "sha256": "e46223bbbcfabed5de9121b63237b5e4"
+        "sha256": "62ea737c1cd05aa86915ce63619f7703"
       },
       {
         "file": "POLIAS E TENSORES/8146990108.png.cimg",
-        "sha256": "773faff8442ff7306e0addc20b5050d0"
+        "sha256": "89abf491f6e4fad63e26b575c8cbd60d"
       },
       {
         "file": "POLIAS E TENSORES/8146990109.png.cimg",
-        "sha256": "afbcae1dc664b1c5d296356421c33941"
+        "sha256": "e320e3f8ce4c4bc7aa962aab0ccdf6f6"
       },
       {
         "file": "POLIAS E TENSORES/8146990110.png.cimg",
-        "sha256": "d8a0663e11f3766800408226b0cb9d40"
+        "sha256": "4a47728d9a5376c22e776be782dc0af2"
       },
       {
         "file": "POLIAS E TENSORES/8146990111.png.cimg",
-        "sha256": "93824ef86deb3ace6d8fcd19dd00cc76"
+        "sha256": "4b31702406bee481371d1d4738e988bc"
       },
       {
         "file": "POLIAS E TENSORES/8146990112.png.cimg",
-        "sha256": "9bda6301ed1079763fa9c191f0b78ace"
+        "sha256": "0defc7780a4fb078535595ffa6372307"
       },
       {
         "file": "POLIAS E TENSORES/8146990113.png.cimg",
-        "sha256": "0a3939bfe68e491cb98d0c3b99c3a0ed"
+        "sha256": "d182cea62cc7499e74aee81d72140d11"
       },
       {
         "file": "POLIAS E TENSORES/8146990114.png.cimg",
-        "sha256": "8c3035f1fa953a76914dab2e5d2dfdbb"
+        "sha256": "747703bc633607291b14720bd48fe3a7"
       },
       {
         "file": "POLIAS E TENSORES/8146990115.png.cimg",
-        "sha256": "e92995f8d4f7803a07e20dd1a80cec9d"
+        "sha256": "32b40eea28c094f38f428577ef2b46aa"
       },
       {
         "file": "POLIAS E TENSORES/8146990116.png.cimg",
-        "sha256": "e67d496e2a596348a4a71fa634c045c1"
+        "sha256": "8ff045034e9015cb44bfd0fb9e46ddb8"
       },
       {
         "file": "POLIAS E TENSORES/8146990117.png.cimg",
-        "sha256": "8263e489514249d28af222acd15193ae"
+        "sha256": "1662aece72377bb03682e6ea863b69db"
       },
       {
         "file": "POLIAS E TENSORES/8146990118.png.cimg",
-        "sha256": "021028244bf66e0f00840464fc142096"
+        "sha256": "106b8b7077b7a4c20e95203ec7dc4151"
       },
       {
         "file": "POLIAS E TENSORES/8146990118_p62.png.cimg",
-        "sha256": "7aabac1d0f9cfb108c5b1b4575ade905"
+        "sha256": "f77c4c22416bf1ca1f376c546df9b64c"
       },
       {
         "file": "POLIAS E TENSORES/8146990119.png.cimg",
-        "sha256": "2ee63ce3c81aa2abbafae13b302b0c13"
+        "sha256": "7567fe04cb53b566298c5f9e26083b01"
       },
       {
         "file": "POLIAS E TENSORES/8146990120.png.cimg",
-        "sha256": "224bb1d7ff4cee3c8d182b2f836fc0eb"
+        "sha256": "75a23ea5a8164b035d36dce8d2aa16f0"
       },
       {
         "file": "POLIAS E TENSORES/8146990121.png.cimg",
-        "sha256": "3f978b4f1512e901ed11ae89d691dceb"
+        "sha256": "d288711c244d4454bb9501cf575318d6"
       },
       {
         "file": "POLIAS E TENSORES/8146990122.png.cimg",
-        "sha256": "bd3f02ced9bf92811761097215dfe750"
+        "sha256": "9aaf50c8578c4066e0551e2a0a5a123e"
       },
       {
         "file": "POLIAS E TENSORES/8146990123.png.cimg",
-        "sha256": "4258691875e247673ee52555b478b7d4"
+        "sha256": "a09945cc8f695c6200e6a7eda92bfa91"
       },
       {
         "file": "POLIAS E TENSORES/8146990124.png.cimg",
-        "sha256": "b4ad22c3edc4080cd1cea6649c21cbde"
+        "sha256": "942b0413012d7428f67679ef7d594a2e"
       },
       {
         "file": "POLIAS E TENSORES/8146990125.png.cimg",
-        "sha256": "ed488471b480c030328cdc299cb2fcdf"
+        "sha256": "4b417824f0de9d03851fc72fc80bec62"
       },
       {
         "file": "POLIAS E TENSORES/8146990126.png.cimg",
-        "sha256": "a1e40ba5c16e5e7592acbbe0a0a49ec8"
+        "sha256": "acd700f63947263feee36610248b9b7d"
       },
       {
         "file": "POLIAS E TENSORES/8146990127.png.cimg",
-        "sha256": "403491324baa73b8bc7672d1eeabed14"
+        "sha256": "8c4d7d0ea48b967ae211f6e5085e6bdd"
       },
       {
         "file": "POLIAS E TENSORES/8146990128.png.cimg",
-        "sha256": "da513444b5ec248c5e30f51c9a322c30"
+        "sha256": "f3a257cf8d72051544e14a0f6acd847d"
       },
       {
         "file": "POLIAS E TENSORES/8146990601.png.cimg",
-        "sha256": "cd44077c4863877d5a20b924188bc8a7"
+        "sha256": "81c40a900d48dbc82fecc3cca656c473"
       },
       {
         "file": "POLIAS E TENSORES/8146990602.png.cimg",
-        "sha256": "732043119b043f2c054eb939614477b4"
+        "sha256": "cf0277f3c85b2d8a4a5f12a9f032682c"
       },
       {
         "file": "POLIAS E TENSORES/8146990603.png.cimg",
-        "sha256": "e5c84e043b91a01fca2c0f3a6972d0d3"
+        "sha256": "cf97195985fbb403b95bc04eeaa4d028"
       },
       {
         "file": "POLIAS E TENSORES/8146990604.png.cimg",
-        "sha256": "2b0155c563aef44e2b298cb7361e467c"
+        "sha256": "9dc0976407ecf4619d561338ff6e43a8"
       },
       {
         "file": "POLIAS E TENSORES/8146990605.png.cimg",
-        "sha256": "19945382164c71c546aeb9786f20c3cf"
+        "sha256": "2785cf030918a3cbef3fabd44f0fd23b"
       },
       {
         "file": "POLIAS E TENSORES/8146990606.png.cimg",
-        "sha256": "97b7679d84b5ab6dbc8af9e182514177"
+        "sha256": "dac6a3def30abeaa4f7b2acc96208900"
       },
       {
         "file": "POLIAS E TENSORES/8146990607.png.cimg",
-        "sha256": "d7706c25d229f1e93c8e6dd56ff62f26"
+        "sha256": "2d97377ed6d5eb575d98fe5d2915df54"
       },
       {
         "file": "POLIAS E TENSORES/8146990608.png.cimg",
-        "sha256": "20ca134d7607850c3f9e13c514750e2b"
+        "sha256": "6281fdbe7e17a9801393190c7195786d"
       },
       {
         "file": "POLIAS E TENSORES/8146990609.png.cimg",
-        "sha256": "6cd5df3ebf62778066f6aae8260e0897"
+        "sha256": "e37164c973853b388b09a1bbaa9f86bf"
       },
       {
         "file": "POLIAS E TENSORES/8146990610.png.cimg",
-        "sha256": "76a1cfe0e756eec564af1bfd7f8d261a"
+        "sha256": "72a48bd8ccbf734d17681fbc9473bb11"
       },
       {
         "file": "POLIAS E TENSORES/8146990611.png.cimg",
-        "sha256": "11136aed44beee239ecbcaa8702aa8e9"
+        "sha256": "ff018e20967d8cc8b37441059e242e28"
       },
       {
         "file": "POLIAS E TENSORES/8146990612.png.cimg",
-        "sha256": "2fbc0d010aa485f84fce5476cbca6d4b"
+        "sha256": "ef66769b3daa8a8b4ff8c82f7e32f0e9"
       },
       {
         "file": "POLIAS E TENSORES/8146990613.png.cimg",
-        "sha256": "4cbd917c0a1af6ececa8451e556d75a6"
+        "sha256": "4064932c96fb562fca3def0f0bc1f674"
       },
       {
         "file": "POLIAS E TENSORES/8146990614.png.cimg",
-        "sha256": "7a5d6043d0bf046b545b2e9eeb11b27d"
+        "sha256": "67b0e4129ce56af951d7e8f7b37b9292"
       },
       {
         "file": "POLIAS E TENSORES/8146990615.png.cimg",
-        "sha256": "75b8de0709aab2ce5788d8f5ad40df7d"
+        "sha256": "52a97f23f6bfdabaf88373294e0e7167"
       },
       {
         "file": "POLIAS E TENSORES/8146990616.png.cimg",
-        "sha256": "72d218a6f5003162a89802a168127cbf"
+        "sha256": "b0095f027a24c1c21ef9ca32c81ddc52"
       },
       {
         "file": "POLIAS E TENSORES/8146990617.png.cimg",
-        "sha256": "625e879277441b7200d577a1d9478f64"
+        "sha256": "1eec5b9c947a66b1c37b9b418062f8a6"
       },
       {
         "file": "POLIAS E TENSORES/8146990618.png.cimg",
-        "sha256": "9a35e714847e13e392ae23f151f5d384"
+        "sha256": "dbf4315d6f56720fab8b8cbf4d57d149"
       },
       {
         "file": "POLIAS E TENSORES/8146990619.png.cimg",
-        "sha256": "ca0025dcbee572a3cf359ae08ee64144"
+        "sha256": "9fc900bc02b7d83e46fb720998e443c3"
       },
       {
         "file": "POLIAS E TENSORES/8146990620.png.cimg",
-        "sha256": "1a41772a5711c9557320ea65f5ccf221"
+        "sha256": "42bd75b90a169990af75dea848073cf2"
       },
       {
         "file": "POLIAS E TENSORES/8146990621.png.cimg",
-        "sha256": "182f5ea161d912ba6b635e9aee03183e"
+        "sha256": "9970b337f69a43678b7649ba23b9306f"
       },
       {
         "file": "POLIAS E TENSORES/8146990622.png.cimg",
-        "sha256": "808786014fb77d6edc70dd85d3709bf7"
+        "sha256": "5ebc5abe5eeaf61bcce2b412eff407e7"
       },
       {
         "file": "POLIAS E TENSORES/8146990623.png.cimg",
-        "sha256": "98a41c1b99fc6620ec95729199501160"
+        "sha256": "9a4947d12d27bd11ca273beb42023bbc"
       },
       {
         "file": "POLIAS E TENSORES/8146990624.png.cimg",
-        "sha256": "165258ab3e561704be68c2823c1c5457"
+        "sha256": "fa169a73a21c105649988a2031d0ac50"
       },
       {
         "file": "POLIAS E TENSORES/8146990625.png.cimg",
-        "sha256": "49aee0666a9aabec60c7fcaad0a57c5a"
+        "sha256": "c77f8fdc3ebf19889071b4568049567b"
       },
       {
         "file": "POLIAS E TENSORES/8146990626.png.cimg",
-        "sha256": "c00d588497c2214dd1293193fa3d8244"
+        "sha256": "d51e974956da0b72a9ca5704761a3c3f"
       },
       {
         "file": "POLIAS E TENSORES/8147990101.png.cimg",
-        "sha256": "9638a8c78672fcc7ffbe636f1249c742"
+        "sha256": "fe9ddf48cb60cc801e0051b76a965f3c"
       },
       {
         "file": "POLIAS E TENSORES/8147990104.png.cimg",
-        "sha256": "46f3c80f3667dc2ba4f5ea472d1c8efb"
+        "sha256": "cb173e688f480fa36f9e499ad476d7c6"
       },
       {
         "file": "POLIAS E TENSORES/8147990105.png.cimg",
-        "sha256": "c9d592fca84b717a8fa231eabdd227ec"
+        "sha256": "573d11e043cae3a909c5f25c730c30ba"
       },
       {
         "file": "POLIAS E TENSORES/8148990101.png.cimg",
-        "sha256": "320a613e7a38b091a3914ebff55c386b"
+        "sha256": "3025e64498d1d9eac2a74876cb25a11c"
       },
       {
         "file": "POLIAS E TENSORES/8148990102.png.cimg",
-        "sha256": "19442460770a3af78a8f6a3c521f3923"
+        "sha256": "e1f415578705e8a1250faac861bfa3b4"
       },
       {
         "file": "POLIAS E TENSORES/8148990103.png.cimg",
-        "sha256": "216435bb53b575e616711e10fbf23c3d"
+        "sha256": "e9b0367dca14fa923a82b837dcf35478"
       },
       {
         "file": "POLIAS E TENSORES/8148990104.png.cimg",
-        "sha256": "4d4671542e908d56aaa2df849982dac3"
+        "sha256": "f82f96b8a69a87ff05f34966ed56b564"
       },
       {
         "file": "POLIAS E TENSORES/8148990105.png.cimg",
-        "sha256": "09907b88208b815d934e61eb40223369"
+        "sha256": "823bfd88ae85e25582c3d7de10faa6c1"
       },
       {
         "file": "POLIAS E TENSORES/8148990106.png.cimg",
-        "sha256": "6f6c0755cec79f501a58916b4edcfe4f"
+        "sha256": "214572b61df3c4e112bed3f9e360fe67"
       },
       {
         "file": "POLIAS E TENSORES/8148990107.png.cimg",
-        "sha256": "010b4f0e282f2aa4a19d8d058e46f9d8"
+        "sha256": "98f2b8243ab01ba964e9aa23e7f0d299"
       },
       {
         "file": "POLIAS E TENSORES/8148990108.png.cimg",
-        "sha256": "07ebf8d9de8b8ea8406e6291a387428d"
+        "sha256": "e3b7741043cdf96d30920ae725d26b69"
       },
       {
         "file": "POLIAS E TENSORES/8148990109.png.cimg",
-        "sha256": "bb9751adee6ff7356e0038063cb952f1"
+        "sha256": "8c1cd6eedbf72e76c788fc17f17030b2"
       },
       {
         "file": "POLIAS E TENSORES/8148990110.png.cimg",
-        "sha256": "9ad3f25c55290bd44ccdde45dbc6c0d5"
+        "sha256": "1a213c8e7b8b324daeb0da6f2dcd2789"
       },
       {
         "file": "POLIAS E TENSORES/8148990111.png.cimg",
-        "sha256": "520c85b56d9e14f67de75edfff35ae10"
+        "sha256": "9c7d80bfd24371bf80d52f53d77d0f3c"
       },
       {
         "file": "POLIAS E TENSORES/8148990112.png.cimg",
-        "sha256": "b93712982cbb446ad682fe7379998333"
+        "sha256": "6618b20073448d0bed50fbbd4d1a3ef7"
       },
       {
         "file": "POLIAS E TENSORES/8148990113.png.cimg",
-        "sha256": "4f737d0265f3687e1f44adeeec70b8f4"
+        "sha256": "b32e6df6507d22a4520c33fca6b2f1e0"
       },
       {
         "file": "POLIAS E TENSORES/8148990114.png.cimg",
-        "sha256": "c596c3c7352e45d5beeb8b6531316cf6"
+        "sha256": "04a21362ac7a6aa0c032b3584d15950e"
       },
       {
         "file": "POLIAS E TENSORES/8148990115.png.cimg",
-        "sha256": "87c5ef5396bfddf4ab911e03ccd5d1cf"
+        "sha256": "e0bba49c00ce97cd310b9393b3ba6dcb"
       },
       {
         "file": "POLIAS E TENSORES/8148990116.png.cimg",
-        "sha256": "df7984d3cf832395d97db76c8068a064"
+        "sha256": "09a5c332cf7abb45861793775b915761"
       },
       {
         "file": "POLIAS E TENSORES/8148990117.png.cimg",
-        "sha256": "5c42a8d2eccd21183a82b3f139ce8293"
+        "sha256": "8f9154722079300b4885191d88c0f952"
       },
       {
         "file": "POLIAS E TENSORES/8148990119.png.cimg",
-        "sha256": "3b46f3b7453bbb0dcd78d034dd6c8232"
+        "sha256": "9f5ab2104bd981fe1afbb618c93ab942"
       },
       {
         "file": "POLIAS E TENSORES/8148990401.png.cimg",
-        "sha256": "1ca47b7ee030b52758e03d46b7c14f79"
+        "sha256": "224d0142581641f6d5e9da264d44a1ea"
       },
       {
         "file": "POLIAS E TENSORES/8148990601.png.cimg",
-        "sha256": "22d0611f0780019b6b6be87767034823"
+        "sha256": "2877c7d881d55d33d08db1cbcbf4e7ac"
       },
       {
         "file": "POLIAS E TENSORES/8148990602.png.cimg",
-        "sha256": "1ebc6eccf3b740de412bdce13e5511f9"
+        "sha256": "c9d41f635275bfa640230c4e6554abae"
       },
       {
         "file": "POLIAS E TENSORES/8148990603.png.cimg",
-        "sha256": "0fdebdd4d352ed4966340cbd313c7e36"
+        "sha256": "6cfd6b7cc17fccd38dbc9e31bf0a8286"
       },
       {
         "file": "POLIAS E TENSORES/8148990604 (2).png.cimg",
-        "sha256": "fd03c3d2d8b7bbfc117822c9bdd91df6"
+        "sha256": "eacedb8f1dc7eb543d49aab466ae49ae"
       },
       {
         "file": "POLIAS E TENSORES/8148990604.png.cimg",
-        "sha256": "0ff87f58b240df9ff0b1ec493c93c5f7"
+        "sha256": "87f848384d6c6f6536885f4c0c8f25b8"
       },
       {
         "file": "POLIAS E TENSORES/8148990605.png.cimg",
-        "sha256": "412957421740bbe514ead0108935878b"
+        "sha256": "b73f63c1199604c5fe9edf50a9f34bac"
       },
       {
         "file": "POLIAS E TENSORES/8148990606.png.cimg",
-        "sha256": "a11e834f13fd04636bf20e9623c72956"
+        "sha256": "6ff6fcab24fa35f702e9a2e5c01151c2"
       },
       {
         "file": "POLIAS E TENSORES/8148990607.png.cimg",
-        "sha256": "38c03e1b281cd1cf595ada929300fadb"
+        "sha256": "7c2d7eab856879a5ac8b4f80226a8efd"
       },
       {
         "file": "POLIAS E TENSORES/8148990608.png.cimg",
-        "sha256": "a0ead111761286aefcf1af1f2bf7236c"
+        "sha256": "3f829a68a598bad17cee3cd252910371"
       },
       {
         "file": "POLIAS E TENSORES/8148990609.png.cimg",
-        "sha256": "a69416a1544da75403ee44cf9ce09941"
+        "sha256": "082c10538c957ea78e666b1fc6910e14"
       },
       {
         "file": "POLIAS E TENSORES/8148990610.png.cimg",
-        "sha256": "80dc3d220802b50ae4f84224a446f463"
+        "sha256": "8be8af2c11c936c5770faf2ebc5effce"
       },
       {
         "file": "POLIAS E TENSORES/8148990611.png.cimg",
-        "sha256": "31e7c95e292396a5febd49a6fa633568"
+        "sha256": "22bc6ad647a648c04d357521fd2f62ea"
       },
       {
         "file": "POLIAS E TENSORES/8148990612 (2).png.cimg",
-        "sha256": "2fb00c25ca2dc19b62d266a670b34a7f"
+        "sha256": "8f97c0fddfe72e75fbcf8b75d1f1d627"
       },
       {
         "file": "POLIAS E TENSORES/8148990612.png.cimg",
-        "sha256": "a168e565409a7161051ac4d42ef3319b"
+        "sha256": "9116a1cb1801f67588f61e8fe65e56ab"
       },
       {
         "file": "POLIAS E TENSORES/8148990613.png.cimg",
-        "sha256": "f41dd460b696fffc37f28d781a3ff485"
+        "sha256": "8bba1ad27203e814db95aab8ce993ff3"
       },
       {
         "file": "POLIAS E TENSORES/8148990614.png.cimg",
-        "sha256": "3ad164717e62e94194a680740bb33779"
+        "sha256": "111560e71045ecbcab17cf1fecd38ffc"
       },
       {
         "file": "POLIAS E TENSORES/8148990615.png.cimg",
-        "sha256": "cba4ee89e34b6b5f64c447fc5a6f8b9f"
+        "sha256": "bd62ccd5ae6aa8019aaf0c5fd8f38b2f"
       },
       {
         "file": "POLIAS E TENSORES/8148990616.png.cimg",
-        "sha256": "8b8c3852aa5659d3383664ff98048de9"
+        "sha256": "52cc90f23b0ab5fdc30b69f97dab5ac1"
       },
       {
         "file": "POLIAS E TENSORES/8148990617.png.cimg",
-        "sha256": "cc8b8afb771e940ce69e19567ad6b24a"
+        "sha256": "172769d33a48201743b5bb9f1dd834a4"
       },
       {
         "file": "POLIAS E TENSORES/8148990618.png.cimg",
-        "sha256": "ccda8b9ae9dc131b18c1f270d3c466b6"
+        "sha256": "4985ac01069d62bbcc6946c35c410a74"
       },
       {
         "file": "POLIAS E TENSORES/8148990619.png.cimg",
-        "sha256": "d46b0de0a73222a74e93489b6a8c36d9"
+        "sha256": "6935deef257b8bbc395b84c49d8b5318"
       },
       {
         "file": "POLIAS E TENSORES/8148990620.png.cimg",
-        "sha256": "b190c20d46660884ebec9e2ae9fde280"
+        "sha256": "2a7906833b31b4cec9a39e3d61f912a7"
       },
       {
         "file": "POLIAS E TENSORES/8148990621.png.cimg",
-        "sha256": "b45611b68aad741d4be906d31885ba94"
+        "sha256": "5b1fd58efb4dbefb8f86b7c5e2e6e1e1"
       },
       {
         "file": "POLIAS E TENSORES/8148990622.png.cimg",
-        "sha256": "8d17ecfac437825c8326e03417903c6a"
+        "sha256": "c2c05f5debf66e48c9a0bfb07091b407"
       },
       {
         "file": "POLIAS E TENSORES/8148990623.png.cimg",
-        "sha256": "18d5aa1a85740128e22cab28205c0fa2"
+        "sha256": "79d89d02477d0b527af531429a6624a8"
       },
       {
         "file": "POLIAS E TENSORES/8148990624.png.cimg",
-        "sha256": "dceca32afbd8d41ca902028b0943dc6e"
+        "sha256": "35acb946cdb11e20325377dafae3b385"
       },
       {
         "file": "POLIAS E TENSORES/8148990625.png.cimg",
-        "sha256": "9fabe2f8540785a27c208571a1c5e9f8"
+        "sha256": "ee05c280ab7a52354723298a1e93cf3a"
       },
       {
         "file": "POLIAS E TENSORES/8148990626.png.cimg",
-        "sha256": "643b4ad10fd2238f9c2f029bdfbb3940"
+        "sha256": "b8ba2149ca5db34c3c080d45bf3244fc"
       },
       {
         "file": "POLIAS E TENSORES/8148990627.png.cimg",
-        "sha256": "30bdf8176023b1e9125efb437de1e1a3"
+        "sha256": "09a259abdff7935e05a2edd2ff771799"
       },
       {
         "file": "POLIAS E TENSORES/8149990101.png.cimg",
-        "sha256": "4988c6d2a25c57bf64454d0b44048e5c"
+        "sha256": "35d6952ae29c97f6f694e0cdc1f847cc"
       },
       {
         "file": "POLIAS E TENSORES/8149990102.png.cimg",
-        "sha256": "e723a690129a004fca8498b80afb9279"
+        "sha256": "2a3ac577e6bc09526ff96c6f885cf490"
       },
       {
         "file": "POLIAS E TENSORES/8149990103.png.cimg",
-        "sha256": "15ca7d06724742aebacd5c4c9e900bd1"
+        "sha256": "08feddce46ddffe43979d1f0ad17090d"
       },
       {
         "file": "POLIAS E TENSORES/8149990104.png.cimg",
-        "sha256": "19cff1ff21435885847355fb277caaf4"
+        "sha256": "1c92bf4c441206b8fd9076e5deecb9cb"
       },
       {
         "file": "POLIAS E TENSORES/8149990105.png.cimg",
-        "sha256": "81cdc8090178c0fee037c1adb2fc1a94"
+        "sha256": "bd71fbc4a98ca289ce0648c9b1df0e3d"
       },
       {
         "file": "POLIAS E TENSORES/8149990106.png.cimg",
-        "sha256": "42dc8b3af0fbeffc191a74f30b3064c7"
+        "sha256": "af496c5de09561253417214064f9f46f"
       },
       {
         "file": "POLIAS E TENSORES/8149990107.png.cimg",
-        "sha256": "2ec7350dd3dbd89e0137c673363d6e52"
+        "sha256": "b4edbc3f2431af4436cc9b827b42449d"
       },
       {
         "file": "POLIAS E TENSORES/8149990108.png.cimg",
-        "sha256": "bf40af28e0316f892d5a066fab3e6ea9"
+        "sha256": "8f7df873026d26aef230b25b513ecc72"
       },
       {
         "file": "POLIAS E TENSORES/8149990109.png.cimg",
-        "sha256": "e3ff7ec928b47b8aac40a24ce853a1fc"
+        "sha256": "92495bd25990186a3b7d8e185b7f56b1"
       },
       {
         "file": "POLIAS E TENSORES/8149990110.png.cimg",
-        "sha256": "1c4130528b0bdbcb0c9abbd7ee61eee7"
+        "sha256": "dad059e0c53f8b973dfcb4363a96b293"
       },
       {
         "file": "POLIAS E TENSORES/8149990111.png.cimg",
-        "sha256": "e6aae476ed6c3662019eeaa4b2544dc0"
+        "sha256": "3f247ce8cfa8eb240142011213da472b"
       },
       {
         "file": "POLIAS E TENSORES/8149990112.png.cimg",
-        "sha256": "a12a277e5a363c7f3fd8471cc026a47b"
+        "sha256": "62ea33ffa12d7472d0274aa83223517d"
       },
       {
         "file": "POLIAS E TENSORES/8149990113.png.cimg",
-        "sha256": "7b6b467a765263c77ce962fdbc8ca1e5"
+        "sha256": "215f9bb4c877336f437f36a7b35e3741"
       },
       {
         "file": "POLIAS E TENSORES/8149990114.png.cimg",
-        "sha256": "d896873767a8e3923f26ea8ed85a71df"
+        "sha256": "8e81e89e79fc46facd1a3467b5233951"
       },
       {
         "file": "POLIAS E TENSORES/8149990115.png.cimg",
-        "sha256": "8fe3d093e38311d16bde42508a5ba8d4"
+        "sha256": "82ae59a7cea84b87dba2885b451af4af"
       },
       {
         "file": "POLIAS E TENSORES/8149990116.png.cimg",
-        "sha256": "e59f06d2a1b7ce846459fd2785f9dbb8"
+        "sha256": "6812e27417ebc2be510aebcdda51d527"
       },
       {
         "file": "POLIAS E TENSORES/8149990117.png.cimg",
-        "sha256": "e5e65234e4cb7c949fda7a79414e18a4"
+        "sha256": "da8e9b3bae8c1d8adc900a37f8b124a5"
       },
       {
         "file": "POLIAS E TENSORES/8149990118.png.cimg",
-        "sha256": "55431f7021262748972fe7afbe72668b"
+        "sha256": "720ea054202c6384e56b35dd698069d5"
       },
       {
         "file": "POLIAS E TENSORES/8149990119.png.cimg",
-        "sha256": "ed61da5429e1ae9d8291a61c44ceae48"
+        "sha256": "d5cec9c7e0b1886d51906599bf160fc0"
       },
       {
         "file": "POLIAS E TENSORES/8149990120.png.cimg",
-        "sha256": "341b5d7d6430084e1143204b19b7695f"
+        "sha256": "41ad1d38be3d6105001dc0eecc341790"
       },
       {
         "file": "POLIAS E TENSORES/8149990121.png.cimg",
-        "sha256": "d3a417324a7bd9078de1157744f0c4f9"
+        "sha256": "8befbea4486b5d1b540244dc20bb46df"
       },
       {
         "file": "POLIAS E TENSORES/8149990122.png.cimg",
-        "sha256": "662511b0d862bacef45aecbe751094d6"
+        "sha256": "4cb5306d814bd5caede3082f74d21ec7"
       },
       {
         "file": "POLIAS E TENSORES/8149990123.png.cimg",
-        "sha256": "b537ee6b8fea7efaad424fadb00305ec"
+        "sha256": "5bab330ea764876ae29bd3a160e5d474"
       },
       {
         "file": "POLIAS E TENSORES/8149990124.png.cimg",
-        "sha256": "24d0adfa56b3520096799a814d0a54af"
+        "sha256": "478d9ed7e235248b774e4ed3b21a9007"
       },
       {
         "file": "POLIAS E TENSORES/8149990125.png.cimg",
-        "sha256": "32166c347d2dde6945ce4f4b47252f30"
+        "sha256": "c69ff9340e48cce9283bad32b0729e8f"
       },
       {
         "file": "POLIAS E TENSORES/8149990601.png.cimg",
-        "sha256": "2f8115d01d655b400e79a1f1057ce463"
+        "sha256": "18f76d6a0f411ccdf92f874595d15e79"
       },
       {
         "file": "POLIAS E TENSORES/8149990602.png.cimg",
-        "sha256": "29aff4190d6ff0472bc8bf813940a348"
+        "sha256": "129b73b2763a28b2ff10e88658146cd2"
       },
       {
         "file": "POLIAS E TENSORES/8149990603.png.cimg",
-        "sha256": "1867e978966d580a4f579c74dc39749e"
+        "sha256": "c5878a86a3545f062b09108837f999c9"
       },
       {
         "file": "POLIAS E TENSORES/8149990604.png.cimg",
-        "sha256": "00b7cddb0071e29b32f34c51e2ff33f8"
+        "sha256": "2de184e257bcbc871f07441b2c0e23ab"
       },
       {
         "file": "POLIAS E TENSORES/8149990605.png.cimg",
-        "sha256": "bd42b5526f8c871ffd4ab0218eedc282"
+        "sha256": "838bce0d05cf4720fac11161a76f0ee8"
       },
       {
         "file": "POLIAS E TENSORES/8149990606.png.cimg",
-        "sha256": "f984f6ee6d68a8c78b7a0798a4919612"
+        "sha256": "bdd9adf738f4f110b9e8520c5f1402c0"
       },
       {
         "file": "POLIAS E TENSORES/8149990607.png.cimg",
-        "sha256": "0857bf95b729c9cebd6ef9182a71e457"
+        "sha256": "0d402d742caae29d98e11a95db543982"
       },
       {
         "file": "POLIAS E TENSORES/8149990608.png.cimg",
-        "sha256": "674ae56c2f12fde97cefac045568dc4e"
+        "sha256": "39057103683d84180d233fc129f5ae48"
       },
       {
         "file": "POLIAS E TENSORES/8149990609.png.cimg",
-        "sha256": "48253911e8257893622d417b7292e9af"
+        "sha256": "542a389954d51f0ce73702f4f72f12ae"
       },
       {
         "file": "POLIAS E TENSORES/8149990610.png.cimg",
-        "sha256": "384f543659cbb18113eff3c7556061e3"
+        "sha256": "ed21b3f1b08f0ad60f9dc05d48ce712f"
       },
       {
         "file": "POLIAS E TENSORES/8149990611.png.cimg",
-        "sha256": "eff915f75da682df8d43129e54fe776d"
+        "sha256": "e1509c8a770b62a3178788f8c5db484b"
       },
       {
         "file": "POLIAS E TENSORES/8149990612.png.cimg",
-        "sha256": "7e90bc893d759da566994cdce0a7c111"
+        "sha256": "75028869da38e956ddb2b034a599b4bc"
       },
       {
         "file": "POLIAS E TENSORES/8149990613.png.cimg",
-        "sha256": "257e2297a8d123e44f77ef659adbb358"
+        "sha256": "eb524c0f3b01da3300aedebccbb3d6ec"
       },
       {
         "file": "POLIAS E TENSORES/8149990614.png.cimg",
-        "sha256": "984b56fa4a0038794e72f7f6b8ff5360"
+        "sha256": "02bc1b9add99dda19dbfb5d7b306ec09"
       },
       {
         "file": "POLIAS E TENSORES/8149990615.png.cimg",
-        "sha256": "54aba26007b34db4cbe5ad01ce3d41c1"
+        "sha256": "b6f1e2a7aa4c92426f0aa16db178a5d2"
       },
       {
         "file": "POLIAS E TENSORES/8149990616.png.cimg",
-        "sha256": "7fb032209ba46c9f73a739c436312c46"
+        "sha256": "4dab6ed71bb7c86c8059ceb3efe4bf0d"
       },
       {
         "file": "POLIAS E TENSORES/8149990617.png.cimg",
-        "sha256": "f474b72e972235239fbdbf605496ffea"
+        "sha256": "dbb87d56d9c1c4e416b5f64f54375134"
       },
       {
         "file": "POLIAS E TENSORES/8149990618.png.cimg",
-        "sha256": "4c003eaf157e688bf2f0b4c70e772783"
+        "sha256": "66a07f580107dacad3b781b1cf4b4e68"
       },
       {
         "file": "POLIAS E TENSORES/8150990101.png.cimg",
-        "sha256": "9e458cbf182c110961b3fabd398d11bc"
+        "sha256": "24a3c1ead15695ade21d766db6792d33"
       },
       {
         "file": "POLIAS E TENSORES/8150990102.png.cimg",
-        "sha256": "c8069acee742d45a623278da5d05d25f"
+        "sha256": "68b0cb506b8471df7514a6edf8cef409"
       },
       {
         "file": "POLIAS E TENSORES/8150990103.png.cimg",
-        "sha256": "e12df502031503228f1dc0e14c2f73f1"
+        "sha256": "283a1c8e52bc184ed963110aec2e6889"
       },
       {
         "file": "POLIAS E TENSORES/8150990104.png.cimg",
-        "sha256": "1f1fda3ee3ea5f8149cc49254c383393"
+        "sha256": "9b0a8639c8fd5c81cd78633b1b92375b"
       },
       {
         "file": "POLIAS E TENSORES/8150990105.png.cimg",
-        "sha256": "db41242d552f6e8bd0da8d4d0b245902"
+        "sha256": "f5854c9f5bc72ea36dffc5e30c462986"
       },
       {
         "file": "POLIAS E TENSORES/8150990106.png.cimg",
-        "sha256": "67f095fb4fd20e3cec962a811c738e2e"
+        "sha256": "ff52bed9866effad8d43e89030b0f5e8"
       },
       {
         "file": "POLIAS E TENSORES/8150990107.png.cimg",
-        "sha256": "22b3ba5961001c6603032baa8d4f89aa"
+        "sha256": "78b92ad1e14fd7d6d7f247e8e654348e"
       },
       {
         "file": "POLIAS E TENSORES/8150990108.png.cimg",
-        "sha256": "c0dab89f0c7d8fd96a080921ab983644"
+        "sha256": "ffda212d8804e47c17621d6b21bc0a36"
       },
       {
         "file": "POLIAS E TENSORES/8150990109.png.cimg",
-        "sha256": "b27369205d7e2f5571d4432ff1424403"
+        "sha256": "43be0e82e717e700c0a91e26fc549101"
       },
       {
         "file": "POLIAS E TENSORES/8150990110.png.cimg",
-        "sha256": "341f289808e41e4c5949a6151751f36f"
+        "sha256": "d196c0a16d5cc54dc753788405da12c7"
       },
       {
         "file": "POLIAS E TENSORES/8150990111.png.cimg",
-        "sha256": "43d6a5bd8915551ddb99ec29410c1387"
+        "sha256": "b8d3d4f3611ece157faaef71b6634353"
       },
       {
         "file": "POLIAS E TENSORES/8150990112.png.cimg",
-        "sha256": "2708e2a5f26f652f88da47ea3bfd66a9"
+        "sha256": "d38e46c4fddb9660ce7400741c1dd77a"
       },
       {
         "file": "POLIAS E TENSORES/8150990113.png.cimg",
-        "sha256": "9ca3f988f0d9c802bf9047b91950f2d0"
+        "sha256": "fec28650773d294b6b4d560143bcb773"
       },
       {
         "file": "POLIAS E TENSORES/8150990115.png.cimg",
-        "sha256": "44cd9e32bf9b5138ae15a7cd1261de41"
+        "sha256": "4273007a090f1febbd4d9a81db0f32b5"
       },
       {
         "file": "POLIAS E TENSORES/8150990116.png.cimg",
-        "sha256": "ee93e4b770b0f81d62d0fbbd0ee50af3"
+        "sha256": "1234cd648e67196ebf8aa6c274925bad"
       },
       {
         "file": "POLIAS E TENSORES/8150990117.png.cimg",
-        "sha256": "99e3db30935bb84498e98059aae0f9e5"
+        "sha256": "ed78353d12eee53688ebb67da1c0387a"
       },
       {
         "file": "POLIAS E TENSORES/8150990118.png.cimg",
-        "sha256": "bff6c08345cefc705368c2ad76b367b5"
+        "sha256": "8410b8f01f6ccfb5f27316208babc2b4"
       },
       {
         "file": "POLIAS E TENSORES/8150990119.png.cimg",
-        "sha256": "2e6c9e8570919552890ea0277a376ecd"
+        "sha256": "dc5c4f9efa4773e78dfa5e1b7ff9298b"
       },
       {
         "file": "POLIAS E TENSORES/8150990120.png.cimg",
-        "sha256": "5fefbb5c79d4a28817e55233c30d1129"
+        "sha256": "f2c78ac16731853839eb6c75925d35d5"
       },
       {
         "file": "POLIAS E TENSORES/8150990121.png.cimg",
-        "sha256": "b5ec9a817f2a67c295a2625764523289"
+        "sha256": "529dcd752b7d07460a3be4cb5f943cc2"
       },
       {
         "file": "POLIAS E TENSORES/8150990122.png.cimg",
-        "sha256": "6422df5ae6a9f7705c8430f25fc0dff9"
+        "sha256": "9cc8eb35ab740505c7cdd61a7c0b2aa5"
       },
       {
         "file": "POLIAS E TENSORES/8150990123.png.cimg",
-        "sha256": "10b93836b9d1872675305ae4ee2eb982"
+        "sha256": "a5372bf7072085992e8a82cd4d3894ae"
       },
       {
         "file": "POLIAS E TENSORES/8150990124.png.cimg",
-        "sha256": "606c70c4551dd0b5682c72c72295fae9"
+        "sha256": "07e6834287eaec9872562f7513cb7874"
       },
       {
         "file": "POLIAS E TENSORES/8150990401.png.cimg",
-        "sha256": "1ba76f5449d12ff358f9c6727efef831"
+        "sha256": "769b55bae496445efbf21afc83bda50e"
       },
       {
         "file": "POLIAS E TENSORES/8150990402.png.cimg",
-        "sha256": "23534643c007524e641fe7dff6f42d20"
+        "sha256": "113b784fb8c3867db37d349e714ef996"
       },
       {
         "file": "POLIAS E TENSORES/8150990403.png.cimg",
-        "sha256": "b8ebfade0c275427ace444584acfe9b7"
+        "sha256": "24aafba9a1f79e3a63eb82df5d8133f7"
       },
       {
         "file": "POLIAS E TENSORES/8150990404.png.cimg",
-        "sha256": "613dc9b854205879939dbbad6915f9b5"
+        "sha256": "dfd837befc2dc80c1f803248aaeb7120"
       },
       {
         "file": "POLIAS E TENSORES/8150990405.png.cimg",
-        "sha256": "baef8cda39866e3e3da7812ecc6b8998"
+        "sha256": "7d37d97ba960b64bf9ae22d2c83fd08f"
       },
       {
         "file": "POLIAS E TENSORES/8150990406.png.cimg",
-        "sha256": "c526eb7972e62ebb9f492c1f15a3685d"
+        "sha256": "5b41adc4aeb4ead0860f71eaa30a14ce"
       },
       {
         "file": "POLIAS E TENSORES/8150990407.png.cimg",
-        "sha256": "bbc39f05a46ebad5f0df729a3aefe23d"
+        "sha256": "b69ff255f4b67823a271b92ace086256"
       },
       {
         "file": "POLIAS E TENSORES/8150990601.png.cimg",
-        "sha256": "4c4c187657d692bcb6d5f56d072acc57"
+        "sha256": "e464097b6d7c78f35c275530ef0dc154"
       },
       {
         "file": "POLIAS E TENSORES/8150990602.png.cimg",
-        "sha256": "4506d2f7571e74137fd6971d7e2898c7"
+        "sha256": "abfadd4262b2dd95bd9958d9911169f1"
       },
       {
         "file": "POLIAS E TENSORES/8150990603.png.cimg",
-        "sha256": "0574e07a24fe812abe0202dcffae12f3"
+        "sha256": "7fa27fcf879ce9037986c8354e092f1b"
       },
       {
         "file": "POLIAS E TENSORES/8150990604.png.cimg",
-        "sha256": "6caa9be3220cd285036a2c1d3da435c6"
+        "sha256": "2ebf43c11253a6e93645705d78542945"
       },
       {
         "file": "POLIAS E TENSORES/8150990605.png.cimg",
-        "sha256": "d2cd63977bd794d91198139e2a773c3d"
+        "sha256": "f1fbfa903d69eb7f0cb03ca5004f2b0a"
       },
       {
         "file": "POLIAS E TENSORES/8150990606.png.cimg",
-        "sha256": "e7a0d194c8548b06faa317f5d73c0f17"
+        "sha256": "7588e379d0f63247ffb906d2c236a04d"
       },
       {
         "file": "POLIAS E TENSORES/8150990607.png.cimg",
-        "sha256": "d4c2f47bd43e5bf645b8c91a5de8d887"
+        "sha256": "cf1b420b83d604912459ec827281e8f9"
       },
       {
         "file": "POLIAS E TENSORES/8150990608.png.cimg",
-        "sha256": "076a549a0744e26f7cf4f08bbcc79390"
+        "sha256": "b9930c964a88327b4c40c5f726644a44"
       },
       {
         "file": "POLIAS E TENSORES/8150990609.png.cimg",
-        "sha256": "39da5b2897bdda5bff7acab19a70d31b"
+        "sha256": "731d52be3063308cd4904585f5055da7"
       },
       {
         "file": "POLIAS E TENSORES/8150990610.png.cimg",
-        "sha256": "ece327508207bb0f9fbfa6daff4381e6"
+        "sha256": "0fb84a1a80c0cb9ae3d7e6904c341129"
       },
       {
         "file": "POLIAS E TENSORES/8150990611.png.cimg",
-        "sha256": "6549a5153a822b92737f62dc7e75bc8b"
+        "sha256": "7e999bf947ef72e1e1252e79b3467ff2"
       },
       {
         "file": "POLIAS E TENSORES/8150990612.png.cimg",
-        "sha256": "38eb38932de34b15186d318d1696a39b"
+        "sha256": "995a337d73f17159db4b171ec0aaf2dc"
       },
       {
         "file": "POLIAS E TENSORES/8150990613.png.cimg",
-        "sha256": "f8448065750b94e945cc5560bedc141b"
+        "sha256": "370b5284c7534b050aa8bb58d67b5997"
       },
       {
         "file": "POLIAS E TENSORES/8150990614.png.cimg",
-        "sha256": "48e9736ac8e118660d5dcc66cf248068"
+        "sha256": "a4e9ec3b259b38afc78076615db9a545"
       },
       {
         "file": "POLIAS E TENSORES/8150990615.png.cimg",
-        "sha256": "4ea89f5ad23ba21ccb14ac7d1fca673e"
+        "sha256": "e0f75b433bfda5b32540b1f1b8ac7305"
       },
       {
         "file": "POLIAS E TENSORES/8150990616.png.cimg",
-        "sha256": "c8897bfb6d968fe950181f02a2d45d4d"
+        "sha256": "e981f51691d33667b756c73baf32ccf9"
       },
       {
         "file": "POLIAS E TENSORES/8150990617.png.cimg",
-        "sha256": "4667b61a5012a75a3eb9e592d591f917"
+        "sha256": "e371ed4168f0301333eb216a09b5624b"
       },
       {
         "file": "POLIAS E TENSORES/8150990618.png.cimg",
-        "sha256": "402486fda49db7c0299317f49631ca57"
+        "sha256": "cb4041fbd673675ee0128345fe520e16"
       },
       {
         "file": "POLIAS E TENSORES/8150990619.png.cimg",
-        "sha256": "51614716945aecf230e6ecae4a157a24"
+        "sha256": "b2f7676be8e9c43731593e712c95e0b9"
       },
       {
         "file": "POLIAS E TENSORES/8150990620.png.cimg",
-        "sha256": "5a8b5d34da081d84d5834d9a6ba17515"
+        "sha256": "1561203129de4b703359fe7e0e1372ae"
       },
       {
         "file": "POLIAS E TENSORES/8150990621.png.cimg",
-        "sha256": "ec3d308b0e0fcceccd4adbcf8e85f64a"
+        "sha256": "35c46f3e5a0858cb858f7511d99cb9d8"
       },
       {
         "file": "POLIAS E TENSORES/8150990622.png.cimg",
-        "sha256": "76583a2e9a101cf1e40157423198a0e8"
+        "sha256": "d73ce4dafca95b73be48fb4160811ab0"
       },
       {
         "file": "POLIAS E TENSORES/8150990623.png.cimg",
-        "sha256": "b523f6223ca187492640cd7299bb3a09"
+        "sha256": "f647663c092ae374d74d662889d98e33"
       },
       {
         "file": "POLIAS E TENSORES/8150990624.png.cimg",
-        "sha256": "24363b2b12ea7733c7f98ea8dcd4f7f5"
+        "sha256": "5588371c7eec27cbc142ec1fc5db8041"
       },
       {
         "file": "POLIAS E TENSORES/8150990625.png.cimg",
-        "sha256": "7cd9c3dc01c68cdcf6636268b0718555"
+        "sha256": "8ee7f70ca26cf8951709d6663abc5726"
       },
       {
         "file": "POLIAS E TENSORES/8156990101.png.cimg",
-        "sha256": "15f6cbc73513e985c73079a3aed33b1a"
+        "sha256": "de8c8f6c1c59be18c8566d48ba60f48b"
       },
       {
         "file": "POLIAS E TENSORES/8156990102.png.cimg",
-        "sha256": "840c936f8c9cc0db995c8f816734b6ed"
+        "sha256": "6565770c8690145e03b2a7235a5c58f7"
       },
       {
         "file": "POLIAS E TENSORES/8156990103.png.cimg",
-        "sha256": "b8100dce2ea123ad75db0e9d41861ecd"
+        "sha256": "eb840891b97903b4ff9ee8427826fafc"
       },
       {
         "file": "POLIAS E TENSORES/8156990104.png.cimg",
-        "sha256": "15f33f6a48e5a1e9ab9220a97af5f3b1"
+        "sha256": "38ed0c0ba6889d2c1850695217e6e707"
       },
       {
         "file": "POLIAS E TENSORES/8156990105.png.cimg",
-        "sha256": "496a914ebe5fdd1298571b7da2fd3e9b"
+        "sha256": "53e12ad2e33963eb136fc81936ccc019"
       },
       {
         "file": "POLIAS E TENSORES/8156990106.png.cimg",
-        "sha256": "49792dd272b9a04886147081ffb5c65e"
+        "sha256": "e03fa1b20f76999b580cf66951230f10"
       },
       {
         "file": "POLIAS E TENSORES/8156990107.png.cimg",
-        "sha256": "b7c8e2a4a94dba3d666609d3ef337f03"
+        "sha256": "aa8b501de62949043341e44971240ef0"
       },
       {
         "file": "POLIAS E TENSORES/8156990108.png.cimg",
-        "sha256": "ef016a3385d2b5f89668e12446cd7719"
+        "sha256": "b90b92cc8efe91901b8b9721bb25e846"
       },
       {
         "file": "POLIAS E TENSORES/8156990109.png.cimg",
-        "sha256": "7a7082f3911360bfa388daad2145f2a0"
+        "sha256": "c9dbbf02a6cb5102f04e472cc9d29d2e"
       },
       {
         "file": "POLIAS E TENSORES/8156990110.png.cimg",
-        "sha256": "eded1a5fc0a4fb7741f6633127ced14e"
+        "sha256": "68aada69c37754fe56f948941f05f672"
       },
       {
         "file": "POLIAS E TENSORES/8156990111.png.cimg",
-        "sha256": "105dd3b5ed6b6dcee55155d4cf9fb9db"
+        "sha256": "450e373adcae6d52d3362782815e41a1"
       },
       {
         "file": "POLIAS E TENSORES/8156990112.png.cimg",
-        "sha256": "9d03c128d9d7007e28c07f864b9c0542"
+        "sha256": "d730833e9a0418c9965262817ead81fa"
       },
       {
         "file": "POLIAS E TENSORES/8156990113.png.cimg",
-        "sha256": "4ed42eb1d1b8777be8c7a35c87114ff6"
+        "sha256": "90c33f9d90517fc5d7fc2fa6559c299d"
       },
       {
         "file": "POLIAS E TENSORES/8156990114.png.cimg",
-        "sha256": "428fb7e0e95ea719aa97a5111e2e2b3c"
+        "sha256": "606f0fd66ac1bb3eb7660d9e7442cd65"
       },
       {
         "file": "POLIAS E TENSORES/8156990115.png.cimg",
-        "sha256": "b09de65c006493f85d4d8df00e0b2c1c"
+        "sha256": "d2aeb29e6ae6d53dd2d113e2b33d19b7"
       },
       {
         "file": "POLIAS E TENSORES/8156990116.png.cimg",
-        "sha256": "b571b28b51a69708f5f72f24722b03a1"
+        "sha256": "661e59efb3206a1df58f0076919082a4"
       },
       {
         "file": "POLIAS E TENSORES/8156990117.png.cimg",
-        "sha256": "d13c31e5bec72ca4cf017c114abde85d"
+        "sha256": "4e2c9d79687694371e6782fe9cba79b5"
       },
       {
         "file": "POLIAS E TENSORES/8156990118.png.cimg",
-        "sha256": "5aa2a4fe1c535c89303f78e73b43a59b"
+        "sha256": "3f12e86e6cdee14cd86af17645bea81a"
       },
       {
         "file": "POLIAS E TENSORES/8156990119.png.cimg",
-        "sha256": "e5c44b4d5df02fa3c7ae8a4684f69914"
+        "sha256": "ac27813d35d0c27232bb2953cc1763a3"
       },
       {
         "file": "POLIAS E TENSORES/8156990120.png.cimg",
-        "sha256": "444a61d02f0578b59fe9138ef285b760"
+        "sha256": "ffdd086226f4f386c306793dfbf28d43"
       },
       {
         "file": "POLIAS E TENSORES/8156990121.png.cimg",
-        "sha256": "9879d0cd3422f37b39e337b3532f58eb"
+        "sha256": "29f15d254dfa95e2dd49f6578c09561f"
       },
       {
         "file": "POLIAS E TENSORES/8156990122.png.cimg",
-        "sha256": "a723a43c9e38b92e592e6cc990d12771"
+        "sha256": "1d0795c139ebb6c116af31704f8f58d9"
       },
       {
         "file": "POLIAS E TENSORES/8156990123.png.cimg",
-        "sha256": "742dec8134fa1728c3b6821de6367bbf"
+        "sha256": "beaa8c7c2dc1b3e5157bc6f57211467a"
       },
       {
         "file": "POLIAS E TENSORES/8156990124.png.cimg",
-        "sha256": "5e51c57f9687c805b9e1b77c6956d7e7"
+        "sha256": "ac6f6a0f511091c041d37fcca5a0b74c"
       },
       {
         "file": "POLIAS E TENSORES/8156990126.png.cimg",
-        "sha256": "3c60d489203fa0825ab6d1914e1612f9"
+        "sha256": "92a5c738c7407c551157c10f06e65548"
       },
       {
         "file": "POLIAS E TENSORES/8156990127.png.cimg",
-        "sha256": "c48f58e3d9cbc2a9f6d5d42f843d8eaa"
+        "sha256": "d1e0dc0ac0100dbe1c25f4a3838841cd"
       },
       {
         "file": "POLIAS E TENSORES/8156990128.png.cimg",
-        "sha256": "fe9d0dc50f782a85264ef751c22d4d05"
+        "sha256": "22237708e1d6762d0f76298809ae9f47"
       },
       {
         "file": "POLIAS E TENSORES/8156990129.png.cimg",
-        "sha256": "15d8367606c52d1fe66561a31b039502"
+        "sha256": "4e4357c4b804747dd2757f9dd3344a2e"
       },
       {
         "file": "POLIAS E TENSORES/8156990130.png.cimg",
-        "sha256": "2d0e16bf82f62adabc8cabecebe9580d"
+        "sha256": "eda8bcbb88a8a73d96b9772c629952fc"
       },
       {
         "file": "POLIAS E TENSORES/8156990131.png.cimg",
-        "sha256": "bdd75e9080bba35d2feac379f8314318"
+        "sha256": "30352fe2b3af62918797528a254e2dc7"
       },
       {
         "file": "POLIAS E TENSORES/8156990401.png.cimg",
-        "sha256": "7fe6d7f215dba33daf71294e194b186b"
+        "sha256": "c524eaeacbaf12a68e4d1d5ddb04413c"
       },
       {
         "file": "POLIAS E TENSORES/8156990402.png.cimg",
-        "sha256": "f36bf12e83cf8ab630e7cc18475b24af"
+        "sha256": "c5b036e62c389ef1c64c3ce837bcf3c2"
       },
       {
         "file": "POLIAS E TENSORES/8156990403.png.cimg",
-        "sha256": "fb54dd9880fcc35acc8066e2e41e6284"
+        "sha256": "eb29fc43d760aade0360dec9cce4ec26"
       },
       {
         "file": "POLIAS E TENSORES/8156990601.png.cimg",
-        "sha256": "82f48d3519fda395a6c7577e092fb687"
+        "sha256": "611e1b84acd6457101266334f5920fc3"
       },
       {
         "file": "POLIAS E TENSORES/8156990602.png.cimg",
-        "sha256": "23ec1c62cf6e3d70b2669851f07ce569"
+        "sha256": "12110d400f49940b0a719ec323e19bc8"
       },
       {
         "file": "POLIAS E TENSORES/8156990603.png.cimg",
-        "sha256": "ac4d4a17ffe250973fbec06217815bce"
+        "sha256": "7d99847382a2e9428002df33d95f471f"
       },
       {
         "file": "POLIAS E TENSORES/8156990604.png.cimg",
-        "sha256": "fd076909191868f3aac8d80d946e3582"
+        "sha256": "24acbc43a6dc5c54f4c7b56a3e19e12b"
       },
       {
         "file": "POLIAS E TENSORES/8156990605.png.cimg",
-        "sha256": "b0950ab873ed4e17b250730970add3b8"
+        "sha256": "c09dafc60879388ca5923afdd8e454ce"
       },
       {
         "file": "POLIAS E TENSORES/8156990606.png.cimg",
-        "sha256": "5f92f27bf0727f363a30fb4653c2d613"
+        "sha256": "ad9e5a4ef843d6404a75392bf0c2bd98"
       },
       {
         "file": "POLIAS E TENSORES/8156990607.png.cimg",
-        "sha256": "892294e7ee0456d0aea0003ff299e24e"
+        "sha256": "25e9be79ac0dc4ba46ef81f40c6287c5"
       },
       {
         "file": "POLIAS E TENSORES/8156990608.png.cimg",
-        "sha256": "350643de613219b42ec286fac3385e40"
+        "sha256": "97f90296ac378d0bdb8ce80e94e664c2"
       },
       {
         "file": "POLIAS E TENSORES/8156990609.png.cimg",
-        "sha256": "d5c1507856d638e02fb13fa678f94f59"
+        "sha256": "088111d62a45c958721201d3bee6df26"
       },
       {
         "file": "POLIAS E TENSORES/8156990610.png.cimg",
-        "sha256": "9b892641e3f939ecce67f04fad178b0d"
+        "sha256": "eb0d12a7ad1c2dd369fb53882c3ba824"
       },
       {
         "file": "POLIAS E TENSORES/8156990611.png.cimg",
-        "sha256": "d2c1a47f38ebbabd4771be090b0a6534"
+        "sha256": "9f4167fe1eefad7cdd913eb923dc5a46"
       },
       {
         "file": "POLIAS E TENSORES/8156990612.png.cimg",
-        "sha256": "ea54e8e19b45ee2a0747ce43e3b6a183"
+        "sha256": "753965c888b2522e6f15bb417723d622"
       },
       {
         "file": "POLIAS E TENSORES/8156990613.png.cimg",
-        "sha256": "3a53a287137019476632e346e0c39fa9"
+        "sha256": "f9bf107b72cf76ceff586f5467980d17"
       },
       {
         "file": "POLIAS E TENSORES/8156990614.png.cimg",
-        "sha256": "12c72c79b5f6beaf0a7e6ce538edd152"
+        "sha256": "5b969fc08a41bcf01a9a60444fa418c7"
       },
       {
         "file": "POLIAS E TENSORES/8156990615.png.cimg",
-        "sha256": "4e2f588b0d9b3d3e911874481d580456"
+        "sha256": "4ffa98fd627ccd4776df8b23cc63ac14"
       },
       {
         "file": "POLIAS E TENSORES/8156990616.png.cimg",
-        "sha256": "f4c2db9ad2c5d855bd4e89783dcfdef3"
+        "sha256": "b5858d7623a62dee209efa61f1fcdb12"
       },
       {
         "file": "POLIAS E TENSORES/8156990617.png.cimg",
-        "sha256": "286905204c99d80aa71abdd608c66e2f"
+        "sha256": "a8c9578bdb334173c1b5ac8d6bd4ea94"
       },
       {
         "file": "POLIAS E TENSORES/8156990618.png.cimg",
-        "sha256": "e19fbb72a7af603397c18071c81ee1b4"
+        "sha256": "3748bd1093b6a619c7f9d2ebc20c5b0e"
       },
       {
         "file": "POLIAS E TENSORES/8156990619.png.cimg",
-        "sha256": "7a29215d1542fc241f495533094ff31a"
+        "sha256": "ba562f629d1d778a125da79f25d60ebd"
       },
       {
         "file": "POLIAS E TENSORES/8156990620.png.cimg",
-        "sha256": "da8f5fbc8bef16dafa731bcdebe0dadf"
+        "sha256": "7e6e960547db3b73f67d3774291ce5a0"
       },
       {
         "file": "POLIAS E TENSORES/8156990621.png.cimg",
-        "sha256": "c706943269bca3c39f07d51bfb3fc0a8"
+        "sha256": "47bc20585246ee79d4a9745421d8e903"
       },
       {
         "file": "POLIAS E TENSORES/8156990622.png.cimg",
-        "sha256": "22d6f600ea1c760bc458e11e1a465eb9"
+        "sha256": "c65507c3ce48976f257b120315b82401"
       },
       {
         "file": "POLIAS E TENSORES/8156990623.png.cimg",
-        "sha256": "512fbbe6c71436437529f4142dd63742"
+        "sha256": "cbff0907d3ca0f03119d3e0982d11ec1"
       },
       {
         "file": "POLIAS E TENSORES/8156990624.png.cimg",
-        "sha256": "64e530898d29895a85088a0a67fccb85"
+        "sha256": "f42973892fc6a089e58ce0fc16130e16"
       },
       {
         "file": "POLIAS E TENSORES/8156990625.png.cimg",
-        "sha256": "52e8608a7ddc826dd1d03d978c35bac8"
+        "sha256": "f2b89f788b4efc7322148c7ce3b45db4"
       },
       {
         "file": "POLIAS E TENSORES/8156990626.png.cimg",
-        "sha256": "75b54a20f9868f245f9681a4b2f5a96b"
+        "sha256": "780768324792e74632cd071695ccb809"
       },
       {
         "file": "POLIAS E TENSORES/8156990627.png.cimg",
-        "sha256": "dfc12a751b5f4bda1f488c4cf1394715"
+        "sha256": "ede3d25ca8843f40680e14f0d9b0d639"
       },
       {
         "file": "POLIAS E TENSORES/8156990628.png.cimg",
-        "sha256": "ba6a08cb8bbae0dd676a71e3c9d785ba"
+        "sha256": "e1a48e0080974f4070a4a08230c62aba"
       },
       {
         "file": "POLIAS E TENSORES/8156990629.png.cimg",
-        "sha256": "0b7e66550e811e342ab8bb477a750d6d"
+        "sha256": "b2f1558803a97fbcf8d523f3f69f10a5"
       },
       {
         "file": "POLIAS E TENSORES/8156990630.png.cimg",
-        "sha256": "f79b19e11ba62243aba6d09c61d4cf23"
+        "sha256": "df99a7fd8517c13c592ae31e64570f5a"
       },
       {
         "file": "POLIAS E TENSORES/8156990631.png.cimg",
-        "sha256": "856b36961dcd328c06a336d4bf5a6ccf"
+        "sha256": "65c2c513869ba384cb4718028208726a"
       },
       {
         "file": "POLIAS E TENSORES/8156990632.png.cimg",
-        "sha256": "2f89c909f265aaee564a425741820fc5"
+        "sha256": "ac753f121428abd2304df0e248728ccb"
       },
       {
         "file": "POLIAS E TENSORES/8156990633.png.cimg",
-        "sha256": "556461c96a12a09c6664e389352cd1a2"
+        "sha256": "d0117042f5f4d05d8c36e5c282ba6648"
       },
       {
         "file": "POLIAS E TENSORES/8156990634.png.cimg",
-        "sha256": "cb553c780789808f3361b8de2946e14c"
+        "sha256": "82551b9336dcd73e33fe0f051134e7e0"
       },
       {
         "file": "POLIAS E TENSORES/8156990635.png.cimg",
-        "sha256": "324dfd50af3e566f31f4559cbc02e635"
+        "sha256": "092b4d3a987124fd92bd74c9c65e81e4"
       },
       {
         "file": "POLIAS E TENSORES/8156990636.png.cimg",
-        "sha256": "d224652ea8c5d2a960de56ebf2d4ba0f"
+        "sha256": "c18d34a70d5d6b0e83eb136c31b06ab8"
       },
       {
         "file": "POLIAS E TENSORES/8156990637.png.cimg",
-        "sha256": "69ae79ce6a96094410980d9f0a06083f"
+        "sha256": "c8fd84c1c69add70dc660e9b60c4d8ec"
       },
       {
         "file": "POLIAS E TENSORES/8156990638.png.cimg",
-        "sha256": "3cb2659f0fb8600aa8b1463fa1f7a312"
+        "sha256": "28fb3c53ff1c66afbe3537f02476a21b"
       },
       {
         "file": "POLIAS E TENSORES/8156990639.png.cimg",
-        "sha256": "e8b0b8135c0fc18062c5431c6a129fcb"
+        "sha256": "4b4bf9f815a5d2d18c56fa507271440c"
       },
       {
         "file": "POLIAS E TENSORES/8156990640.png.cimg",
-        "sha256": "0c95cc5cfc18ecd623f6d2d4b189f6a9"
+        "sha256": "68c4fdacfad3c0190392042e2f4350e0"
       },
       {
         "file": "POLIAS E TENSORES/8156990641.png.cimg",
-        "sha256": "0d34f81890c7acae9d270b4456aeab2b"
+        "sha256": "b251516647ce94b1b63c69535c294c4e"
       },
       {
         "file": "POLIAS E TENSORES/8156990642.png.cimg",
-        "sha256": "bf9c3c2d00e9cb25d8e5d608ab6d10fb"
+        "sha256": "3da7511e845244fb62b1d16bae298a09"
       },
       {
         "file": "POLIAS E TENSORES/8156990643.png.cimg",
-        "sha256": "84d44440efcc6ea39d495c5b0343d586"
+        "sha256": "a234fc0925b8396c343f82e8e68304ad"
       },
       {
         "file": "POLIAS E TENSORES/8156990644.png.cimg",
-        "sha256": "3706de13c3f1e52a1ee9060d080ac2df"
+        "sha256": "fb7d8a68e6702244a9bc7f487035ecfe"
       },
       {
         "file": "POLIAS E TENSORES/8156990645.png.cimg",
-        "sha256": "f3fe5668b50bebc7af1c2bf478e69022"
+        "sha256": "019023abef9c540a811515d3a7e553a8"
       },
       {
         "file": "POLIAS E TENSORES/8156990646.png.cimg",
-        "sha256": "4ef777bd31e4068de60fe26e094bd1e6"
+        "sha256": "054c81581c814f588bda39d347e5be02"
       },
       {
         "file": "POLIAS E TENSORES/8156990647.png.cimg",
-        "sha256": "548e516761594da47f8e100674c69b00"
+        "sha256": "a43c97256dd5dd4b2c3257cd78563d19"
       },
       {
         "file": "POLIAS E TENSORES/8156990648.png.cimg",
-        "sha256": "ce5b9229574596ce3c46387ee1721f7b"
+        "sha256": "a4929210433b012cd2166625267de362"
       },
       {
         "file": "POLIAS E TENSORES/8156990649.png.cimg",
-        "sha256": "fc84c92fcb0c2a1aca7f89e8dccce607"
+        "sha256": "9c3c13c22e1801b312a4e46fd4b73247"
       },
       {
         "file": "POLIAS E TENSORES/8156990650.png.cimg",
-        "sha256": "b518e3270f7b55cb6a1943739ef4642e"
+        "sha256": "bdcfba17320abe90febaf1241097b6af"
       },
       {
         "file": "POLIAS E TENSORES/8156990652.png.cimg",
-        "sha256": "0b02367f9abaccb94b8b9989b4967bb7"
+        "sha256": "8d4565260d338ff23ea6425073aafb8b"
       },
       {
         "file": "POLIAS E TENSORES/8156990653.png.cimg",
-        "sha256": "05dfa2d9b5cfd8e9e9c99f3ac2a353b2"
+        "sha256": "d781c48101485075d409fd2805e3265e"
       },
       {
         "file": "POLIAS E TENSORES/8156990656.png.cimg",
-        "sha256": "8669f17b957273177f2e10c248e20659"
+        "sha256": "5cd6f9a00d8f3dbdbb8b336bc27cc731"
       },
       {
         "file": "POLIAS E TENSORES/8156990657.png.cimg",
-        "sha256": "1917fa359e02b23879b9f9dec45c51fa"
+        "sha256": "b0023d98e40085fa3503f4734073b010"
       },
       {
         "file": "POLIAS E TENSORES/8156990658.png.cimg",
-        "sha256": "482fdf1d69ae43cbe6aed21116e7d0c8"
+        "sha256": "c857838e2739a575f461d0f11a24a50b"
       },
       {
         "file": "POLIAS E TENSORES/8156990659.png.cimg",
-        "sha256": "c54f6f4074415fc912a57a8be23a7f50"
+        "sha256": "09c9d6f31a5912b8947045be4d22f836"
       },
       {
         "file": "POLIAS E TENSORES/8156990660.png.cimg",
-        "sha256": "908e4c12618cab99231ec3e79d794118"
+        "sha256": "6265a25accd39242d4e9ac0e686bf5d1"
       },
       {
         "file": "POLIAS E TENSORES/8163990101.png.cimg",
-        "sha256": "3ccd43e39807b5d98081f6e457c930d4"
+        "sha256": "763fe8ff6b422a63dc6f114caa65899c"
       },
       {
         "file": "POLIAS E TENSORES/8163990102.png.cimg",
-        "sha256": "417cdd9e39dd8c1e1de6a7ceb1934f26"
+        "sha256": "2c7e73b8069fed62fd2575aececff8fb"
       },
       {
         "file": "POLIAS E TENSORES/8163990103.png.cimg",
-        "sha256": "63d5688e343e21b82db9e61a230e5d3a"
+        "sha256": "b979a95b6c0fb650d1fcc20a00590d83"
       },
       {
         "file": "POLIAS E TENSORES/8163990104.png.cimg",
-        "sha256": "efbbe4164ea302a534290549c74f2667"
+        "sha256": "162cddadb9f831e4db62582897b0dad4"
       },
       {
         "file": "POLIAS E TENSORES/8163990105.png.cimg",
-        "sha256": "8a967d9df50b1dbdf783810199fde5b1"
+        "sha256": "f0b4914e65a99bca73614b448ab685f0"
       },
       {
         "file": "POLIAS E TENSORES/8163990106.png.cimg",
-        "sha256": "47dc93382f256e6d4cfb5127c6b78c1c"
+        "sha256": "f25a4b204dcf6d87c7828abe43fb8071"
       },
       {
         "file": "POLIAS E TENSORES/8163990107.png.cimg",
-        "sha256": "4ee9a9bbc7638365745b2561863d1df2"
+        "sha256": "79c8d59baed0b141a2308f421d852892"
       },
       {
         "file": "POLIAS E TENSORES/8163990108.png.cimg",
-        "sha256": "60e68eb5336379ae8f9c8d64e1b39ea6"
+        "sha256": "d2752a110abaf5f545d7c6ca4923b53e"
       },
       {
         "file": "POLIAS E TENSORES/8163990110.png.cimg",
-        "sha256": "363d865808b7fe4b5a08ed2b93e8116f"
+        "sha256": "a5591d834e8335b1233a7f1ec22eb366"
       },
       {
         "file": "POLIAS E TENSORES/8163990601.png.cimg",
-        "sha256": "23aa96d33262c5c963d99bfe10e113d6"
+        "sha256": "dac236cb5ddf29f43a9f0027beed6fba"
       },
       {
         "file": "POLIAS E TENSORES/8163990602.png.cimg",
-        "sha256": "54d538fa8c87869c3f7bed869d3b74df"
+        "sha256": "48a32ba27fec89aa323b19367776a3c6"
       },
       {
         "file": "POLIAS E TENSORES/8163990603.png.cimg",
-        "sha256": "19961e8a520aa87e6bad7962aedf275e"
+        "sha256": "1e3facabab5c05e2209793f4db9fe5fe"
       },
       {
         "file": "POLIAS E TENSORES/8163990604.png.cimg",
-        "sha256": "2d31d64a55d1a6fd5379d113e073b0ee"
+        "sha256": "90e98d292589674b1c5fd71f5ea052e1"
       },
       {
         "file": "POLIAS E TENSORES/8163990605.png.cimg",
-        "sha256": "3dcb136d02bfd1364876dd7c64e9ac64"
+        "sha256": "47a36fbd96977172d549d7ccf8a46905"
       },
       {
         "file": "POLIAS E TENSORES/8163990606.png.cimg",
-        "sha256": "6a59ba805864ef29d5e546446f2f79a6"
+        "sha256": "1f42749e075fbe4a088caaa7af5ab253"
       },
       {
         "file": "POLIAS E TENSORES/8163990607.png.cimg",
-        "sha256": "00f793b2a9b17f57083b175dc2b96455"
+        "sha256": "4b96ac574b503d574871f21a7a147c70"
       },
       {
         "file": "POLIAS E TENSORES/8163990608.png.cimg",
-        "sha256": "7b2651b4eecdec7d548e5bae3ca430bf"
+        "sha256": "16669764b54fe38b55156f1263255992"
       },
       {
         "file": "POLIAS E TENSORES/8163990609.png.cimg",
-        "sha256": "b98020107fc6331e8b6531576d11b499"
+        "sha256": "9e6d4bfb5bdef0a0f450778ad57c34a2"
       },
       {
         "file": "POLIAS E TENSORES/8163990610.png.cimg",
-        "sha256": "b230da89d3254c770ec7d76fe8836b97"
+        "sha256": "961faff3cfc18f0d0f8ca34a2e1c4c21"
       },
       {
         "file": "POLIAS E TENSORES/8163990611.png.cimg",
-        "sha256": "f0b1035d956c99f80e629a43ccb9cd7c"
+        "sha256": "93659cde3d8fd36cf1b39deb35cb03de"
       },
       {
         "file": "POLIAS E TENSORES/8163990612.png.cimg",
-        "sha256": "9b20bfdc66abb786cc7ae641dd3b892a"
+        "sha256": "8ab154682d849cd47df48fa1acd17d66"
       },
       {
         "file": "POLIAS E TENSORES/8163990613.png.cimg",
-        "sha256": "c0ea827d8ac41dd0e101e1e7dbc54647"
+        "sha256": "1793c6b2cce29e12ffeffdc48bf5ab5b"
       },
       {
         "file": "POLIAS E TENSORES/8163990614.png.cimg",
-        "sha256": "9dbc40930800bbb04c912b1240f50ef0"
+        "sha256": "d9b2e1cc8a27327ca74a1e1be2b07e9a"
       },
       {
         "file": "POLIAS E TENSORES/8163990615.png.cimg",
-        "sha256": "5ad518c2e8a5df04c6e41187acd8bc28"
+        "sha256": "1f65b544f5ec390848d39198da9ba2f9"
       },
       {
         "file": "POLIAS E TENSORES/8163990617.png.cimg",
-        "sha256": "72ee5e0b571fce74df2d5d4806ae6078"
+        "sha256": "6941bd8603a77b376017894d8a387f25"
       },
       {
         "file": "POLIAS E TENSORES/8163990619.png.cimg",
-        "sha256": "7ecf9c79a5a6f6459cec69151803f624"
+        "sha256": "495e62870fd1023bef30f242c1cdd8bc"
       },
       {
         "file": "POLIAS E TENSORES/8163990620.png.cimg",
-        "sha256": "e63ea970204c48c6ddfa2e66fe834789"
+        "sha256": "be3c502261ceed05b3bf46436317c2da"
       },
       {
         "file": "POLIAS E TENSORES/8169990101.png.cimg",
-        "sha256": "9b7091c5be9d68d871d9ea8a7b411a2b"
+        "sha256": "f154073e81d2bae7083721efedcacca2"
       },
       {
         "file": "POLIAS E TENSORES/8169990102.png.cimg",
-        "sha256": "d329aaa269e47d499a727ed1b449a1d0"
+        "sha256": "30154f5175b6341c21de61708a531cd6"
       },
       {
         "file": "POLIAS E TENSORES/8169990103.png.cimg",
-        "sha256": "95a6c568ac47a9ab513eca4c780d684f"
+        "sha256": "6e266bb9befea0dca7379c768fad0f0d"
       },
       {
         "file": "POLIAS E TENSORES/8169990104.png.cimg",
-        "sha256": "199c532b0b332bfcf3b33cf9c389f45a"
+        "sha256": "ec384b3a8c0207f1876ab7964c6c02c7"
       },
       {
         "file": "POLIAS E TENSORES/8169990105.png.cimg",
-        "sha256": "e2ef7c5b689aecbb2eb464196de23bc1"
+        "sha256": "ac91497f510c6960c6d4c56f480695ba"
       },
       {
         "file": "POLIAS E TENSORES/8169990106.png.cimg",
-        "sha256": "21bafe561f6e896b2a755ae410f664a5"
+        "sha256": "31bf5688800a025a37667a6841b62dd9"
       },
       {
         "file": "POLIAS E TENSORES/8169990107.png.cimg",
-        "sha256": "ed58e44d47134822ef8bf2551a05f287"
+        "sha256": "84ca9c70a38a611e37643ca247fef77d"
       },
       {
         "file": "POLIAS E TENSORES/8169990108.png.cimg",
-        "sha256": "743469fc0a4ac87556a0292bcffe3ff1"
+        "sha256": "ec3c5ec77d2925aeea34ebb34adf2e5a"
       },
       {
         "file": "POLIAS E TENSORES/8169990110.png.cimg",
-        "sha256": "d02b756aa1f1dfe172a760df0e38669d"
+        "sha256": "1271c778e86b8495bf7aba653b7be39a"
       },
       {
         "file": "POLIAS E TENSORES/8169990111.png.cimg",
-        "sha256": "110523180cb8c1eb0c18a29f69af3750"
+        "sha256": "d6573801f47b746f1ef0f023f2620d31"
       },
       {
         "file": "POLIAS E TENSORES/8169990112.png.cimg",
-        "sha256": "75958753dd0ae71918018c03fa52a0a9"
+        "sha256": "a1023ec86d117090ea6eab6eb3472f1f"
       },
       {
         "file": "POLIAS E TENSORES/8169990113.png.cimg",
-        "sha256": "0f568d79d822e0c5ef1d43679996a0b5"
+        "sha256": "9e693f6b8d67e9f4a8a4c4d386afbbaf"
       },
       {
         "file": "POLIAS E TENSORES/8169990114.png.cimg",
-        "sha256": "5104ee89e7d2d6d24286e8836401f514"
+        "sha256": "633a7cc95f94b57b9cda8588069bc254"
       },
       {
         "file": "POLIAS E TENSORES/8169990601.png.cimg",
-        "sha256": "9e56fa7cf640fb0830411be8e0196c45"
+        "sha256": "eafc06fd71bfb03d1f00691edf5d7611"
       },
       {
         "file": "POLIAS E TENSORES/8169990602.png.cimg",
-        "sha256": "a6c25dedab10dcc70dd6aa6d3062eaf2"
+        "sha256": "82fe2e4bfad86562346b95df2873ea65"
       },
       {
         "file": "POLIAS E TENSORES/8169990603.png.cimg",
-        "sha256": "01c9b3dc0fb5d984d26f82e02e18a6e7"
+        "sha256": "5f37027a2230ea7c9283f237ca7efc47"
       },
       {
         "file": "POLIAS E TENSORES/8169990604.png.cimg",
-        "sha256": "21997d08283faae8a3bfd1a65fce1829"
+        "sha256": "08789b8c9b8099ded6b11d75d3a2fa97"
       },
       {
         "file": "POLIAS E TENSORES/8169990605.png.cimg",
-        "sha256": "1b79914617dee5e2c89061e672275e35"
+        "sha256": "38a3887db1c5d25fbb24df73312ec37f"
       },
       {
         "file": "POLIAS E TENSORES/8169990606.png.cimg",
-        "sha256": "0bf7e154f3c2ea4c8b12c3c499b4bfb0"
+        "sha256": "fb2283a98098780d4a063efeba395a9d"
       },
       {
         "file": "POLIAS E TENSORES/8169990607.png.cimg",
-        "sha256": "4a8d530ddb1b0f1fc472d40748bb0bfb"
+        "sha256": "71a25818b3bdcd46b344a63a7f5685c2"
       },
       {
         "file": "POLIAS E TENSORES/8169990608.png.cimg",
-        "sha256": "df6e51e13573e313e07f115c8a6de062"
+        "sha256": "cae8741d63845887c3371ba20ff1eb6b"
       },
       {
         "file": "POLIAS E TENSORES/8169990609.png.cimg",
-        "sha256": "d14755ffdaed23a964e80437cff9936c"
+        "sha256": "8b0278ac9b10aaf6f3ac869322e850e6"
       },
       {
         "file": "POLIAS E TENSORES/8169990610.png.cimg",
-        "sha256": "9dbf9a844180f2fb4e9397df2073e614"
+        "sha256": "c09cd31d023ad90de67d702df6f1fbdf"
       },
       {
         "file": "POLIAS E TENSORES/8169990611.png.cimg",
-        "sha256": "8b1c09eda4d7e7c5b06c98e136a7bcbf"
+        "sha256": "4326ae3c9cfa2ed38841a800745df5b2"
       },
       {
         "file": "POLIAS E TENSORES/8169990612.png.cimg",
-        "sha256": "48e0392d4b637a56d44c314ca5d1fbce"
+        "sha256": "f622775dbe0b99b3bcd4247b7c7e4e42"
       },
       {
         "file": "POLIAS E TENSORES/8169990614.png.cimg",
-        "sha256": "cb631811598356ce4d2813ef4a40c12a"
+        "sha256": "285cc6c194485078fed9641607fbed06"
       },
       {
         "file": "POLIAS E TENSORES/8169990615.png.cimg",
-        "sha256": "2d866aad66177f3ddc8b7a8ccc731bcd"
+        "sha256": "55a52e316b2160d7c3e71a7bafb58ea0"
       },
       {
         "file": "POLIAS E TENSORES/8169990616.png.cimg",
-        "sha256": "afa19aefb77b83a34e1a89b51cc2dc34"
+        "sha256": "67a666b09d1a6db02fc34d5103ff1cf5"
       },
       {
         "file": "POLIAS E TENSORES/8169990617.png.cimg",
-        "sha256": "e75d50ee365f29a28a5d4f1510cd66c0"
+        "sha256": "0f0aa12734c7bc2cc9d6b2eda6997b58"
       },
       {
         "file": "POLIAS E TENSORES/8169990618.png.cimg",
-        "sha256": "fa8c953a99ab27efd9c9cf2174349c8c"
+        "sha256": "5208c372f15b8615ae2745219ccaa48a"
       },
       {
         "file": "POLIAS E TENSORES/8169990619.png.cimg",
-        "sha256": "21c759fcd4e526462044ad42b5cb315c"
+        "sha256": "1c4c6b372e2a3b4531043c8577b353d3"
       },
       {
         "file": "POLIAS E TENSORES/8169990620.png.cimg",
-        "sha256": "cf6cea2f3ef3ddc3a9890a36daa6533c"
+        "sha256": "0db3a4b6d347cf790f4481a792cb584b"
       },
       {
         "file": "POLIAS E TENSORES/8169990621.png.cimg",
-        "sha256": "4569033cd09a469e15f24fd77755341b"
+        "sha256": "fb9e8d3c987898f7a461ed5c02a871d5"
       },
       {
         "file": "POLIAS E TENSORES/8169990622.png.cimg",
-        "sha256": "189c04734009f026b9455a9adea276fa"
+        "sha256": "c3e5a4a1a5290d4df83490e10ffdd31f"
       },
       {
         "file": "POLIAS E TENSORES/8169990623.png.cimg",
-        "sha256": "c86bd7a6bbb994a2083babdd2e12a2e9"
+        "sha256": "9e3906f62e4feda896b8072d7a16b4a4"
       },
       {
         "file": "POLIAS E TENSORES/8169990624.png.cimg",
-        "sha256": "28c0565c98869e23b029c3b79386dd53"
+        "sha256": "1bcbab1c976ef59d23cf3a3f0ac1ea34"
       },
       {
         "file": "POLIAS E TENSORES/8169990625.png.cimg",
-        "sha256": "fcce0507bd6641155a97ab044151e1e9"
+        "sha256": "9535c64e7be56f8dc440029460c2968f"
       },
       {
         "file": "POLIAS E TENSORES/8170990101.png.cimg",
-        "sha256": "0482a9354f1e535f4e9f220e41308f43"
+        "sha256": "2e8a572783398556cdfde1422e4b06d3"
       },
       {
         "file": "POLIAS E TENSORES/8170990102.png.cimg",
-        "sha256": "013cd7f5d168d4cc8faf40bc6b922985"
+        "sha256": "106c75c29822738277ae091af06524df"
       },
       {
         "file": "POLIAS E TENSORES/8170990103.png.cimg",
-        "sha256": "28aafd60356ec48d87cea06b1bc60258"
+        "sha256": "779d9c163afadcd6e4d5cf66df8fa155"
       },
       {
         "file": "POLIAS E TENSORES/8170990104.png.cimg",
-        "sha256": "4f3b588b34c1e61d518fdb4c4c590a97"
+        "sha256": "4297b123220fb2624c47f5fa5616a6e4"
       },
       {
         "file": "POLIAS E TENSORES/8170990105.png.cimg",
-        "sha256": "6b82243b75a9d4f56e58803503bccfb7"
+        "sha256": "d275741d6b6f4b87e652a8443d760deb"
       },
       {
         "file": "POLIAS E TENSORES/8170990107.png.cimg",
-        "sha256": "dcd92c13f3d7b8b7821d5eb3c1eb1768"
+        "sha256": "304b627dadf01173dbb1315c3f45c088"
       },
       {
         "file": "POLIAS E TENSORES/8170990108.png.cimg",
-        "sha256": "77c30e19096e780bee98ecf8e81ba82d"
+        "sha256": "5acc283160bef4e35067e42cf1016c22"
       },
       {
         "file": "POLIAS E TENSORES/8170990110.png.cimg",
-        "sha256": "8bc94917922fb6db6970470cd4970b49"
+        "sha256": "6c0424f194418e4d5cc1259613a5e05e"
       },
       {
         "file": "POLIAS E TENSORES/8170990111.png.cimg",
-        "sha256": "84da202af09cc94092a46d55b91a96d8"
+        "sha256": "bc4dfa9057f9f8ed1e7d766fdcba4e9c"
       },
       {
         "file": "POLIAS E TENSORES/8170990113.png.cimg",
-        "sha256": "57973a790d3ac941ee77b9f69774f2ba"
+        "sha256": "183940e0d34b9ad984bf8c5bf24af435"
       },
       {
         "file": "POLIAS E TENSORES/8170990114.png.cimg",
-        "sha256": "307830b2606dfdcc51291c38d5bae4e9"
+        "sha256": "402a98e6e093fcdf0fd7fefe0bac1cd1"
       },
       {
         "file": "POLIAS E TENSORES/8170990601.png.cimg",
-        "sha256": "033a4ad02fb2fc6cc36237bb603e958b"
+        "sha256": "f5c27720bff47221a5656cf61fa3df6e"
       },
       {
         "file": "POLIAS E TENSORES/8170990602.png.cimg",
-        "sha256": "cc44c861583bf270f62da58946c7ad8c"
+        "sha256": "e7754c0243dd7ba791738af05ae16dd5"
       },
       {
         "file": "POLIAS E TENSORES/8170990603.png.cimg",
-        "sha256": "3057c8ae3c343e26bb604a7521904c02"
+        "sha256": "38dc417e32b3e93062ec72c8a37c7479"
       },
       {
         "file": "POLIAS E TENSORES/8170990604.png.cimg",
-        "sha256": "c34505373bba1acce4686d035d4d0c1d"
+        "sha256": "7182d9581510a26f95023c81160eafb4"
       },
       {
         "file": "POLIAS E TENSORES/8170990605.png.cimg",
-        "sha256": "bd12f5e32504605e20bcabf239d388a1"
+        "sha256": "ef0bff49a6d56a84c7ad9e6c567b4543"
       },
       {
         "file": "POLIAS E TENSORES/8170990606.png.cimg",
-        "sha256": "eb89bf63a301f2665dea0572e25b1397"
+        "sha256": "f412cc568a603684a5ef552693949be4"
       },
       {
         "file": "POLIAS E TENSORES/8170990607.png.cimg",
-        "sha256": "164504f37a663cdeddc60b459281b446"
+        "sha256": "e96a7b61b4861d09e8a63de3525ba831"
       },
       {
         "file": "POLIAS E TENSORES/8170990608.png.cimg",
-        "sha256": "322d41a24bccaa7647e74a8cb05dec0f"
+        "sha256": "ccd328b81699c3f08d8efef7930d3f83"
       },
       {
         "file": "POLIAS E TENSORES/8171990601.png.cimg",
-        "sha256": "ce60e54028a69c89b874ee82d8047354"
+        "sha256": "4cdbc211584abbf3fa2b2352fa8b745b"
       },
       {
         "file": "POLIAS E TENSORES/8171990602.png.cimg",
-        "sha256": "bb749557042ec01be371a759a3237418"
+        "sha256": "ddc3264b61b4bbcd22647bf4b4b162a2"
       },
       {
         "file": "POLIAS E TENSORES/8173990101.png.cimg",
-        "sha256": "621f1b219b22107dec43986e6ffadb0a"
+        "sha256": "a6b6e1fd05b3ce6689ae976c7a00d260"
       },
       {
         "file": "POLIAS E TENSORES/8173990102.png.cimg",
-        "sha256": "734f2f4c7c6c0cf2558b1dffcbf6bfae"
+        "sha256": "fef4f4c46f9f480641ea7cb676e3748d"
       },
       {
         "file": "POLIAS E TENSORES/8173990103.png.cimg",
-        "sha256": "a5a753a9953ab11472170530c847fda0"
+        "sha256": "9aa5e3181a3fd5da1ee3cce64112ae67"
       },
       {
         "file": "POLIAS E TENSORES/8173990104.png.cimg",
-        "sha256": "19c9dcfda119b3b99f79503c43ccd579"
+        "sha256": "dbe548c004d47a748282068724c56072"
       },
       {
         "file": "POLIAS E TENSORES/8173990601.png.cimg",
-        "sha256": "26761446bbdfef115d5fdfd7c6517864"
+        "sha256": "4f790c43b3776f128b4499cf2ee3dde2"
       },
       {
         "file": "POLIAS E TENSORES/8173990602.png.cimg",
-        "sha256": "f16beb5eeb19ecf6ba09af13e0b722be"
+        "sha256": "3231185b82aee9502a1d688734c47de4"
       },
       {
         "file": "POLIAS E TENSORES/8173990603.png.cimg",
-        "sha256": "08d1ee23e6b697786ebd126add2d79a6"
+        "sha256": "ab007925ab1f5a108d05a67d476bc7c2"
       },
       {
         "file": "POLIAS E TENSORES/8173990604.png.cimg",
-        "sha256": "0607e924c945d8612fba49d54cc271d5"
+        "sha256": "6fae1dfa0b83e36e5dcd18730b8ef163"
       },
       {
         "file": "POLIAS E TENSORES/8173990605.png.cimg",
-        "sha256": "556cc14bf5379396d770bf75245e89e3"
+        "sha256": "e8d377f9f4eb2db61148f3992302c6e5"
       },
       {
         "file": "POLIAS E TENSORES/8173990606.png.cimg",
-        "sha256": "05152d6369fe6b68c750e3032349e71d"
+        "sha256": "a378292f94739bba6864bcd071db2df8"
       },
       {
         "file": "POLIAS E TENSORES/8173990607.png.cimg",
-        "sha256": "f06d94eca77d3f0ade040e15059ce7ce"
+        "sha256": "3855e7399c51355c748303664ceb0488"
       },
       {
         "file": "POLIAS E TENSORES/8173990608.png.cimg",
-        "sha256": "d3ffe98e3554934f65e5c44d19d6160d"
+        "sha256": "4441899ce787bb1711f708d057690d8e"
       },
       {
         "file": "POLIAS E TENSORES/8175990101.png.cimg",
-        "sha256": "678515f2fcb872bc01efc6b5584c1fad"
+        "sha256": "ebe1d9470e325af35d793275a36e7bec"
       },
       {
         "file": "POLIAS E TENSORES/8175990102.png.cimg",
-        "sha256": "62bfed46a7939e1bf026fd81e7c9cebc"
+        "sha256": "76b9c4bec7f28122227a74ed647a8717"
       },
       {
         "file": "POLIAS E TENSORES/8175990103.png.cimg",
-        "sha256": "15bd3ab892c89f26e700c009572ce03d"
+        "sha256": "a311055b1e61b16c3ea3e8684bbdf36c"
       },
       {
         "file": "POLIAS E TENSORES/8175990104.png.cimg",
-        "sha256": "de0598470b644b78316dff3039ca6350"
+        "sha256": "f1cf1b5698d020a66badcf05fe14817d"
       },
       {
         "file": "POLIAS E TENSORES/8175990105.png.cimg",
-        "sha256": "bb0f57480afdda54387342b331edca7b"
+        "sha256": "fcdcbd69725a66c30ee444c1a6427918"
       },
       {
         "file": "POLIAS E TENSORES/8175990106.png.cimg",
-        "sha256": "1baa17e0d41325d6b09046f9b7c84aff"
+        "sha256": "bf443807a043ea2f38fadece9ff1fe6e"
       },
       {
         "file": "POLIAS E TENSORES/8175990107.png.cimg",
-        "sha256": "ab6a2158bb1dfb5cd0d8b4861dcd5397"
+        "sha256": "f9ee16d2eb6cab990fb23935b0306299"
       },
       {
         "file": "POLIAS E TENSORES/8175990108.png.cimg",
-        "sha256": "1e98206ff63387bc7ff25fffe07e0e0a"
+        "sha256": "994de6a5fdd8e1281f5386ecc4ee034f"
       },
       {
         "file": "POLIAS E TENSORES/8175990109.png.cimg",
-        "sha256": "13dbeba0af5e4af926edf3c25825c480"
+        "sha256": "f1b8ccd9157279e166032c92af495cc7"
       },
       {
         "file": "POLIAS E TENSORES/8175990111.png.cimg",
-        "sha256": "1f267f9723c143ae6ae469a3e9b345c9"
+        "sha256": "2b079d91fb30614d7beda5e1d2bf0d7d"
       },
       {
         "file": "POLIAS E TENSORES/8175990112.png.cimg",
-        "sha256": "9de522674b45597322dddc76c00b3fb9"
+        "sha256": "2e49b2420c9c8035f305272dccaa443b"
       },
       {
         "file": "POLIAS E TENSORES/8175990113.png.cimg",
-        "sha256": "b5665f444b6c1f7e394ec5ca104fceeb"
+        "sha256": "2f50fa2ea862436cb8752d464ed898c5"
       },
       {
         "file": "POLIAS E TENSORES/8175990114.png.cimg",
-        "sha256": "c5554647e9b743bb81efd228ab496f82"
+        "sha256": "10e6a1d1cf8648c6f9c89ec7b650b5be"
       },
       {
         "file": "POLIAS E TENSORES/8175990115.png.cimg",
-        "sha256": "1082664a72dafd810d58a39ef91fde53"
+        "sha256": "473da1b275deae9840adf826130e0b3d"
       },
       {
         "file": "POLIAS E TENSORES/8175990116.png.cimg",
-        "sha256": "4523a3ff74f36889b22f5e2079de70ac"
+        "sha256": "eab5108454cae1592aa502544447b96b"
       },
       {
         "file": "POLIAS E TENSORES/8175990117.png.cimg",
-        "sha256": "0a47907e5519a2b58965b01021f94445"
+        "sha256": "fc4caca1aec4d563698b55659f503bdf"
       },
       {
         "file": "POLIAS E TENSORES/8175990118.png.cimg",
-        "sha256": "03453090401ca1f10cbeb7686570c028"
+        "sha256": "a13ce1d1b8815c9b1c28450e81f4cf95"
       },
       {
         "file": "POLIAS E TENSORES/8175990119.png.cimg",
-        "sha256": "a0a501e5414cdb0ed2d95f22b01286d9"
+        "sha256": "d1d414c550ecb59a676d4a10ca2c28d7"
       },
       {
         "file": "POLIAS E TENSORES/8175990120.png.cimg",
-        "sha256": "5b0b431b3ddab0964547cb4e7fa06ca2"
+        "sha256": "6692463410030f44a41b9126c4afa5e9"
       },
       {
         "file": "POLIAS E TENSORES/8175990121.png.cimg",
-        "sha256": "eef10281e6170f2269f510bb9c876e47"
+        "sha256": "0c72da8ec2ccc5c8d77a6b691089f9cd"
       },
       {
         "file": "POLIAS E TENSORES/8175990122.png.cimg",
-        "sha256": "e29765bf8000f211df3740adca1c43c3"
+        "sha256": "ec7aaa43c6473494273a52ad5d536baa"
       },
       {
         "file": "POLIAS E TENSORES/8175990123.png.cimg",
-        "sha256": "6d4249592ce166ec575215187b1e669c"
+        "sha256": "57d1c3902da09256774e506be1a65841"
       },
       {
         "file": "POLIAS E TENSORES/8175990125.png.cimg",
-        "sha256": "5b3c994a4493366d3197c72d89aae7a4"
+        "sha256": "dc0287feb5724772608e678da9488378"
       },
       {
         "file": "POLIAS E TENSORES/8175990126.png.cimg",
-        "sha256": "fc2c0e0c32d36751333c8ccab6990379"
+        "sha256": "c7d90e9f792565b1699c283b1a7c71df"
       },
       {
         "file": "POLIAS E TENSORES/8175990128.png.cimg",
-        "sha256": "2186f2932f4d9ef714790e330e38cb47"
+        "sha256": "1915b5b31aca51e3c7f1ef43c2366e33"
       },
       {
         "file": "POLIAS E TENSORES/8175990129.png.cimg",
-        "sha256": "01014fb499570e6a37bbf5bdc35ee45f"
+        "sha256": "a355535c64afcde5a79f4eb1ccb4dd40"
       },
       {
         "file": "POLIAS E TENSORES/8175990130.png.cimg",
-        "sha256": "6d4159562e0af736faea45008f2a3177"
+        "sha256": "421291684143ece8c312dd371f2709cc"
       },
       {
         "file": "POLIAS E TENSORES/8175990601.png.cimg",
-        "sha256": "5318b6fa3ba5b9d34c9b60822cd8f709"
+        "sha256": "c600c52290db5cdbfdd7fd96e1cb5d49"
       },
       {
         "file": "POLIAS E TENSORES/8175990602.png.cimg",
-        "sha256": "47cb8e408e5934448f25ababaa014cdc"
+        "sha256": "f55ee7503ec69ee4016f52b270fb8b24"
       },
       {
         "file": "POLIAS E TENSORES/8175990603.png.cimg",
-        "sha256": "c6b4988188a79a24f30eaf6a5885701d"
+        "sha256": "bfad15a69d99181cb3c4c70870e0ff5c"
       },
       {
         "file": "POLIAS E TENSORES/8175990604.png.cimg",
-        "sha256": "14c4138459889ab8708fe1366e39abba"
+        "sha256": "ad6e0ca71e44abb776b589f8c171d701"
       },
       {
         "file": "POLIAS E TENSORES/8175990605.png.cimg",
-        "sha256": "3bfbdc40a1fe69f1d3d7c1df19982cab"
+        "sha256": "6805ec5f8d8eed50156637cb33e6cf56"
       },
       {
         "file": "POLIAS E TENSORES/8175990606.png.cimg",
-        "sha256": "f2790c2e3f49b5bb3a0e2d221d61f8f3"
+        "sha256": "f19892e4d2e634a0bae9695b076ee6c7"
       },
       {
         "file": "POLIAS E TENSORES/8175990607.png.cimg",
-        "sha256": "2a84977694f4dee5308df22aa3408670"
+        "sha256": "4ea6ee26f276f33295d0dd9ab5007a9f"
       },
       {
         "file": "POLIAS E TENSORES/8175990608.png.cimg",
-        "sha256": "a3ce6ca78d37b97524f9615c4aecbe9e"
+        "sha256": "7ab78528dd7bb5794d12b54a4ca864d9"
       },
       {
         "file": "POLIAS E TENSORES/8175990609.png.cimg",
-        "sha256": "a792267c1df15eff41dce9ca007b9da5"
+        "sha256": "28027a5557dd4d73543ef23110095f78"
       },
       {
         "file": "POLIAS E TENSORES/8175990610.png.cimg",
-        "sha256": "7955d21d00637c1e2a51f35a684a9d9e"
+        "sha256": "15d3269c033ebff794837ccbd1994a9a"
       },
       {
         "file": "POLIAS E TENSORES/8175990611.png.cimg",
-        "sha256": "0ba900b563a306f81ff14a81b9ebda9d"
+        "sha256": "30c4c91473a180b9a7a424d86786f726"
       },
       {
         "file": "POLIAS E TENSORES/8175990612.png.cimg",
-        "sha256": "d6439b59a2eb13c978e889b74d729cc5"
+        "sha256": "809f8b34b745449d6e773c0db7504c73"
       },
       {
         "file": "POLIAS E TENSORES/8175990613.png.cimg",
-        "sha256": "449d87452caa632e59473d24c41381d7"
+        "sha256": "8f7af926e7c36c214a89f02c7ac23f89"
       },
       {
         "file": "POLIAS E TENSORES/8175990614.png.cimg",
-        "sha256": "25b8972a65790d8bfb7df5d64621cbe6"
+        "sha256": "37ed46e82de12fb265a5bbea57bef481"
       },
       {
         "file": "POLIAS E TENSORES/8175990615.png.cimg",
-        "sha256": "e196677b77b2bd5d708e9789738973e1"
+        "sha256": "c4bd7c71a159fa8aad30ccbb7d9df97a"
       },
       {
         "file": "POLIAS E TENSORES/8175990616.png.cimg",
-        "sha256": "a586062143883c65d791e27fe336d4ca"
+        "sha256": "238d916020b59c46d3fb844994fba9f1"
       },
       {
         "file": "POLIAS E TENSORES/8175990618.png.cimg",
-        "sha256": "86eb60f23b5872136e5867b8d8683e41"
+        "sha256": "eacf2e44160d904405dfc73a0fb089bd"
       },
       {
         "file": "POLIAS E TENSORES/8175990620.png.cimg",
-        "sha256": "9010e2c50307883b5d1f2040d49fe55c"
+        "sha256": "8be184f767ad76adda90580f6aa35760"
       },
       {
         "file": "POLIAS E TENSORES/8175990621.png.cimg",
-        "sha256": "f2a9a16c4ec69572a40c56988103b46a"
+        "sha256": "bee778c132b059021f241eaac95e7759"
       },
       {
         "file": "POLIAS E TENSORES/8175990622.png.cimg",
-        "sha256": "1c3ae155c791407bc6c940ed525b6ebe"
+        "sha256": "9ad23f69ea6507c460d5626e8662c72f"
       },
       {
         "file": "POLIAS E TENSORES/8175990623.png.cimg",
-        "sha256": "132ae50d3abfaa2fd01e96d9093a8ca4"
+        "sha256": "64eba38b45db93b33e3df5c40b33daad"
       },
       {
         "file": "POLIAS E TENSORES/8176990101.png.cimg",
-        "sha256": "642867644ede3d955321289025884e59"
+        "sha256": "9b28cde54a112e74cc0aa07a508774ab"
       },
       {
         "file": "POLIAS E TENSORES/8176990102.png.cimg",
-        "sha256": "78cea1fa2b3455415edf364bf57b5ee8"
+        "sha256": "0cf79470fd18b9d4bdd0176ef2b40724"
       },
       {
         "file": "POLIAS E TENSORES/8176990103.png.cimg",
-        "sha256": "191c3152b03ceeabb635d135a3208c36"
+        "sha256": "a1523097c6dbc5406497ef4b83ac00e3"
       },
       {
         "file": "POLIAS E TENSORES/8176990104.png.cimg",
-        "sha256": "0e2b2d86b6ea6c383b29dd1f85c12efe"
+        "sha256": "d2850c324b45f0d169c7d9be4b4ea556"
       },
       {
         "file": "POLIAS E TENSORES/8176990105.png.cimg",
-        "sha256": "c8ec70f39673abeac7749d0a82752cdf"
+        "sha256": "e61f084d4281dc46129cfbde28da3098"
       },
       {
         "file": "POLIAS E TENSORES/8176990107.png.cimg",
-        "sha256": "9634237830777cf48404452890eb2c45"
+        "sha256": "80dd267b96a9b5019d7c379fbd258bb9"
       },
       {
         "file": "POLIAS E TENSORES/8176990108.png.cimg",
-        "sha256": "4249b38d04b6255f57aa3ee7808b6c54"
+        "sha256": "04b75a6c4ac8333a89240357bb07717a"
       },
       {
         "file": "POLIAS E TENSORES/8176990601.png.cimg",
-        "sha256": "eee4cf8b675bab83e99d1e6c6a1c44da"
+        "sha256": "7af16a151c942e39689c20c0872e9f06"
       },
       {
         "file": "POLIAS E TENSORES/8176990602.png.cimg",
-        "sha256": "35a2f77d3a45357157170d103f65ffeb"
+        "sha256": "9d3ecf4abf665f635f295d4a6478ee0b"
       },
       {
         "file": "POLIAS E TENSORES/8176990603.png.cimg",
-        "sha256": "7f0ed4fe6518e51fa50b6b32c36cba23"
+        "sha256": "7defd30dc8ea46ea41d5f3b9f01ee7ab"
+      },
+      {
+        "file": "POLIAS E TENSORES/9169990109.png.cimg",
+        "sha256": "40d2a4a5ba242e90814235c06cf32a7e"
+      },
+      {
+        "file": "POLIAS E TENSORES/9248990408.png.cimg",
+        "sha256": "10fafd843185ef1ea8151976bab636f6"
       },
       {
         "file": "RESERVATORIO/6111042303.png.cimg",
