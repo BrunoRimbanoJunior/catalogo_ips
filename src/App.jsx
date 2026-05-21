@@ -500,16 +500,16 @@ function buildPrintCatalogHtml({ items, filters }) {
         .cover-bg, .back-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
         .cover-title { position: absolute; left: 17mm; right: 17mm; top: 118mm; text-align: center; color: #f50812; font-size: 28pt; line-height: 1.12; font-weight: 900; letter-spacing: 1px; text-shadow: -1.3px -1.3px #fff, 1.3px -1.3px #fff, -1.3px 1.3px #fff, 1.3px 1.3px #fff, 0 4px 8px rgba(0,0,0,.45); }
         .cover-year { position: absolute; right: 24mm; bottom: 68mm; color: #fff; font-size: 20pt; font-weight: 900; text-shadow: 0 3px 8px rgba(0,0,0,.6); }
-        .catalog-header { height: 28mm; display: grid; grid-template-columns: 1fr minmax(0, 1.15fr) auto; align-items: center; gap: 8mm; padding: 7mm 10mm 4mm; background: linear-gradient(110deg, #e60018 0 45%, #f7f7f7 45% 100%); border-bottom: 1px solid #ddd; }
-        .catalog-header .header-brand { color: #fff; font-size: 22pt; font-weight: 900; font-style: italic; }
-        .catalog-header .header-title { color: #e60018; font-size: 18pt; font-weight: 900; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+        .catalog-header { min-height: 32mm; display: grid; grid-template-columns: 1fr minmax(0, 1.15fr) auto; align-items: center; gap: 8mm; padding: 7mm 10mm 4mm; background: linear-gradient(110deg, #e60018 0 45%, #f7f7f7 45% 100%); border-bottom: 1px solid #ddd; }
+        .catalog-header .header-brand { color: #fff; font-size: 22pt; font-weight: 900; font-style: italic; white-space: normal; word-wrap: break-word; overflow-wrap: break-word; }
+        .catalog-header .header-title { color: #e60018; font-size: 18pt; font-weight: 900; font-style: italic; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; text-align: center; }
         .catalog-header .header-year { color: #111; font-size: 14pt; font-weight: 900; }
-        .index-header { grid-template-columns: minmax(0, 45%) minmax(0, 1fr); gap: 6mm; padding: 0 10mm; background: linear-gradient(110deg, #e60018 0 45%, #f7f7f7 45% 100%); }
-        .index-header .header-brand { min-width: 0; color: #fff; font-size: 18pt; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: clip; }
-        .index-header-copy { min-width: 0; text-align: right; line-height: 1.05; }
-        .index-header-copy strong { display: block; color: #e60018; font-size: 17pt; font-style: italic; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .index-header { min-height: 30mm; grid-template-columns: minmax(0, 45%) minmax(0, 1fr); gap: 6mm; padding: 7mm 10mm 4mm; background: linear-gradient(110deg, #e60018 0 45%, #f7f7f7 45% 100%); align-items: center; }
+        .index-header .header-brand { min-width: 0; color: #fff; font-size: 18pt; line-height: 1.2; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; }
+        .index-header-copy { min-width: 0; text-align: right; line-height: 1.15; }
+        .index-header-copy strong { display: block; color: #e60018; font-size: 17pt; font-style: italic; font-weight: 900; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; }
         .index-header-copy span { display: block; margin-top: 3mm; color: #111; font-size: 14pt; font-weight: 900; white-space: nowrap; }
-        .index-content { padding: 9mm 13mm 16mm; }
+        .index-content { padding: 8mm 13mm 12mm; min-height: calc(297mm - 30mm - 16mm - 8mm); display: flex; flex-direction: column; justify-content: space-between; }
         .index-content h1 { margin: 0; color: #c62828; font-size: 24pt; text-transform: uppercase; }
         .index-content p { margin: 2mm 0 7mm; font-size: 10pt; color: #555; }
         .index-list { display: flex; flex-direction: column; gap: 2.2mm; margin-top: 5mm; }
@@ -519,14 +519,14 @@ function buildPrintCatalogHtml({ items, filters }) {
         .index-dots { border-bottom: 1px dotted #999; transform: translateY(-1.5mm); }
         .index-page { font-weight: 900; }
         .index-empty { padding: 10mm; color: #777; border: 1px solid #ddd; }
-        .product-header { grid-template-columns: 1fr 1fr; padding: 0; background: #f5f5f5; height: 27mm; }
+        .product-header { grid-template-columns: 1fr 1fr; padding: 0; background: #f5f5f5; min-height: 30mm; }
         .header-red { height: 100%; background: #e60018; clip-path: polygon(0 0, 93% 0, 84% 100%, 0 100%); display: flex; align-items: center; padding-left: 12mm; }
         .header-red img { max-width: 58mm; max-height: 20mm; object-fit: contain; filter: brightness(0) invert(1); }
-        .header-copy { text-align: center; padding-right: 8mm; line-height: 1.05; }
-        .header-copy strong { display: block; color: #e60018; font-size: 18pt; font-style: italic; font-weight: 900; }
-        .header-copy span { display: block; color: #111; font-size: 16pt; font-style: italic; font-weight: 900; }
-        .header-copy small { display: block; color: #111; font-size: 12pt; font-style: italic; font-weight: 900; }
-        .product-grid { height: 248mm; padding: 4mm 10mm 3mm; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr); gap: 3mm; }
+        .header-copy { text-align: center; padding-right: 8mm; line-height: 1.15; display: flex; flex-direction: column; justify-content: center; }
+        .header-copy strong { display: block; color: #e60018; font-size: 18pt; font-style: italic; font-weight: 900; white-space: normal; overflow-wrap: break-word; }
+        .header-copy span { display: block; color: #111; font-size: 16pt; font-style: italic; font-weight: 900; white-space: normal; overflow-wrap: break-word; }
+        .header-copy small { display: block; color: #111; font-size: 12pt; font-style: italic; font-weight: 900; white-space: normal; overflow-wrap: break-word; }
+        .product-grid { height: calc(297mm - 30mm - 24mm - 6mm); padding: 4mm 10mm 3mm; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr); gap: 3mm; }
         .product-card { position: relative; overflow: hidden; border: 1px solid #d3d3d3; background: #fff; display: grid; grid-template-rows: 10mm 1fr auto auto; }
         .product-card::before { content: ""; position: absolute; inset: 10mm 0 24mm; background: radial-gradient(circle at 75% 0%, rgba(0,0,0,.08), transparent 45%), linear-gradient(135deg, transparent 0 67%, rgba(0,0,0,.07) 67% 70%, transparent 70%); pointer-events: none; }
         .card-top { position: relative; z-index: 1; height: 10mm; background: #d4d4d4; display: flex; align-items: center; padding: 0 4mm; border-bottom: 1px solid #aaa; }
@@ -539,17 +539,17 @@ function buildPrintCatalogHtml({ items, filters }) {
         .no-image { color: #aaa; border: 1px dashed #ccc; padding: 7mm 10mm; text-align: center; font-size: 10pt; font-weight: 800; }
         .card-desc { position: relative; z-index: 1; border-top: 1px solid #ddd; padding: 2.5mm 3mm 1mm; min-height: 12mm; text-align: center; font-size: 9.8pt; line-height: 1.13; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
         .card-application { position: relative; z-index: 1; padding: 0 3mm 2.5mm; text-align: center; font-size: 9.8pt; line-height: 1.13; font-weight: 900; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
-        .catalog-footer { position: absolute; left: 0; right: 0; bottom: 0; height: 20mm; background: #a00012; color: #fff; display: grid; grid-template-columns: 20mm 1fr 34mm; align-items: center; gap: 5mm; padding: 0 10mm; }
+        .catalog-footer { position: absolute; left: 0; right: 0; bottom: 0; min-height: 24mm; background: #a00012; color: #fff; display: grid; grid-template-columns: 20mm 1fr 34mm; align-items: center; gap: 5mm; padding: 6mm 10mm; }
         .catalog-footer span { font-size: 13pt; font-weight: 900; }
-        .catalog-footer strong { display: block; text-align: center; font-size: 13pt; }
-        .catalog-footer small { display: block; margin-top: 2mm; text-align: center; font-size: 5.8pt; line-height: 1.35; font-style: italic; font-weight: 700; }
+        .catalog-footer strong { display: block; text-align: center; font-size: 13pt; white-space: normal; overflow-wrap: break-word; }
+        .catalog-footer small { display: block; margin-top: 2mm; text-align: center; font-size: 5.8pt; line-height: 1.5; font-style: italic; font-weight: 700; white-space: normal; overflow-wrap: break-word; }
         .catalog-footer img { max-width: 30mm; max-height: 13mm; object-fit: contain; filter: brightness(0) invert(1); }
         .product-footer { grid-template-columns: 34mm 1fr 34mm; }
         .product-footer .footer-page-no { justify-self: start; }
         .product-footer.footer-even .footer-page-no { justify-self: end; }
         .product-footer .footer-logo { justify-self: end; }
         .product-footer.footer-even .footer-logo { justify-self: start; }
-        .index-page-wrap .catalog-footer { grid-template-columns: 20mm 1fr; height: 14mm; }
+        .index-page-wrap .catalog-footer { grid-template-columns: 20mm 1fr; min-height: 16mm; padding: 4mm 10mm; }
         @media screen { .page { margin: 0 auto 12px; box-shadow: 0 6px 22px rgba(0,0,0,.25); } }
       </style>
     </head>

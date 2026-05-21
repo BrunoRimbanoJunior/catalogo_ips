@@ -73,6 +73,16 @@ function updateEnvFile(relPath, fallbackRelPath) {
 {
   const { data } = readJson("src-tauri/tauri.conf.json");
   data.version = version;
+  
+  // Generate a build number from version (e.g., 1.5.3 -> 10503)
+  const [major, minor, patch] = version.split(".").map(v => parseInt(v, 10) || 0);
+  const buildNumber = String(major * 10000 + (minor || 0) * 100 + (patch || 0));
+  
+  // Ensure bundle.macOS exists and set the buildNumber
+  if (!data.bundle) data.bundle = {};
+  if (!data.bundle.macOS) data.bundle.macOS = {};
+  data.bundle.macOS.fileVersion = buildNumber;
+  
   writeJson("src-tauri/tauri.conf.json", data);
 }
 
