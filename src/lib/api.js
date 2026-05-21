@@ -20,6 +20,10 @@ export async function fetchPrintCatalog(params) {
   return await invoke("get_print_catalog_cmd", { params });
 }
 
+export async function exportPrintExcel(params, path) {
+  return await invoke("export_print_excel_cmd", { params, path });
+}
+
 export async function getProductDetails(productId) {
   return await invoke("get_product_details_cmd", { productId });
 }

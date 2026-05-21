@@ -20,6 +20,7 @@ import {
   fetchGroups,
   fetchPrintCatalog,
   cleanupImagesFromManifest,
+  exportPrintExcel,
   savePdfBase64,
 } from "./lib/api";
 import { loadInitialCatalog, loadGroups, loadVehiclesByFilters, searchWithFilters } from "./lib/catalogData";
@@ -54,6 +55,69 @@ const REG_DEFAULT = {
 const GITHUB_REPO = "BrunoRimbanoJunior/catalogo_ips";
 const GITHUB_RELEASES_LATEST = `https://github.com/${GITHUB_REPO}/releases/latest`;
 const GITHUB_LATEST_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
+
+function onlyDigits(value = "") {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function hasRepeatedDigits(digits) {
+  return /^(\d)\1+$/.test(digits);
+}
+
+function isValidCpf(value = "") {
+  const digits = onlyDigits(value);
+  if (digits.length !== 11 || hasRepeatedDigits(digits)) return false;
+
+  let sum = 0;
+  for (let i = 0; i < 9; i += 1) sum += Number(digits[i]) * (10 - i);
+  let check = (sum * 10) % 11;
+  if (check === 10) check = 0;
+  if (check !== Number(digits[9])) return false;
+
+  sum = 0;
+  for (let i = 0; i < 10; i += 1) sum += Number(digits[i]) * (11 - i);
+  check = (sum * 10) % 11;
+  if (check === 10) check = 0;
+  return check === Number(digits[10]);
+}
+
+function isValidCnpj(value = "") {
+  const digits = onlyDigits(value);
+  if (digits.length !== 14 || hasRepeatedDigits(digits)) return false;
+
+  const calcDigit = (base, weights) => {
+    const sum = weights.reduce((acc, weight, index) => acc + Number(base[index]) * weight, 0);
+    const mod = sum % 11;
+    return mod < 2 ? 0 : 11 - mod;
+  };
+
+  const first = calcDigit(digits, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  const second = calcDigit(digits, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  return first === Number(digits[12]) && second === Number(digits[13]);
+}
+
+function isValidRegistrationEmail(value = "") {
+  const email = String(value || "").trim();
+  if (!email || email.length > 254 || /\s/.test(email)) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+
+function validateRegistrationForm(form, fallbackEmail = "") {
+  const email = String(form.email || fallbackEmail || "").trim().toLowerCase();
+  const cpfCnpj = String(form.cpf_cnpj || "").trim();
+  const isCompany = form.person_type === "pj";
+
+  if (!isValidRegistrationEmail(email)) {
+    return { error: "Informe um e-mail valido." };
+  }
+  if (isCompany && !isValidCnpj(cpfCnpj)) {
+    return { error: "Informe um CNPJ valido." };
+  }
+  if (!isCompany && !isValidCpf(cpfCnpj)) {
+    return { error: "Informe um CPF valido." };
+  }
+  return { error: "", email, cpfCnpj };
+}
 
 function normalizeVersionTag(raw = "") {
   return String(raw || "").trim().replace(/^v/i, "");
@@ -1032,6 +1096,18 @@ function ensurePdfExtension(path) {
   return /\.pdf$/i.test(String(path || "")) ? path : `${path}.pdf`;
 }
 
+function buildPrintParams(filters) {
+  return {
+    lines: filters.lines,
+    groups: filters.groups,
+    makes: filters.makes,
+    vehicles: filters.vehicles,
+    launch_only: filters.launchOnly,
+    favorites_only: filters.favoritesOnly,
+    limit: 5000,
+  };
+}
+
 function readDetailValue(product, ...keys) {
   if (!product) return null;
   for (const key of keys) {
@@ -1645,15 +1721,7 @@ function App() {
     setPrintLoading(true);
     setPrintMsg("Preparando catalogo para impressao...");
     try {
-      const rows = await fetchPrintCatalog({
-        lines: printFilters.lines,
-        groups: printFilters.groups,
-        makes: printFilters.makes,
-        vehicles: printFilters.vehicles,
-        launch_only: printFilters.launchOnly,
-        favorites_only: printFilters.favoritesOnly,
-        limit: 5000,
-      });
+      const rows = await fetchPrintCatalog(buildPrintParams(printFilters));
       if (!rows || rows.length === 0) {
         setPrintMsg("Nenhum produto encontrado para os filtros selecionados.");
         return;
@@ -1687,21 +1755,52 @@ function App() {
     }
   }
 
+  async function handleGenerateExcel() {
+    setPrintLoading(true);
+    setPrintMsg("Preparando Excel...");
+    try {
+      const picked = await saveDialog({
+        defaultPath: "catalogo_ips.xlsx",
+        filters: [{ name: "Excel", extensions: ["xlsx"] }],
+      });
+      if (!picked) {
+        setPrintMsg("Geracao cancelada.");
+        return;
+      }
+      const res = await exportPrintExcel(buildPrintParams(printFilters), picked);
+      if (!res?.rows) {
+        setPrintMsg("Nenhum produto encontrado para os filtros selecionados.");
+        return;
+      }
+      setPrintMsg(`Excel gerado com ${res.rows} linhas: ${res.output || picked}`);
+    } catch (e) {
+      setPrintMsg(`Falha ao gerar Excel: ${e?.message || e}`);
+    } finally {
+      setPrintLoading(false);
+    }
+  }
+
   async function submitRegistration(ev) {
     ev?.preventDefault();
     setAuthSuccess("");
     setAuthError("");
+    const validation = validateRegistrationForm(form, registrationEmail);
+    if (validation.error) {
+      setAuthError(validation.error);
+      return;
+    }
     setFormSubmitting(true);
     try {
       if (!supabase) throw new Error("Supabase nao configurado.");
       let profileId = profile?.id || null;
-      if (!profileId && (form.email || registrationEmail)) {
-        const { data } = await supabase.from("profiles").select("id").eq("email", form.email || registrationEmail).maybeSingle();
+      if (!profileId && validation.email) {
+        const { data } = await supabase.from("profiles").select("id").eq("email", validation.email).maybeSingle();
         if (data?.id) profileId = data.id;
       }
       const payload = {
         ...form,
-        email: form.email || registrationEmail || "",
+        cpf_cnpj: validation.cpfCnpj,
+        email: validation.email,
         status: "approved",
         device_fingerprint: profile?.device_fingerprint || fingerprint,
         id: profileId || undefined,
@@ -1713,6 +1812,8 @@ function App() {
         setProfile(resolved);
         localStorage.setItem("profile.cached", JSON.stringify(resolved));
       }
+      setRegistrationEmail(validation.email);
+      setForm((prev) => ({ ...prev, cpf_cnpj: validation.cpfCnpj, email: validation.email }));
       setAuthSuccess("Cadastro enviado. Aguarde aprovacao.");
       setSentOnce(true);
       setAllowAfterDelay(false);
@@ -2095,6 +2196,9 @@ function App() {
                 <a href="https://www.youtube.com/@MKTIPS-t8t" target="_blank" rel="noreferrer" aria-label="YouTube">
                   <svg viewBox="0 0 24 24"><path d="M21.8 8s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.2 5 12 5 12 5h0s-4.2 0-7.1.1c-.4 0-1.3.1-1.9.9-.6.6-.8 2-.8 2S2 9.6 2 11.1v1.7C2 14.4 2.2 16 2.2 16s.2 1.4.8 2c.7.8 1.7.7 2.1.8 1.5.1 6.9.1 6.9.1s4.2 0 7.1-.1c.4 0 1.3-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.7c0-1.5-.2-3.1-.2-3.1zM10 14.7V8.8l5 2.9-5 3z" /></svg>
                 </a>
+                <a href="https://api.whatsapp.com/send/?phone=554130864388&text=Ol%C3%A1%21+Gostaria+de+mais+informa%C3%A7%C3%B5es.&type=phone_number&app_absent=0" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+                  <svg viewBox="0 0 24 24"><path d="M12 2a9.9 9.9 0 00-8.4 15.2L2.5 22l4.9-1.1A9.9 9.9 0 1012 2zm0 2a7.9 7.9 0 016.8 11.9 7.9 7.9 0 01-9.1 3.1l-.6-.2-2.3.5.5-2.2-.3-.6A7.9 7.9 0 0112 4zm-3.2 3.9c-.2 0-.5.1-.7.4-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.9 4.5 4 .6.3 1.1.4 1.5.5.6.2 1.2.1 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.5-.4l-1.7-.8c-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.8-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2.1-.4 0-.5l-.8-1.9c-.2-.4-.4-.4-.6-.4z" /></svg>
+                </a>
                 <a href="mailto:contato@ipsbrasil.com.br" aria-label="Email">
                   <svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 2v.2l8 4.8 8-4.8V6H4zm0 3.3V18h16V9.3l-8 4.8-8-4.8z" /></svg>
                 </a>
@@ -2421,7 +2525,7 @@ function App() {
                 </label>
                 <label className="auth-field wide">
                   CPF/CNPJ
-                  <input value={form.cpf_cnpj} onChange={(e) => setForm((s) => ({ ...s, cpf_cnpj: e.target.value }))} placeholder="000.000.000-00" />
+                  <input inputMode="numeric" value={form.cpf_cnpj} onChange={(e) => setForm((s) => ({ ...s, cpf_cnpj: e.target.value }))} placeholder={form.person_type === "pj" ? "00.000.000/0000-00" : "000.000.000-00"} />
                 </label>
 
                 <label className="auth-field">
@@ -2450,7 +2554,7 @@ function App() {
 
                 <label className="auth-field wide">
                   E-mail
-                  <input type="email" value={form.email || registrationEmail} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} placeholder="usuario@empresa.com" />
+                  <input type="email" inputMode="email" autoCapitalize="none" value={form.email || registrationEmail} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} placeholder="usuario@empresa.com" />
                 </label>
 
                 <div className="auth-meta">
@@ -2587,9 +2691,14 @@ function App() {
                   <span>Imprime Itens Favoritos</span>
                 </label>
               </div>
-              <button className="print-submit" type="button" onClick={handleGeneratePrint} disabled={printLoading}>
-                {printLoading ? "Preparando..." : "Imprimir (Gerar PDF)"}
-              </button>
+              <div className="print-actions">
+                <button className="print-submit print-submit-secondary" type="button" onClick={handleGenerateExcel} disabled={printLoading}>
+                  {printLoading ? "Preparando..." : "Gerar Excel"}
+                </button>
+                <button className="print-submit" type="button" onClick={handleGeneratePrint} disabled={printLoading}>
+                  {printLoading ? "Preparando..." : "Imprimir (Gerar PDF)"}
+                </button>
+              </div>
             </div>
             {printMsg ? <div className="print-message">{printMsg}</div> : null}
           </div>
@@ -2666,7 +2775,7 @@ function App() {
                       </label>
                       <label className="auth-field wide">
                         CPF/CNPJ
-                        <input value={form.cpf_cnpj} onChange={(e) => setForm((s) => ({ ...s, cpf_cnpj: e.target.value }))} placeholder="000.000.000-00" />
+                        <input inputMode="numeric" value={form.cpf_cnpj} onChange={(e) => setForm((s) => ({ ...s, cpf_cnpj: e.target.value }))} placeholder={form.person_type === "pj" ? "00.000.000/0000-00" : "000.000.000-00"} />
                       </label>
 
                       <label className="auth-field">
@@ -2695,7 +2804,7 @@ function App() {
 
                       <label className="auth-field wide">
                         E-mail
-                        <input type="email" value={form.email || registrationEmail} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} placeholder="usuario@empresa.com" />
+                        <input type="email" inputMode="email" autoCapitalize="none" value={form.email || registrationEmail} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} placeholder="usuario@empresa.com" />
                       </label>
 
                       <div className="auth-meta">

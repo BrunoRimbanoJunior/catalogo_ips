@@ -140,6 +140,11 @@ mod core {
         pub similar: Option<String>,
         pub image: Option<String>,
     }
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub struct ExcelExportResult {
+        pub rows: usize,
+        pub output: String,
+    }
 
     #[derive(Debug, Serialize, Deserialize)]
     pub struct ManifestDb {
@@ -1034,6 +1039,150 @@ mod core {
             .collect()
     }
 
+    fn push_unique_text(list: &mut Vec<String>, value: String) {
+        let clean = value.trim();
+        if clean.is_empty() {
+            return;
+        }
+        if !list.iter().any(|item| item.eq_ignore_ascii_case(clean)) {
+            list.push(clean.to_string());
+        }
+    }
+
+    fn excel_multiline_vehicles(value: &str) -> String {
+        let mut vehicles = Vec::new();
+        for raw in value.split(',') {
+            push_unique_text(&mut vehicles, raw.trim().to_string());
+        }
+        vehicles.join("\n")
+    }
+
+    fn similar_codes_text(value: &str) -> String {
+        let normalized = value.replace([',', ';', '|', '\n', '\r'], " ");
+        let mut codes = Vec::new();
+        for token in normalized.split_whitespace() {
+            let clean = token.trim();
+            if clean.is_empty() {
+                continue;
+            }
+            if let Some((_, right)) = clean.split_once(':') {
+                if !right.trim().is_empty() {
+                    push_unique_text(&mut codes, right.trim().to_ascii_uppercase());
+                }
+                continue;
+            }
+            if clean.ends_with(':') {
+                continue;
+            }
+            push_unique_text(&mut codes, clean.to_ascii_uppercase());
+        }
+        codes.join(" ")
+    }
+
+    fn excel_clean_concat(value: Option<String>) -> String {
+        value
+            .unwrap_or_default()
+            .split(',')
+            .map(|part| part.trim())
+            .filter(|part| !part.is_empty())
+            .collect::<Vec<_>>()
+            .join("; ")
+    }
+
+    fn xml_escape(value: &str) -> String {
+        value
+            .chars()
+            .map(|ch| match ch {
+                '&' => "&amp;".to_string(),
+                '<' => "&lt;".to_string(),
+                '>' => "&gt;".to_string(),
+                '"' => "&quot;".to_string(),
+                '\'' => "&apos;".to_string(),
+                _ => ch.to_string(),
+            })
+            .collect::<String>()
+    }
+
+    fn excel_col_name(mut index: usize) -> String {
+        let mut name = String::new();
+        index += 1;
+        while index > 0 {
+            let rem = (index - 1) % 26;
+            name.insert(0, (b'A' + rem as u8) as char);
+            index = (index - 1) / 26;
+        }
+        name
+    }
+
+    fn xlsx_sheet_xml(rows: &[Vec<String>]) -> String {
+        let last_row = rows.len().max(1);
+        let last_col = rows.first().map(|r| r.len()).unwrap_or(1).saturating_sub(1);
+        let dimension = format!("A1:{}{}", excel_col_name(last_col), last_row);
+        let mut xml = String::from(r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>"#);
+        xml.push_str(
+            r#"<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">"#,
+        );
+        xml.push_str(&format!(r#"<dimension ref="{}"/>"#, dimension));
+        xml.push_str(r#"<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>"#);
+        xml.push_str(r#"<cols><col min="1" max="1" width="18" customWidth="1"/><col min="2" max="2" width="18" customWidth="1"/><col min="3" max="3" width="32" customWidth="1"/><col min="4" max="4" width="64" customWidth="1"/><col min="5" max="5" width="48" customWidth="1"/><col min="6" max="6" width="38" customWidth="1"/></cols>"#);
+        xml.push_str("<sheetData>");
+        for (row_idx, row) in rows.iter().enumerate() {
+            let row_num = row_idx + 1;
+            xml.push_str(&format!(r#"<row r="{}">"#, row_num));
+            for (col_idx, value) in row.iter().enumerate() {
+                let cell_ref = format!("{}{}", excel_col_name(col_idx), row_num);
+                let style = if row_idx == 0 { 1 } else { 2 };
+                xml.push_str(&format!(
+                    r#"<c r="{}" s="{}" t="inlineStr"><is><t xml:space="preserve">{}</t></is></c>"#,
+                    cell_ref,
+                    style,
+                    xml_escape(value)
+                ));
+            }
+            xml.push_str("</row>");
+        }
+        xml.push_str("</sheetData>");
+        xml.push_str(&format!(r#"<autoFilter ref="{}"/>"#, dimension));
+        xml.push_str("</worksheet>");
+        xml
+    }
+
+    fn write_xlsx_file(path: &Path, rows: &[Vec<String>]) -> Result<(), String> {
+        use std::io::Write;
+        let file = std::fs::File::create(path).map_err(|e| e.to_string())?;
+        let mut zip = zip::ZipWriter::new(file);
+        let options =
+            zip::write::FileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+        let mut add = |name: &str, contents: &str| -> Result<(), String> {
+            zip.start_file(name, options).map_err(|e| e.to_string())?;
+            zip.write_all(contents.as_bytes())
+                .map_err(|e| e.to_string())
+        };
+        add(
+            "[Content_Types].xml",
+            r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>"#,
+        )?;
+        add(
+            "_rels/.rels",
+            r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>"#,
+        )?;
+        add(
+            "xl/workbook.xml",
+            r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Resultado" sheetId="1" r:id="rId1"/></sheets></workbook>"#,
+        )?;
+        add(
+            "xl/_rels/workbook.xml.rels",
+            r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>"#,
+        )?;
+        add(
+            "xl/styles.xml",
+            r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"><alignment wrapText="1" vertical="top"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"><alignment wrapText="1" vertical="top"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>"#,
+        )?;
+        add("xl/worksheets/sheet1.xml", &xlsx_sheet_xml(rows))?;
+        zip.finish().map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
     #[tauri::command]
     pub fn get_print_catalog_cmd(
         app: AppHandle,
@@ -1214,6 +1363,126 @@ mod core {
             }
         }
         Ok(out)
+    }
+
+    #[tauri::command]
+    pub fn export_print_excel_cmd(
+        app: AppHandle,
+        params: PrintCatalogParams,
+        path: String,
+    ) -> Result<ExcelExportResult, String> {
+        let conn =
+            open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+        migrate(&conn).map_err(|e| e.to_string())?;
+
+        let vehicle_label_expr = "UPPER(TRIM(CASE WHEN INSTR(REPLACE(v.name,'/',' '),' ')>0 THEN SUBSTR(REPLACE(v.name,'/',' '),1,INSTR(REPLACE(v.name,'/',' '),' ')-1) ELSE v.name END))";
+        let mut sql = String::from(
+            "SELECT
+                p.code,
+                NULLIF(group_concat(DISTINCT TRIM(COALESCE(v.category,''))), ''),
+                p.pgroup,
+                group_concat(DISTINCT TRIM(v.name)),
+                COALESCE(NULLIF(TRIM(COALESCE(p.details,'')), ''), NULLIF(TRIM(COALESCE(p.description,'')), ''), ''),
+                NULLIF(TRIM(COALESCE(p.similar,'')), '')
+             FROM products p
+             JOIN brands b ON b.id = p.brand_id
+             JOIN product_vehicles pv ON pv.product_id = p.id
+             JOIN vehicles v ON v.id = pv.vehicle_id",
+        );
+        let mut where_clauses: Vec<String> = Vec::new();
+        let mut values: Vec<rusqlite::types::Value> = Vec::new();
+
+        add_in_filter(
+            &mut where_clauses,
+            &mut values,
+            "UPPER(TRIM(COALESCE(v.category,'')))",
+            params.lines.as_ref(),
+        );
+        add_in_filter(
+            &mut where_clauses,
+            &mut values,
+            "UPPER(TRIM(COALESCE(p.pgroup,'')))",
+            params.groups.as_ref(),
+        );
+        add_in_filter(
+            &mut where_clauses,
+            &mut values,
+            "UPPER(TRIM(COALESCE(v.make,'')))",
+            params.makes.as_ref(),
+        );
+        add_in_filter(
+            &mut where_clauses,
+            &mut values,
+            vehicle_label_expr,
+            params.vehicles.as_ref(),
+        );
+        if params.launch_only {
+            where_clauses.push(
+                "(UPPER(COALESCE(p.pgroup,'')) LIKE '%LANC%' OR UPPER(COALESCE(p.details,'')) LIKE '%LANC%' OR EXISTS (SELECT 1 FROM images il WHERE il.product_id = p.id AND LOWER(REPLACE(il.filename,'\\','/')) LIKE '%/lancamentos/%'))"
+                    .into(),
+            );
+        }
+        let _ = params.favorites_only;
+
+        if !where_clauses.is_empty() {
+            sql.push_str(" WHERE ");
+            sql.push_str(&where_clauses.join(" AND "));
+        }
+        sql.push_str(" GROUP BY p.id");
+        sql.push_str(
+            " ORDER BY UPPER(TRIM(COALESCE(p.pgroup,''))), UPPER(TRIM(COALESCE(NULLIF(MIN(TRIM(COALESCE(v.make,''))), ''),''))), UPPER(TRIM(MIN(TRIM(v.name)))), UPPER(TRIM(p.description)), UPPER(TRIM(p.code))",
+        );
+        if let Some(limit) = params.limit.filter(|v| *v > 0) {
+            sql.push_str(&format!(" LIMIT {}", limit));
+        }
+
+        let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+        let mut query = stmt
+            .query(rusqlite::params_from_iter(values))
+            .map_err(|e| e.to_string())?;
+
+        let mut rows = vec![vec![
+            "CODIGO".to_string(),
+            "LINHA".to_string(),
+            "GRUPO".to_string(),
+            "VEICULOS".to_string(),
+            "DETALHES".to_string(),
+            "SIMILARES".to_string(),
+        ]];
+        while let Some(row) = query.next().map_err(|e| e.to_string())? {
+            let vehicles_raw: Option<String> = row.get(3).map_err(|e| e.to_string())?;
+            let vehicles = excel_multiline_vehicles(&vehicles_raw.unwrap_or_default());
+            let similar_raw: Option<String> = row.get(5).map_err(|e| e.to_string())?;
+            rows.push(vec![
+                row.get::<_, Option<String>>(0)
+                    .map_err(|e| e.to_string())?
+                    .unwrap_or_default(),
+                excel_clean_concat(row.get(1).map_err(|e| e.to_string())?),
+                row.get::<_, Option<String>>(2)
+                    .map_err(|e| e.to_string())?
+                    .unwrap_or_default(),
+                vehicles,
+                row.get::<_, Option<String>>(4)
+                    .map_err(|e| e.to_string())?
+                    .unwrap_or_default(),
+                similar_codes_text(&similar_raw.unwrap_or_default()),
+            ]);
+        }
+
+        let output = if path.to_ascii_lowercase().ends_with(".xlsx") {
+            path
+        } else {
+            format!("{}.xlsx", path)
+        };
+        let dest = PathBuf::from(&output);
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        write_xlsx_file(&dest, &rows)?;
+        Ok(ExcelExportResult {
+            rows: rows.len().saturating_sub(1),
+            output,
+        })
     }
 
     #[tauri::command]
@@ -2608,6 +2877,7 @@ pub fn run() {
             core::get_groups_stats_cmd,
             core::search_products_cmd,
             core::get_print_catalog_cmd,
+            core::export_print_excel_cmd,
             core::get_product_details_cmd,
             core::sync_from_manifest,
             core::index_images_from_manifest,

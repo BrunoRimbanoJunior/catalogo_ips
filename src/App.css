@@ -332,8 +332,11 @@ button {
 .print-footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; margin-top: 12px; }
 .print-flags { display: flex; flex-direction: column; gap: 5px; text-align: left; }
 .print-flag { display: inline-flex; align-items: center; gap: 6px; color: #111; font-weight: 800; cursor: pointer; font-size: 12px; }
+.print-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .print-submit { background: #242424; color: #fff; border: 0; border-radius: 8px; padding: 8px 12px; font-weight: 800; box-shadow: 0 3px 10px rgba(0,0,0,0.18); white-space: nowrap; font-size: 13px; }
 .print-submit:hover { background: #0b4d91; }
+.print-submit-secondary { background: #146c43; }
+.print-submit-secondary:hover { background: #0f5132; }
 .print-submit:disabled { opacity: 0.7; cursor: not-allowed; }
 .print-message { margin-top: 8px; padding: 8px 10px; border: 1px solid #b1e5c8; background: #e8fff5; color: #0c6b3d; border-radius: 8px; text-align: left; font-weight: 700; font-size: 12px; }
 
@@ -365,6 +368,9 @@ button {
     flex-direction: column;
   }
   .print-submit {
+    width: 100%;
+  }
+  .print-actions {
     width: 100%;
   }
 }
