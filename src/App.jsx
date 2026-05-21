@@ -339,18 +339,8 @@ function chunkArray(list, size) {
   return out;
 }
 
-async function mapWithConcurrency(list, limit, mapper) {
-  const results = new Array(list.length);
-  let index = 0;
-  const workers = Array.from({ length: Math.min(limit, list.length || 1) }, async () => {
-    while (index < list.length) {
-      const current = index;
-      index += 1;
-      results[current] = await mapper(list[current], current);
-    }
-  });
-  await Promise.all(workers);
-  return results;
+function yieldToUi() {
+  return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
 function catalogPrintTitle(filters) {
@@ -568,24 +558,6 @@ function buildPrintCatalogHtml({ items, filters }) {
   </html>`;
 }
 
-async function toPrintBlobUrl(path) {
-  if (!path) return "";
-  const assetUrl = convertFileSrc(path);
-  try {
-    const response = await fetch(assetUrl);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const blob = await response.blob();
-    if (!blob || blob.size === 0) throw new Error("blob vazio");
-    return URL.createObjectURL(blob);
-  } catch (_) {
-    try {
-      return await readImageBase64(path);
-    } catch (_) {
-      return "";
-    }
-  }
-}
-
 let activePrintRoot = null;
 let activePrintStyle = null;
 let activePrintObjectUrls = [];
@@ -687,6 +659,7 @@ function printHtmlDocument(html, objectUrls = []) {
 }
 
 const PDF_PAGE = { width: 595.28, height: 841.89 };
+const PDF_MAX_ITEMS_PER_FILE = 360;
 const PDF_RED = rgb(0.9, 0, 0.08);
 const PDF_DARK_RED = rgb(0.62, 0, 0.07);
 const PDF_BLACK = rgb(0.04, 0.04, 0.04);
@@ -801,19 +774,74 @@ function guessPdfImageMime(bytes, fallback = "") {
   return fallback || "";
 }
 
-async function sourceToImageBytes(source) {
-  if (!source) return null;
-  if (String(source).startsWith("data:")) return dataUrlToBytes(source);
-  const response = await fetch(source);
-  if (!response.ok) return null;
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  return { bytes, mime: guessPdfImageMime(bytes, response.headers.get("content-type") || "") };
+function isLocalImageSource(source = "") {
+  const text = String(source || "");
+  return /^[a-zA-Z]:[\\/]/.test(text) || text.startsWith("\\\\") || text.startsWith("/");
 }
 
-async function embedPdfImage(pdfDoc, source) {
+async function sourceToImageBytes(source) {
+  if (!source) return null;
+  const text = String(source);
+  if (text.startsWith("data:")) return dataUrlToBytes(text);
+  if (isLocalImageSource(text)) {
+    return dataUrlToBytes(await readImageBase64(text));
+  }
   try {
-    const loaded = await sourceToImageBytes(source);
+    const response = await fetch(text);
+    if (!response.ok) return null;
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    return { bytes, mime: guessPdfImageMime(bytes, response.headers.get("content-type") || "") };
+  } catch (_) {
+    try {
+      return dataUrlToBytes(await readImageBase64(text));
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+async function downsampleImageForPdf(loaded, options = {}) {
+  const { maxWidth = 1100, maxHeight = 700, jpegQuality = 0.84 } = options;
+  if (!loaded?.bytes?.length || typeof createImageBitmap !== "function") return loaded;
+
+  const mime = guessPdfImageMime(loaded.bytes, loaded.mime).toLowerCase();
+  if (!mime.startsWith("image/")) return loaded;
+
+  let bitmap = null;
+  try {
+    const sourceBlob = new Blob([loaded.bytes], { type: mime || "image/png" });
+    bitmap = await createImageBitmap(sourceBlob);
+    const scale = Math.min(1, maxWidth / bitmap.width, maxHeight / bitmap.height);
+    const shouldResize = scale < 1;
+    const shouldConvert = !mime.includes("jpeg") && !mime.includes("jpg");
+    const shouldCompress = loaded.bytes.length > 450_000;
+    if (!shouldResize && !shouldConvert && !shouldCompress) return loaded;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return loaded;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", jpegQuality));
+    canvas.width = 1;
+    canvas.height = 1;
+    if (!blob || blob.size === 0) return loaded;
+    return { bytes: new Uint8Array(await blob.arrayBuffer()), mime: "image/jpeg" };
+  } catch (_) {
+    return loaded;
+  } finally {
+    if (bitmap?.close) bitmap.close();
+  }
+}
+
+async function embedPdfImage(pdfDoc, source, options = {}) {
+  try {
+    let loaded = await sourceToImageBytes(source);
     if (!loaded?.bytes?.length) return null;
+    if (options.downsample) loaded = await downsampleImageForPdf(loaded, options);
     const mime = guessPdfImageMime(loaded.bytes, loaded.mime).toLowerCase();
     if (mime.includes("png")) return await pdfDoc.embedPng(loaded.bytes);
     if (mime.includes("jpeg") || mime.includes("jpg")) return await pdfDoc.embedJpg(loaded.bytes);
@@ -849,14 +877,18 @@ function drawImageCover(page, image, x, y, width, height) {
   });
 }
 
-function buildCatalogPdfModel(items, filters) {
-  const itemsPerPage = 6;
-  const indexEntriesPerPage = 28;
-  const sortedItems = [...items].sort((a, b) => {
+function sortCatalogItems(items = []) {
+  return [...items].sort((a, b) => {
     const ak = [a.group, a.make, a.vehicle, a.description, a.code].map((v) => String(v || "").toUpperCase()).join("|");
     const bk = [b.group, b.make, b.vehicle, b.description, b.code].map((v) => String(v || "").toUpperCase()).join("|");
     return ak.localeCompare(bk, "pt-BR", { numeric: true, sensitivity: "base" });
   });
+}
+
+function buildCatalogPdfModel(items, filters) {
+  const itemsPerPage = 6;
+  const indexEntriesPerPage = 28;
+  const sortedItems = sortCatalogItems(items);
   const groupMap = new Map();
   sortedItems.forEach((item, index) => {
     const group = displayText(item.group, "SEM GRUPO").toUpperCase();
@@ -936,17 +968,24 @@ function drawPdfProductHeader(page, fonts, title) {
   const y = PDF_PAGE.height - headerH;
   page.drawRectangle({ x: 0, y, width: PDF_PAGE.width * 0.48, height: headerH, color: PDF_RED });
   page.drawRectangle({ x: PDF_PAGE.width * 0.48, y, width: PDF_PAGE.width * 0.52, height: headerH, color: PDF_LIGHT });
-  drawPdfText(page, "YOKOMITSU", { x: mm(12), y: y + mm(11), size: 20, font: fonts.boldOblique, color: rgb(1, 1, 1) });
-  const fitted = fitPdfText(title, fonts.boldOblique, 17, PDF_PAGE.width * 0.45);
+  drawPdfText(page, "IPS DO BRASIL", { x: mm(12), y: y + mm(11), size: 20, font: fonts.boldOblique, color: rgb(1, 1, 1) });
+  const rightX = PDF_PAGE.width * 0.48;
+  const rightW = PDF_PAGE.width * 0.52;
+  const fitted = fitPdfText(title, fonts.boldOblique, 17, rightW - mm(18));
   drawPdfText(page, fitted, {
-    x: PDF_PAGE.width - mm(12) - textWidth(fonts.boldOblique, fitted, 17),
+    x: rightX + (rightW - textWidth(fonts.boldOblique, fitted, 17)) / 2,
     y: y + mm(17),
     size: 17,
     font: fonts.boldOblique,
     color: PDF_RED,
   });
-  drawPdfText(page, "IPS DO BRASIL", { x: PDF_PAGE.width - mm(78), y: y + mm(9), size: 15, font: fonts.boldOblique, color: PDF_BLACK });
-  drawPdfText(page, "CATALOGO 2026", { x: PDF_PAGE.width - mm(70), y: y + mm(3), size: 11, font: fonts.boldOblique, color: PDF_BLACK });
+  drawPdfText(page, "CATALOGO 2026", {
+    x: rightX + (rightW - textWidth(fonts.boldOblique, "CATALOGO 2026", 11)) / 2,
+    y: y + mm(3),
+    size: 11,
+    font: fonts.boldOblique,
+    color: PDF_BLACK,
+  });
 }
 
 function drawPdfFooter(page, fonts, pageNo) {
@@ -970,13 +1009,7 @@ function drawPdfFooter(page, fonts, pageNo) {
     color: rgb(1, 1, 1),
   });
   const warning = "AS FOTOS CONTIDAS NESSE CATALOGO SAO DE CARATER MERAMENTE ILUSTRATIVO. AS MARCAS DAS MONTADORAS SAO DE FUNCAO INFORMATIVA E COMPARATIVA.";
-  drawPdfText(page, fitPdfText(warning, fonts.oblique, 5.5, PDF_PAGE.width - mm(72)), {
-    x: mm(36),
-    y: mm(4),
-    size: 5.5,
-    font: fonts.oblique,
-    color: rgb(1, 1, 1),
-  });
+  drawCenteredPdfLines(page, wrapPdfText(warning, fonts.oblique, 5.4, PDF_PAGE.width - mm(92), 3), fonts.oblique, 5.4, PDF_PAGE.width / 2, mm(7.2), PDF_PAGE.width - mm(92), rgb(1, 1, 1), 6.1);
   drawPdfText(page, logoText, {
     x: even ? mm(10) : PDF_PAGE.width - mm(10) - textWidth(fonts.bold, logoText, 9),
     y: mm(7),
@@ -1028,7 +1061,7 @@ function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
   }
 }
 
-async function buildCatalogPdfBase64({ items, filters }) {
+async function buildCatalogPdfBase64({ items, filters, onProgress, volumeLabel = "" }) {
   const pdfDoc = await PDFDocument.create();
   const fonts = {
     regular: await pdfDoc.embedFont(StandardFonts.Helvetica),
@@ -1054,6 +1087,15 @@ async function buildCatalogPdfBase64({ items, filters }) {
     drawPdfText(cover, line, { x, y, size, font: fonts.bold, color: PDF_RED });
   });
   drawPdfText(cover, "CATALOGO 2026", { x: PDF_PAGE.width - mm(82), y: mm(112), size: 20, font: fonts.bold, color: rgb(1, 1, 1) });
+  if (volumeLabel) {
+    drawPdfText(cover, volumeLabel, {
+      x: PDF_PAGE.width - mm(82),
+      y: mm(101),
+      size: 12,
+      font: fonts.bold,
+      color: rgb(1, 1, 1),
+    });
+  }
 
   const back = pdfDoc.addPage([PDF_PAGE.width, PDF_PAGE.height]);
   if (backImage) drawImageCover(back, backImage, 0, 0, PDF_PAGE.width, PDF_PAGE.height);
@@ -1064,6 +1106,10 @@ async function buildCatalogPdfBase64({ items, filters }) {
   });
 
   for (let pageIndex = 0; pageIndex < model.productPages.length; pageIndex += 1) {
+    if (onProgress && (pageIndex === 0 || (pageIndex + 1) % 5 === 0 || pageIndex === model.productPages.length - 1)) {
+      onProgress(`Gerando PDF: pagina ${pageIndex + 1} de ${model.productPages.length}`);
+      await yieldToUi();
+    }
     const pageNo = model.firstProductPage + pageIndex;
     const page = pdfDoc.addPage([PDF_PAGE.width, PDF_PAGE.height]);
     drawPdfProductHeader(page, fonts, model.coverTitle);
@@ -1078,7 +1124,17 @@ async function buildCatalogPdfBase64({ items, filters }) {
       const item = model.productPages[pageIndex][i];
       let image = null;
       if (item.imageSrc) {
-        if (!imageCache.has(item.imageSrc)) imageCache.set(item.imageSrc, await embedPdfImage(pdfDoc, item.imageSrc));
+        if (!imageCache.has(item.imageSrc)) {
+          imageCache.set(
+            item.imageSrc,
+            await embedPdfImage(pdfDoc, item.imageSrc, {
+              downsample: true,
+              maxWidth: 1100,
+              maxHeight: 700,
+              jpegQuality: 0.84,
+            })
+          );
+        }
         image = imageCache.get(item.imageSrc);
       }
       const col = i % 2;
@@ -1089,11 +1145,22 @@ async function buildCatalogPdfBase64({ items, filters }) {
     }
   }
 
+  if (onProgress) {
+    onProgress("Finalizando arquivo PDF...");
+    await yieldToUi();
+  }
   return await pdfDoc.saveAsBase64({ dataUri: false });
 }
 
 function ensurePdfExtension(path) {
   return /\.pdf$/i.test(String(path || "")) ? path : `${path}.pdf`;
+}
+
+function pdfPartPath(path, partIndex, totalParts) {
+  const pdfPath = ensurePdfExtension(path);
+  if (totalParts <= 1) return pdfPath;
+  const suffix = `_parte_${String(partIndex + 1).padStart(2, "0")}`;
+  return pdfPath.replace(/\.pdf$/i, `${suffix}.pdf`);
 }
 
 function buildPrintParams(filters) {
@@ -1404,12 +1471,12 @@ function App() {
     const timer = setTimeout(async () => {
       try {
         setToolsMsg("Limpando imagens obsoletas (manifest)...");
-        await cleanupImagesFromManifest(manifestUrl);
-        setToolsMsg("Limpeza de imagens concluida.");
+        const res = await cleanupImagesFromManifest(manifestUrl);
+        setToolsMsg(`Limpeza de imagens concluida: ${res?.removed_files || res?.removedFiles || 0} removidas.`);
       } catch (e) {
         setToolsMsg(`Falha ao limpar imagens: ${e}`);
       }
-    }, 10 * 60 * 1000); // auto-clean depois de 10 min no cliente
+    }, 15 * 1000); // auto-clean logo apos inicializar, sem travar a primeira carga
     setCleanupScheduled(true);
     return () => clearTimeout(timer);
   }, [ready, cleanupScheduled, manifestUrl]);
@@ -1495,7 +1562,15 @@ function App() {
 
         try {
           const idxRes = await indexImagesFromManifest(manifestUrl);
-          setSecondaryStatus(`Indexados ${idxRes?.matched || 0}/${idxRes?.scanned || 0} imagens.`);
+          let cleanupMsg = "";
+          try {
+            const cleanRes = await cleanupImagesFromManifest(manifestUrl);
+            const removed = cleanRes?.removed_files || cleanRes?.removedFiles || 0;
+            cleanupMsg = ` Limpeza: ${removed} removidas.`;
+          } catch (cleanupError) {
+            cleanupMsg = ` Falha na limpeza: ${cleanupError}`;
+          }
+          setSecondaryStatus(`Indexados ${idxRes?.matched || 0}/${idxRes?.scanned || 0} imagens.${cleanupMsg}`);
         } catch (e) {
           setSecondaryStatus(`Falha ao indexar: ${e}`);
         }
@@ -1734,20 +1809,40 @@ function App() {
         setPrintMsg("Geracao cancelada.");
         return;
       }
-      const uniqueImages = Array.from(new Set(rows.map((item) => item?.image).filter(Boolean)));
-      const imagePairs = await mapWithConcurrency(uniqueImages, 16, async (path) => [path, await toPrintBlobUrl(path)]);
-      const imageMap = new Map(imagePairs);
-      const objectUrls = imagePairs.map(([, src]) => src).filter((src) => String(src || "").startsWith("blob:"));
-      const items = rows.map((item) => ({
-        ...item,
-        imageSrc: item?.image ? imageMap.get(item.image) || "" : "",
-      }));
-      setPrintMsg("Gerando arquivo PDF...");
-      const pdfBase64 = await buildCatalogPdfBase64({ items, filters: printFilters });
-      const outputPath = ensurePdfExtension(picked);
-      await savePdfBase64(outputPath, pdfBase64);
-      objectUrls.forEach((url) => URL.revokeObjectURL(url));
-      setPrintMsg(`PDF gerado com ${rows.length} itens: ${outputPath}`);
+      const sortedRows = sortCatalogItems(rows);
+      const batches = chunkArray(sortedRows, PDF_MAX_ITEMS_PER_FILE);
+      const totalParts = batches.length;
+      if (totalParts > 1) {
+        setPrintMsg(`Selecao grande (${rows.length} itens). O PDF sera dividido em ${totalParts} partes.`);
+        await yieldToUi();
+      }
+
+      const outputs = [];
+      for (let partIndex = 0; partIndex < totalParts; partIndex += 1) {
+        const batch = batches[partIndex];
+        const volumeLabel = totalParts > 1 ? `PARTE ${partIndex + 1} DE ${totalParts}` : "";
+        const items = batch.map((item) => ({
+          ...item,
+          imageSrc: item?.image || "",
+        }));
+        const outputPath = pdfPartPath(picked, partIndex, totalParts);
+        setPrintMsg(totalParts > 1 ? `Gerando ${volumeLabel} (${items.length} itens)...` : "Gerando arquivo PDF...");
+        let pdfBase64 = await buildCatalogPdfBase64({
+          items,
+          filters: printFilters,
+          volumeLabel,
+          onProgress: (msg) => setPrintMsg(totalParts > 1 ? `${volumeLabel}: ${msg}` : msg),
+        });
+        await savePdfBase64(outputPath, pdfBase64);
+        pdfBase64 = "";
+        outputs.push(outputPath);
+        await yieldToUi();
+      }
+      setPrintMsg(
+        totalParts > 1
+          ? `PDF dividido em ${totalParts} arquivos com ${rows.length} itens. Primeiro arquivo: ${outputs[0]}`
+          : `PDF gerado com ${rows.length} itens: ${outputs[0]}`
+      );
     } catch (e) {
       setPrintMsg(`Falha ao gerar impressao: ${e?.message || e}`);
     } finally {
@@ -1958,7 +2053,11 @@ function App() {
       setDbVersion(res?.db_version || res?.dbVersion || dbVersion);
       localStorage.setItem("manifestUrl", target);
       setStatusMsg(`Sincronizado: db v${res?.db_version || res?.dbVersion || "?"} | imgs +${res?.downloaded_images || res?.downloadedImages || 0}`);
-      setToolsMsg("Sync concluído.");
+      const idxRes = await indexImagesFromManifest(target);
+      const cleanRes = await cleanupImagesFromManifest(target);
+      setToolsMsg(
+        `Sync concluído. Indexados ${idxRes?.matched || 0}/${idxRes?.scanned || 0}; removidas ${cleanRes?.removed_files || cleanRes?.removedFiles || 0} imagens obsoletas.`
+      );
     } catch (e) {
       setToolsMsg(`Falha ao sincronizar: ${e}`);
     } finally {
@@ -2010,7 +2109,10 @@ function App() {
     setToolsMsg("Indexando imagens via manifest...");
     try {
       const idxRes = await indexImagesFromManifest(target);
-      setToolsMsg(`Indexados ${idxRes?.matched || 0}/${idxRes?.scanned || 0} imagens.`);
+      const cleanRes = await cleanupImagesFromManifest(target);
+      setToolsMsg(
+        `Indexados ${idxRes?.matched || 0}/${idxRes?.scanned || 0} imagens. Removidas ${cleanRes?.removed_files || cleanRes?.removedFiles || 0} obsoletas.`
+      );
     } catch (e) {
       setToolsMsg(`Falha ao indexar: ${e}`);
     }
@@ -2834,14 +2936,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
