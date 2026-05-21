@@ -16,6 +16,10 @@ export async function searchProducts(params) {
   return await invoke("search_products_cmd", { params });
 }
 
+export async function fetchPrintCatalog(params) {
+  return await invoke("get_print_catalog_cmd", { params });
+}
+
 export async function getProductDetails(productId) {
   return await invoke("get_product_details_cmd", { productId });
 }

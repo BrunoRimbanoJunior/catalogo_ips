@@ -37,8 +37,10 @@ fn header_key(s: &str) -> &'static str {
         "code"
     } else if ["DESCRICAO"].contains(&n.as_str()) {
         "description"
-    } else if ["GRUPO", "GRUPODEPRODUTOS", "CATEGORIA", "TIPO"].contains(&n.as_str()) {
+    } else if ["GRUPO", "GRUPODEPRODUTOS", "TIPO"].contains(&n.as_str()) {
         "group"
+    } else if ["CATEGORIA", "LINHA", "LINHAVEICULO", "LINHADEVEICULO"].contains(&n.as_str()) {
+        "category"
     } else if ["APLICACAO", "APLICACOES"].contains(&n.as_str()) {
         "application"
     } else if ["VEICULO", "VEICULOS"].contains(&n.as_str()) {
@@ -94,6 +96,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
     let mut idx_altura: usize = usize::MAX;
     let mut idx_largura: usize = usize::MAX;
     let mut idx_comprimento: usize = usize::MAX;
+    let mut idx_category: usize = usize::MAX;
 
     // order: brand, code, description, group, application, vehicles, oem, similar
     for (i, cell) in header.iter().enumerate() {
@@ -108,6 +111,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
             "oem" if idx.6 == usize::MAX => idx.6 = i,
             "similar" if idx.7 == usize::MAX => idx.7 = i,
             "make" if idx_make == usize::MAX => idx_make = i,
+            "category" if idx_category == usize::MAX => idx_category = i,
             "ean_gtin" if idx_ean_gtin == usize::MAX => idx_ean_gtin = i,
             "altura" if idx_altura == usize::MAX => idx_altura = i,
             "largura" if idx_largura == usize::MAX => idx_largura = i,
@@ -147,6 +151,8 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
     tx.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", [])
         .ok();
     tx.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", [])
+        .ok();
+    tx.execute("ALTER TABLE vehicles ADD COLUMN category TEXT", [])
         .ok();
     tx.execute("ALTER TABLE products ADD COLUMN ean_gtin TEXT", [])
         .ok();
@@ -207,6 +213,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
         };
         let oem = cell(idx.6);
         let similar = cell(idx.7);
+        let category = cell(idx_category);
         let ean_gtin = cell(idx_ean_gtin);
         let altura = cell(idx_altura);
         let largura = cell(idx_largura);
@@ -344,7 +351,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
                 let primary_make = make_tokens.get(0).cloned().unwrap_or_default();
                 let primary_make_id = make_ids.get(0).copied();
                 tx.execute(
-                    "INSERT INTO vehicles(name, make, make_id) VALUES(?, ?, ?) ON CONFLICT(name) DO UPDATE SET make=COALESCE(NULLIF(excluded.make,''), vehicles.make), make_id=COALESCE(excluded.make_id, vehicles.make_id)",
+                    "INSERT INTO vehicles(name, make, make_id, category) VALUES(?, ?, ?, ?) ON CONFLICT(name) DO UPDATE SET make=COALESCE(NULLIF(excluded.make,''), vehicles.make), make_id=COALESCE(excluded.make_id, vehicles.make_id), category=COALESCE(NULLIF(excluded.category,''), vehicles.category)",
                     params![
                         v,
                         if primary_make.is_empty() {
@@ -352,7 +359,12 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
                         } else {
                             Some(primary_make.clone())
                         },
-                        primary_make_id
+                        primary_make_id,
+                        if category.is_empty() {
+                            None::<String>
+                        } else {
+                            Some(category.clone())
+                        }
                     ],
                 )
                 .ok();

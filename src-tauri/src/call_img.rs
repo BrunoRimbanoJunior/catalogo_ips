@@ -139,6 +139,126 @@ fn guess_mime(path: &Path, bytes: &[u8]) -> &'static str {
     }
 }
 
+fn read_with_cimg_fallback(path: &Path) -> Option<(PathBuf, Vec<u8>)> {
+    if let Ok(bytes) = fs::read(path) {
+        return Some((path.to_path_buf(), bytes));
+    }
+    if let Some(as_str) = path.to_str() {
+        let as_owned = as_str.to_string();
+        if !as_owned.to_ascii_lowercase().ends_with(".cimg") {
+            let alt = PathBuf::from(format!("{}.cimg", as_owned));
+            if let Ok(bytes) = fs::read(&alt) {
+                return Some((alt, bytes));
+            }
+        }
+    }
+    None
+}
+
+fn resolve_with_cimg_fallback(path: &Path) -> Option<PathBuf> {
+    if path.exists() {
+        return Some(path.to_path_buf());
+    }
+    if let Some(as_str) = path.to_str() {
+        let as_owned = as_str.to_string();
+        if !as_owned.to_ascii_lowercase().ends_with(".cimg") {
+            let alt = PathBuf::from(format!("{}.cimg", as_owned));
+            if alt.exists() {
+                return Some(alt);
+            }
+        }
+    }
+    None
+}
+
+fn decrypt_if_needed(data: Vec<u8>, key_env: Option<&String>, path: &Path) -> Result<Vec<u8>, String> {
+    let encrypted = data.len() > 5 && &data[..4] == b"CIMG";
+    if !encrypted {
+        return Ok(data);
+    }
+    if key_env.is_none() {
+        eprintln!("decrypt_image: arquivo criptografado, mas DESCRYPT_KEY nao encontrado");
+    }
+    let key = key_env.map(|s| s.as_str()).unwrap_or(TEST_FALLBACK_KEY);
+    match decrypt_image(&data, key) {
+        Ok(p) => Ok(p),
+        Err(e) => {
+            eprintln!(
+                "decrypt_image: falha ao descriptografar {} ({} bytes): {}",
+                path.display(),
+                data.len(),
+                e
+            );
+            Err(format!("Falha ao descriptografar: {}", e))
+        }
+    }
+}
+
+fn print_cache_name(path: &Path, imgs_dir: &Path) -> String {
+    let rel = path.strip_prefix(imgs_dir).unwrap_or(path);
+    let mut name = rel
+        .to_string_lossy()
+        .replace('\\', "__")
+        .replace('/', "__")
+        .replace(':', "_");
+    if name.to_ascii_lowercase().ends_with(".cimg") {
+        name.truncate(name.len().saturating_sub(5));
+    }
+    if name.trim().is_empty() {
+        "print-image.png".to_string()
+    } else {
+        name
+    }
+}
+
+pub fn prepare_image_for_print(app: &AppHandle, path_or_rel: String) -> Result<PathBuf, String> {
+    let (data_dir, _dbf, imgs_dir) = ensure_dirs(app).map_err(|e| e.to_string())?;
+    let requested = {
+        let p = PathBuf::from(&path_or_rel);
+        if p.is_absolute() {
+            p
+        } else {
+            imgs_dir.join(p)
+        }
+    };
+    let Some(source_path) = resolve_with_cimg_fallback(&requested) else {
+        return Err(format!(
+            "Falha ao ler imagem (nao encontrada): {}",
+            requested.display()
+        ));
+    };
+
+    if source_path
+        .extension()
+        .and_then(|e| e.to_str())
+        .map(|ext| !ext.eq_ignore_ascii_case("cimg"))
+        .unwrap_or(true)
+    {
+        return Ok(source_path);
+    }
+
+    let bytes = fs::read(&source_path).map_err(|e| e.to_string())?;
+    let cache_dir = data_dir.join("print-cache");
+    fs::create_dir_all(&cache_dir).map_err(|e| e.to_string())?;
+    let cache_path = cache_dir.join(print_cache_name(&source_path, &imgs_dir));
+
+    let cache_fresh = match (fs::metadata(&source_path), fs::metadata(&cache_path)) {
+        (Ok(src), Ok(dst)) => {
+            dst.len() > 0
+                && src.modified().ok().zip(dst.modified().ok()).map_or(false, |(s, d)| d >= s)
+        }
+        _ => false,
+    };
+    if cache_fresh {
+        return Ok(cache_path);
+    }
+
+    let key_env = resolve_key(app, &data_dir);
+    let decoded = decrypt_if_needed(bytes, key_env.as_ref(), &source_path)?;
+    fs::write(&cache_path, decoded).map_err(|e| e.to_string())?;
+    Ok(cache_path)
+}
+
 pub fn read_image_base64(app: &AppHandle, path_or_rel: String) -> Result<String, String> {
     // monta caminho absoluto
     let (data_dir, _dbf, imgs_dir) = ensure_dirs(app).map_err(|e| e.to_string())?;
@@ -156,59 +276,16 @@ pub fn read_image_base64(app: &AppHandle, path_or_rel: String) -> Result<String,
         .map(|s| s.trim_end_matches(".cimg"))
         .map(|s| s.to_ascii_lowercase());
 
-    let key_env = resolve_key(app, &data_dir);
-    let try_decrypt = |data: Vec<u8>| -> Result<Vec<u8>, String> {
-        let encrypted = data.len() > 5 && &data[..4] == b"CIMG";
-        if !encrypted {
-            return Ok(data);
-        }
-        if key_env.is_none() {
-            eprintln!("decrypt_image: arquivo criptografado, mas DESCRYPT_KEY nao encontrado");
-        }
-        let key = key_env
-            .as_ref()
-            .map(|s| s.as_str())
-            .unwrap_or(TEST_FALLBACK_KEY);
-        match decrypt_image(&data, key) {
-            Ok(p) => Ok(p),
-            Err(e) => {
-                eprintln!(
-                    "decrypt_image: falha ao descriptografar {} ({} bytes): {}",
-                    abs_try.display(),
-                    data.len(),
-                    e
-                );
-                Err(format!("Falha ao descriptografar: {}", e))
-            }
-        }
-    };
-
     fn to_data_url(path: &std::path::Path, bytes: Vec<u8>) -> String {
         let mime = guess_mime(path, &bytes);
         let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
         format!("data:{};base64,{}", mime, encoded)
     }
 
-    let read_with_fallback = |path: &std::path::Path| -> Option<Vec<u8>> {
-        if let Ok(bytes) = fs::read(path) {
-            return Some(bytes);
-        }
-        // tenta <orig>.cimg quando o arquivo nao existir
-        if let Some(as_str) = path.to_str() {
-            let as_owned = as_str.to_string();
-            if !as_owned.to_ascii_lowercase().ends_with(".cimg") {
-                let alt = PathBuf::from(format!("{}.cimg", as_owned));
-                if let Ok(bytes) = fs::read(&alt) {
-                    return Some(bytes);
-                }
-            }
-        }
-        None
-    };
-
-    if let Some(bytes) = read_with_fallback(&abs_try) {
-        let bytes = try_decrypt(bytes).map_err(|e| e.to_string())?;
-        return Ok(to_data_url(&abs_try, bytes));
+    if let Some((source_path, bytes)) = read_with_cimg_fallback(&abs_try) {
+        let key_env = resolve_key(app, &data_dir);
+        let bytes = decrypt_if_needed(bytes, key_env.as_ref(), &source_path)?;
+        return Ok(to_data_url(&source_path, bytes));
     }
 
     eprintln!(

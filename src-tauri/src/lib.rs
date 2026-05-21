@@ -18,11 +18,11 @@ mod core {
     use rusqlite::{params, Connection, OptionalExtension};
     use serde_json::json;
     use sha2::{Digest, Sha256};
-    use std::collections::HashSet;
+    use std::collections::{HashMap, HashSet};
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::process::{Command as PCommand, Stdio};
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
     use std::time::Duration;
     use tauri::AppHandle;
     use tokio::sync::Semaphore;
@@ -46,21 +46,6 @@ mod core {
 
     fn is_launch_component(name: &str) -> bool {
         normalize_launch_token(name) == LAUNCH_CANON
-    }
-
-    fn is_in_launch_dir(path: &Path, root: &Path) -> bool {
-        if let Ok(rel) = path.strip_prefix(root) {
-            for comp in rel.components() {
-                if let std::path::Component::Normal(os) = comp {
-                    if let Some(s) = os.to_str() {
-                        if is_launch_component(s) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        false
     }
 
     fn normalize_rel_path(path: &str) -> String {
@@ -91,6 +76,7 @@ mod core {
     pub struct Vehicle {
         pub id: i64,
         pub name: String,
+        pub category: Option<String>,
     }
     #[derive(Debug, Serialize, Deserialize, Clone)]
     pub struct ProductListItem {
@@ -123,6 +109,30 @@ mod core {
         pub vehicle_id: Option<i64>,
         pub code_query: Option<String>,
         pub limit: Option<i64>,
+    }
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub struct PrintCatalogParams {
+        pub lines: Option<Vec<String>>,
+        pub groups: Option<Vec<String>>,
+        pub makes: Option<Vec<String>>,
+        pub vehicles: Option<Vec<String>>,
+        #[serde(default, alias = "launchOnly")]
+        pub launch_only: bool,
+        #[serde(default, alias = "favoritesOnly")]
+        pub favorites_only: bool,
+        pub limit: Option<i64>,
+    }
+    #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub struct PrintCatalogItem {
+        pub product_id: i64,
+        pub code: String,
+        pub description: String,
+        pub brand: String,
+        pub group: Option<String>,
+        pub line: Option<String>,
+        pub make: Option<String>,
+        pub vehicle: String,
+        pub image: Option<String>,
     }
 
     #[derive(Debug, Serialize, Deserialize)]
@@ -175,7 +185,6 @@ mod core {
         pub kept_files: usize,
         pub total_scanned: usize,
         pub manifest_files: usize,
-        pub skipped_launch_files: usize,
     }
 
     #[derive(Debug, Serialize, Deserialize)]
@@ -219,6 +228,7 @@ mod core {
               name TEXT NOT NULL UNIQUE,
               make TEXT,
               make_id INTEGER,
+              category TEXT,
               FOREIGN KEY(make_id) REFERENCES makes(id)
             );
             CREATE TABLE IF NOT EXISTS products (
@@ -279,6 +289,7 @@ mod core {
         let _ = conn.execute("ALTER TABLE products ADD COLUMN comprimento TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []);
+        let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN category TEXT", []);
         let _ = conn.execute(
             "CREATE TABLE IF NOT EXISTS vehicle_makes (vehicle_id INTEGER NOT NULL, make_id INTEGER NOT NULL, PRIMARY KEY(vehicle_id, make_id))",
             [],
@@ -381,6 +392,7 @@ mod core {
         // Normaliza montadoras e coluna make em vehicles
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []);
+        let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN category TEXT", []);
         let _ = conn.execute(
             "CREATE TABLE IF NOT EXISTS makes (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE)",
             [],
@@ -435,13 +447,14 @@ mod core {
         let conn =
             open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
         let mut stmt = conn
-            .prepare("SELECT id, name FROM vehicles ORDER BY name")
+            .prepare("SELECT id, name, category FROM vehicles ORDER BY name")
             .map_err(|e| e.to_string())?;
         let rows = stmt
             .query_map([], |row| {
                 Ok(Vehicle {
                     id: row.get(0)?,
                     name: row.get(1)?,
+                    category: row.get(2)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -480,7 +493,7 @@ mod core {
     ) -> Result<Vec<Vehicle>, String> {
         let conn =
             open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-        let mut sql = String::from("SELECT id, name FROM vehicles");
+        let mut sql = String::from("SELECT id, name, category FROM vehicles");
         let mut params_vec: Vec<rusqlite::types::Value> = Vec::new();
         if let Some(m) = make
             .as_ref()
@@ -497,6 +510,7 @@ mod core {
                 Ok(Vehicle {
                     id: row.get(0)?,
                     name: row.get(1)?,
+                    category: row.get(2)?,
                 })
             })
             .map_err(|e| e.to_string())?;
@@ -546,7 +560,7 @@ mod core {
         let conn =
             open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
         let mut sql = String::from(
-            "SELECT DISTINCT v.id, v.name FROM vehicles v JOIN product_vehicles pv ON pv.vehicle_id = v.id JOIN products p ON p.id = pv.product_id",
+            "SELECT DISTINCT v.id, v.name, v.category FROM vehicles v JOIN product_vehicles pv ON pv.vehicle_id = v.id JOIN products p ON p.id = pv.product_id",
         );
         let mut wherec: Vec<String> = Vec::new();
         if brand_id.is_some() {
@@ -586,6 +600,7 @@ mod core {
             out.push(Vehicle {
                 id: row.get(0).map_err(|e| e.to_string())?,
                 name: row.get(1).map_err(|e| e.to_string())?,
+                category: row.get(2).map_err(|e| e.to_string())?,
             });
         }
         Ok(out)
@@ -892,6 +907,184 @@ mod core {
                 brand: row.get(3).map_err(|e| e.to_string())?,
                 vehicles: row.get(4).ok(),
             });
+        }
+        Ok(out)
+    }
+
+    fn normalized_filter_values(values: Option<&Vec<String>>) -> Vec<String> {
+        values
+            .into_iter()
+            .flatten()
+            .map(|s| s.trim().to_ascii_uppercase())
+            .filter(|s| !s.is_empty())
+            .collect()
+    }
+
+    fn add_in_filter(
+        where_clauses: &mut Vec<String>,
+        values: &mut Vec<rusqlite::types::Value>,
+        expr: &str,
+        filter_values: Option<&Vec<String>>,
+    ) {
+        let vals = normalized_filter_values(filter_values);
+        if vals.is_empty() {
+            return;
+        }
+        let placeholders = std::iter::repeat("?")
+            .take(vals.len())
+            .collect::<Vec<_>>()
+            .join(",");
+        where_clauses.push(format!("{expr} IN ({placeholders})"));
+        for value in vals {
+            values.push(value.into());
+        }
+    }
+
+    #[tauri::command]
+    pub fn get_print_catalog_cmd(
+        app: AppHandle,
+        params: PrintCatalogParams,
+    ) -> Result<Vec<PrintCatalogItem>, String> {
+        let conn =
+            open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+        migrate(&conn).map_err(|e| e.to_string())?;
+
+        let vehicle_label_expr = "UPPER(TRIM(CASE WHEN INSTR(REPLACE(v.name,'/',' '),' ')>0 THEN SUBSTR(REPLACE(v.name,'/',' '),1,INSTR(REPLACE(v.name,'/',' '),' ')-1) ELSE v.name END))";
+        let mut sql = String::from(
+            "SELECT
+                p.id,
+                p.code,
+                p.description,
+                b.name,
+                p.pgroup,
+                NULLIF(MIN(TRIM(COALESCE(v.category,''))), ''),
+                NULLIF(MIN(TRIM(COALESCE(v.make,''))), ''),
+                MIN(TRIM(v.name)),
+                (
+                    SELECT i.filename
+                    FROM images i
+                    WHERE i.product_id = p.id
+                      AND LOWER(REPLACE(i.filename,'\\','/')) NOT LIKE '%/lancamentos/%'
+                    ORDER BY i.filename
+                    LIMIT 1
+                ) AS image
+             FROM products p
+             JOIN brands b ON b.id = p.brand_id
+             JOIN product_vehicles pv ON pv.product_id = p.id
+             JOIN vehicles v ON v.id = pv.vehicle_id",
+        );
+        let mut where_clauses: Vec<String> = Vec::new();
+        let mut values: Vec<rusqlite::types::Value> = Vec::new();
+
+        add_in_filter(
+            &mut where_clauses,
+            &mut values,
+            "UPPER(TRIM(COALESCE(v.category,'')))",
+            params.lines.as_ref(),
+        );
+        add_in_filter(
+            &mut where_clauses,
+            &mut values,
+            "UPPER(TRIM(COALESCE(p.pgroup,'')))",
+            params.groups.as_ref(),
+        );
+        add_in_filter(
+            &mut where_clauses,
+            &mut values,
+            "UPPER(TRIM(COALESCE(v.make,'')))",
+            params.makes.as_ref(),
+        );
+        add_in_filter(
+            &mut where_clauses,
+            &mut values,
+            vehicle_label_expr,
+            params.vehicles.as_ref(),
+        );
+        if params.launch_only {
+            where_clauses.push(
+                "(UPPER(COALESCE(p.pgroup,'')) LIKE '%LANC%' OR UPPER(COALESCE(p.details,'')) LIKE '%LANC%' OR EXISTS (SELECT 1 FROM images il WHERE il.product_id = p.id AND LOWER(REPLACE(il.filename,'\\','/')) LIKE '%/lancamentos/%'))"
+                    .into(),
+            );
+        }
+        // Ainda nao existe tabela/flag de favoritos no catalogo local; mantemos o campo
+        // no contrato para ativar o filtro quando essa origem estiver disponivel.
+        let _ = params.favorites_only;
+
+        if !where_clauses.is_empty() {
+            sql.push_str(" WHERE ");
+            sql.push_str(&where_clauses.join(" AND "));
+        }
+        sql.push_str(" GROUP BY p.id");
+        sql.push_str(
+            " ORDER BY UPPER(TRIM(COALESCE(p.pgroup,''))), UPPER(TRIM(COALESCE(NULLIF(MIN(TRIM(COALESCE(v.make,''))), ''),''))), UPPER(TRIM(MIN(TRIM(v.name)))), UPPER(TRIM(p.description)), UPPER(TRIM(p.code))",
+        );
+        if let Some(limit) = params.limit.filter(|v| *v > 0) {
+            sql.push_str(&format!(" LIMIT {}", limit));
+        }
+
+        let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+        let mut rows = stmt
+            .query(rusqlite::params_from_iter(values))
+            .map_err(|e| e.to_string())?;
+        let mut out = Vec::new();
+        while let Some(row) = rows.next().map_err(|e| e.to_string())? {
+            out.push(PrintCatalogItem {
+                product_id: row.get(0).map_err(|e| e.to_string())?,
+                code: row.get(1).map_err(|e| e.to_string())?,
+                description: row.get(2).map_err(|e| e.to_string())?,
+                brand: row.get(3).map_err(|e| e.to_string())?,
+                group: row.get(4).map_err(|e| e.to_string())?,
+                line: row.get(5).map_err(|e| e.to_string())?,
+                make: row.get(6).map_err(|e| e.to_string())?,
+                vehicle: row.get(7).map_err(|e| e.to_string())?,
+                image: row.get(8).map_err(|e| e.to_string())?,
+            });
+        }
+        let mut unique_images = Vec::new();
+        let mut seen_images = HashSet::new();
+        for item in out.iter() {
+            if let Some(img) = item.image.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+                if seen_images.insert(img.to_string()) {
+                    unique_images.push(img.to_string());
+                }
+            }
+        }
+        let prepared_images: HashMap<String, Option<String>> = if unique_images.is_empty() {
+            HashMap::new()
+        } else {
+            let workers = std::thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(4)
+                .clamp(2, 8)
+                .min(unique_images.len());
+            let chunk_size = (unique_images.len() + workers - 1) / workers;
+            let prepared = Arc::new(Mutex::new(HashMap::new()));
+            std::thread::scope(|scope| {
+                for chunk in unique_images.chunks(chunk_size) {
+                    let app_handle = app.clone();
+                    let chunk = chunk.to_vec();
+                    let prepared = Arc::clone(&prepared);
+                    scope.spawn(move || {
+                        for file in chunk {
+                            let result = crate::call_img::prepare_image_for_print(&app_handle, file.clone())
+                                .ok()
+                                .map(|p| p.to_string_lossy().into_owned());
+                            if let Ok(mut map) = prepared.lock() {
+                                map.insert(file, result);
+                            }
+                        }
+                    });
+                }
+            });
+            Arc::try_unwrap(prepared)
+                .ok()
+                .and_then(|m| m.into_inner().ok())
+                .unwrap_or_default()
+        };
+        for item in out.iter_mut() {
+            if let Some(img) = item.image.clone() {
+                item.image = prepared_images.get(&img).cloned().unwrap_or(None);
+            }
         }
         Ok(out)
     }
@@ -2033,7 +2226,6 @@ mod core {
         let (_, _dbf, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
         let mut removed = 0usize;
         let mut kept = 0usize;
-        let mut skipped_launch = 0usize;
         let mut total = 0usize;
 
         for entry in WalkDir::new(&imgs_dir).into_iter().filter_map(|e| e.ok()) {
@@ -2041,10 +2233,6 @@ mod core {
                 continue;
             }
             total += 1;
-            if is_in_launch_dir(entry.path(), &imgs_dir) {
-                skipped_launch += 1;
-                continue;
-            }
             let rel = entry
                 .path()
                 .strip_prefix(&imgs_dir)
@@ -2072,7 +2260,6 @@ mod core {
             kept_files: kept,
             total_scanned: total,
             manifest_files: manifest_files.len(),
-            skipped_launch_files: skipped_launch,
         })
     }
 
@@ -2281,6 +2468,7 @@ pub fn run() {
             core::get_types_cmd,
             core::get_groups_stats_cmd,
             core::search_products_cmd,
+            core::get_print_catalog_cmd,
             core::get_product_details_cmd,
             core::sync_from_manifest,
             core::index_images_from_manifest,

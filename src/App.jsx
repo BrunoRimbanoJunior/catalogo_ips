@@ -17,6 +17,7 @@ import {
   getAppVersionConfig,
   setAppVersionConfig,
   fetchGroups,
+  fetchPrintCatalog,
   cleanupImagesFromManifest,
 } from "./lib/api";
 import { loadInitialCatalog, loadGroups, loadVehiclesByFilters, searchWithFilters } from "./lib/catalogData";
@@ -164,6 +165,415 @@ function vehicleLabel(name = "") {
   return first || name || "";
 }
 
+function optionKey(value = "") {
+  return String(value || "").trim().toUpperCase();
+}
+
+function sortOptions(a, b) {
+  return String(a.label || "").localeCompare(String(b.label || ""), "pt-BR", { numeric: true, sensitivity: "base" });
+}
+
+function lineDisplayLabel(value = "") {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  return text.replace(/^LINHA\s+/i, "").toUpperCase();
+}
+
+function uniqueTextOptions(values = [], labelFormatter = null) {
+  const seen = new Set();
+  const out = [];
+  for (const value of values) {
+    const clean = String(value || "").trim();
+    if (!clean) continue;
+    const key = optionKey(clean);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ value: clean, label: labelFormatter ? labelFormatter(clean) : clean });
+  }
+  return out.sort(sortOptions);
+}
+
+function vehiclePrintOptions(list = [], search = "", selectedLines = []) {
+  const query = String(search || "").trim().toUpperCase();
+  const lineSet = new Set((selectedLines || []).map(optionKey).filter(Boolean));
+  const seen = new Set();
+  const out = [];
+  for (const vehicle of list || []) {
+    const rawCategory = vehicle?.category || "";
+    if (lineSet.size && !lineSet.has(optionKey(rawCategory))) continue;
+    const label = vehicleLabel(vehicle?.name || "");
+    if (!label) continue;
+    const key = optionKey(label);
+    if (seen.has(key)) continue;
+    if (query && !key.includes(query)) continue;
+    seen.add(key);
+    out.push({ value: label, label });
+  }
+  return out.sort(sortOptions);
+}
+
+function PrintFilterList({ title, options, selected, onToggle, onClear, emptyText, children }) {
+  const selectedSet = new Set(selected || []);
+  const selectedCount = selectedSet.size;
+  return (
+    <section className="print-filter-block">
+      <div className="print-filter-heading">
+        <span>{title}</span>
+        <em>(Selecionados: {selectedCount})</em>
+      </div>
+      {children}
+      <div className="print-options" role="group" aria-label={title}>
+        <label className={`print-option ${selectedCount === 0 ? "selected" : ""}`}>
+          <input type="checkbox" checked={selectedCount === 0} onChange={onClear} />
+          <span>TODOS</span>
+        </label>
+        {options.length === 0 ? <div className="print-empty">{emptyText || "Nenhum item encontrado."}</div> : null}
+        {options.map((opt) => (
+          <label key={opt.value} className={`print-option ${selectedSet.has(opt.value) ? "selected" : ""}`}>
+            <input type="checkbox" checked={selectedSet.has(opt.value)} onChange={() => onToggle(opt.value)} />
+            <span>{opt.label}</span>
+          </label>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function escapeHtml(value = "") {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function displayText(value, fallback = "") {
+  const text = String(value || "").trim();
+  return text || fallback;
+}
+
+function firstCatalogVehicle(value = "") {
+  return (
+    String(value || "")
+      .split(/[;,\|\n\r]+/)
+      .map((part) => part.trim())
+      .find(Boolean) || ""
+  );
+}
+
+function isEncryptedImagePath(path = "") {
+  return String(path || "").trim().toLowerCase().endsWith(".cimg");
+}
+
+function chunkArray(list, size) {
+  const out = [];
+  for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
+  return out;
+}
+
+async function mapWithConcurrency(list, limit, mapper) {
+  const results = new Array(list.length);
+  let index = 0;
+  const workers = Array.from({ length: Math.min(limit, list.length || 1) }, async () => {
+    while (index < list.length) {
+      const current = index;
+      index += 1;
+      results[current] = await mapper(list[current], current);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
+function catalogPrintTitle(filters) {
+  const groups = filters?.groups || [];
+  return groups.length === 1 ? displayText(groups[0], "CATALOGO DE PRODUTOS").toUpperCase() : "CATALOGO DE PRODUTOS";
+}
+
+function catalogIndexLineTitle(filters) {
+  const lines = filters?.lines || [];
+  return lines.length === 1 ? displayText(lines[0], "").toUpperCase() : "CATALOGO DE PRODUTOS";
+}
+
+function buildPrintCatalogHtml({ items, filters }) {
+  const itemsPerPage = 6;
+  const indexEntriesPerPage = 28;
+  const sortedItems = [...items].sort((a, b) => {
+    const ak = [a.group, a.make, a.vehicle, a.description, a.code].map((v) => String(v || "").toUpperCase()).join("|");
+    const bk = [b.group, b.make, b.vehicle, b.description, b.code].map((v) => String(v || "").toUpperCase()).join("|");
+    return ak.localeCompare(bk, "pt-BR", { numeric: true, sensitivity: "base" });
+  });
+
+  const groupMap = new Map();
+  sortedItems.forEach((item, index) => {
+    const group = displayText(item.group, "SEM GRUPO").toUpperCase();
+    const make = displayText(item.make, "SEM MONTADORA").toUpperCase();
+    const key = `${group}||${make}`;
+    if (!groupMap.has(key)) groupMap.set(key, { group, make, firstIndex: index, total: 0 });
+    groupMap.get(key).total += 1;
+  });
+  const groupListBase = Array.from(groupMap.values());
+  const indexGroupCount = new Set(groupListBase.map((entry) => entry.group)).size;
+  const indexPageCount = Math.max(1, Math.ceil((groupListBase.length + indexGroupCount) / indexEntriesPerPage));
+  const firstProductPage = 3 + indexPageCount;
+  const indexGroups = groupListBase.map((entry) => ({
+    ...entry,
+    page: firstProductPage + Math.floor(entry.firstIndex / itemsPerPage),
+  }));
+  const productPages = chunkArray(sortedItems, itemsPerPage);
+  const coverTitle = catalogPrintTitle(filters);
+  const indexLineTitle = catalogIndexLineTitle(filters);
+  const indexRows = [];
+  let lastIndexGroup = "";
+  indexGroups.forEach((entry) => {
+    if (entry.group !== lastIndexGroup) {
+      indexRows.push({ type: "group", group: entry.group });
+      lastIndexGroup = entry.group;
+    }
+    indexRows.push({ type: "make", make: entry.make, page: entry.page });
+  });
+
+  const indexPages = chunkArray(indexRows, indexEntriesPerPage)
+    .map((entries, pageOffset) => {
+      const rows = entries
+        .map((entry) =>
+          entry.type === "group"
+            ? `<div class="index-group-title">${escapeHtml(entry.group)}</div>`
+            : `
+            <div class="index-row">
+              <span class="index-sub">${escapeHtml(entry.make)}</span>
+              <span class="index-dots"></span>
+              <span class="index-page">${entry.page}</span>
+            </div>`
+        )
+        .join("");
+      return `
+        <section class="page index-page-wrap">
+          <header class="catalog-header index-header">
+            <div class="header-brand">IPS DO BRASIL</div>
+            <div class="index-header-copy">
+              <strong>${escapeHtml(indexLineTitle)}</strong>
+              <span>CATALOGO 2026</span>
+            </div>
+          </header>
+          <main class="index-content">
+            <h1>Indice:</h1>
+            <div class="index-list">${rows || '<div class="index-empty">Nenhum item selecionado.</div>'}</div>
+          </main>
+          <footer class="catalog-footer">
+            <span>${3 + pageOffset}</span>
+            <strong>www.ipsbrasil.com.br</strong>
+          </footer>
+        </section>`;
+    })
+    .join("");
+
+  const productHtml = productPages
+    .map((pageItems, pageIndex) => {
+      const pageNo = firstProductPage + pageIndex;
+      const cards = pageItems
+        .map((item) => {
+          const make = displayText(item.make, item.brand).toUpperCase();
+          const vehicle = displayText(firstCatalogVehicle(item.vehicle), "APLICACAO").toUpperCase();
+          const description = displayText(item.description, "PRODUTO").toUpperCase();
+          const image = item.imageSrc
+            ? `<img src="${escapeHtml(item.imageSrc)}" alt="">`
+            : `<div class="no-image">IMAGEM<br>INDISPONIVEL</div>`;
+          return `
+            <article class="product-card">
+              <div class="card-top">
+                <div class="card-vehicle"><strong>${escapeHtml(make)}</strong><span>// ${escapeHtml(vehicle)}</span></div>
+                <span class="card-code">${escapeHtml(item.code)}</span>
+              </div>
+              <div class="card-image">${image}</div>
+              <div class="card-desc">${escapeHtml(description)}</div>
+              <div class="card-application">${escapeHtml(vehicle)}</div>
+            </article>`;
+        })
+        .join("");
+      return `
+        <section class="page product-page">
+          <header class="catalog-header product-header">
+            <div class="header-red">
+              <img src="/images/logo.png" alt="">
+            </div>
+            <div class="header-copy">
+              <strong>${escapeHtml(coverTitle)}</strong>
+              <span>IPS DO BRASIL</span>
+              <small>CATALOGO 2026</small>
+            </div>
+          </header>
+          <main class="product-grid">${cards}</main>
+          <footer class="catalog-footer product-footer ${pageNo % 2 === 0 ? "footer-even" : "footer-odd"}">
+            <span class="footer-page-no">${pageNo}</span>
+            <div>
+              <strong>www.ipsbrasil.com.br</strong>
+              <small>AS FOTOS CONTIDAS NESSE CATALOGO SAO DE CARATER MERAMENTE ILUSTRATIVO, NAO CORRESPONDENDO A FOTO ORIGINAL DO PRODUTO. AS MARCAS DAS MONTADORAS SAO DE FUNCAO MERAMENTE INFORMATIVAS E COMPARATIVAS.</small>
+            </div>
+            <img class="footer-logo" src="/images/logo.png" alt="">
+          </footer>
+        </section>`;
+    })
+    .join("");
+
+  return `<!doctype html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Catalogo IPS - Impressao</title>
+      <style>
+        @page { size: A4 portrait; margin: 0; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #d9d9d9; color: #111; font-family: Arial, Helvetica, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .page { position: relative; width: 210mm; height: 297mm; overflow: hidden; background: #fff; page-break-after: always; break-after: page; }
+        .cover-bg, .back-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .cover-title { position: absolute; left: 17mm; right: 17mm; top: 118mm; text-align: center; color: #f50812; font-size: 28pt; line-height: 1.12; font-weight: 900; letter-spacing: 1px; text-shadow: -1.3px -1.3px #fff, 1.3px -1.3px #fff, -1.3px 1.3px #fff, 1.3px 1.3px #fff, 0 4px 8px rgba(0,0,0,.45); }
+        .cover-year { position: absolute; right: 24mm; bottom: 68mm; color: #fff; font-size: 20pt; font-weight: 900; text-shadow: 0 3px 8px rgba(0,0,0,.6); }
+        .catalog-header { height: 28mm; display: grid; grid-template-columns: 1fr minmax(0, 1.15fr) auto; align-items: center; gap: 8mm; padding: 7mm 10mm 4mm; background: linear-gradient(110deg, #e60018 0 45%, #f7f7f7 45% 100%); border-bottom: 1px solid #ddd; }
+        .catalog-header .header-brand { color: #fff; font-size: 22pt; font-weight: 900; font-style: italic; }
+        .catalog-header .header-title { color: #e60018; font-size: 18pt; font-weight: 900; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+        .catalog-header .header-year { color: #111; font-size: 14pt; font-weight: 900; }
+        .index-header { grid-template-columns: minmax(0, 45%) minmax(0, 1fr); gap: 6mm; padding: 0 10mm; background: linear-gradient(110deg, #e60018 0 45%, #f7f7f7 45% 100%); }
+        .index-header .header-brand { min-width: 0; color: #fff; font-size: 18pt; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+        .index-header-copy { min-width: 0; text-align: right; line-height: 1.05; }
+        .index-header-copy strong { display: block; color: #e60018; font-size: 17pt; font-style: italic; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .index-header-copy span { display: block; margin-top: 3mm; color: #111; font-size: 14pt; font-weight: 900; white-space: nowrap; }
+        .index-content { padding: 9mm 13mm 16mm; }
+        .index-content h1 { margin: 0; color: #c62828; font-size: 24pt; text-transform: uppercase; }
+        .index-content p { margin: 2mm 0 7mm; font-size: 10pt; color: #555; }
+        .index-list { display: flex; flex-direction: column; gap: 2.2mm; margin-top: 5mm; }
+        .index-group-title { margin-top: 2mm; color: #c62828; font-size: 12pt; line-height: 1.15; font-weight: 900; text-transform: uppercase; }
+        .index-row { display: grid; grid-template-columns: auto 1fr auto; gap: 3mm; align-items: baseline; font-size: 11pt; padding-left: 5mm; }
+        .index-sub { font-weight: 800; }
+        .index-dots { border-bottom: 1px dotted #999; transform: translateY(-1.5mm); }
+        .index-page { font-weight: 900; }
+        .index-empty { padding: 10mm; color: #777; border: 1px solid #ddd; }
+        .product-header { grid-template-columns: 1fr 1fr; padding: 0; background: #f5f5f5; height: 27mm; }
+        .header-red { height: 100%; background: #e60018; clip-path: polygon(0 0, 93% 0, 84% 100%, 0 100%); display: flex; align-items: center; padding-left: 12mm; }
+        .header-red img { max-width: 58mm; max-height: 20mm; object-fit: contain; filter: brightness(0) invert(1); }
+        .header-copy { text-align: center; padding-right: 8mm; line-height: 1.05; }
+        .header-copy strong { display: block; color: #e60018; font-size: 18pt; font-style: italic; font-weight: 900; }
+        .header-copy span { display: block; color: #111; font-size: 16pt; font-style: italic; font-weight: 900; }
+        .header-copy small { display: block; color: #111; font-size: 12pt; font-style: italic; font-weight: 900; }
+        .product-grid { height: 248mm; padding: 4mm 10mm 3mm; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr); gap: 3mm; }
+        .product-card { position: relative; overflow: hidden; border: 1px solid #d3d3d3; background: #fff; display: grid; grid-template-rows: 10mm 1fr auto auto; }
+        .product-card::before { content: ""; position: absolute; inset: 10mm 0 24mm; background: radial-gradient(circle at 75% 0%, rgba(0,0,0,.08), transparent 45%), linear-gradient(135deg, transparent 0 67%, rgba(0,0,0,.07) 67% 70%, transparent 70%); pointer-events: none; }
+        .card-top { position: relative; z-index: 1; height: 10mm; background: #d4d4d4; display: flex; align-items: center; padding: 0 4mm; border-bottom: 1px solid #aaa; }
+        .card-vehicle { width: 100%; min-width: 0; font-size: 10pt; font-weight: 900; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-vehicle strong { color: #ef2630; margin-right: 2mm; }
+        .card-vehicle span { color: #111; }
+        .card-code { position: absolute; left: 1mm; top: 1mm; width: 1px; height: 1px; overflow: hidden; opacity: 0.01; color: transparent; font-size: 1pt; line-height: 1; pointer-events: none; }
+        .card-image { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; padding: 2mm 4mm; min-height: 0; overflow: hidden; }
+        .card-image img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; }
+        .no-image { color: #aaa; border: 1px dashed #ccc; padding: 7mm 10mm; text-align: center; font-size: 10pt; font-weight: 800; }
+        .card-desc { position: relative; z-index: 1; border-top: 1px solid #ddd; padding: 3mm 3mm 1mm; min-height: 12mm; text-align: center; font-size: 10.5pt; line-height: 1.15; }
+        .card-application { position: relative; z-index: 1; padding: 0 3mm 3mm; text-align: center; font-size: 10.5pt; line-height: 1.15; font-weight: 900; }
+        .catalog-footer { position: absolute; left: 0; right: 0; bottom: 0; height: 20mm; background: #a00012; color: #fff; display: grid; grid-template-columns: 20mm 1fr 34mm; align-items: center; gap: 5mm; padding: 0 10mm; }
+        .catalog-footer span { font-size: 13pt; font-weight: 900; }
+        .catalog-footer strong { display: block; text-align: center; font-size: 13pt; }
+        .catalog-footer small { display: block; margin-top: 2mm; text-align: center; font-size: 5.8pt; line-height: 1.35; font-style: italic; font-weight: 700; }
+        .catalog-footer img { max-width: 30mm; max-height: 13mm; object-fit: contain; filter: brightness(0) invert(1); }
+        .product-footer { grid-template-areas: "page body logo"; grid-template-columns: 34mm 1fr 34mm; }
+        .product-footer.footer-even { grid-template-areas: "logo body page"; }
+        .product-footer .footer-page-no { grid-area: page; justify-self: start; }
+        .product-footer.footer-even .footer-page-no { justify-self: end; }
+        .product-footer div { grid-area: body; }
+        .product-footer .footer-logo { grid-area: logo; justify-self: end; }
+        .product-footer.footer-even .footer-logo { justify-self: start; }
+        .index-page-wrap .catalog-footer { grid-template-columns: 20mm 1fr; height: 14mm; }
+        @media screen { .page { margin: 0 auto 12px; box-shadow: 0 6px 22px rgba(0,0,0,.25); } }
+      </style>
+    </head>
+    <body>
+      <section class="page cover-page">
+        <img class="cover-bg" src="/images/capa.png" alt="">
+        <div class="cover-title">${escapeHtml(coverTitle)}</div>
+        <div class="cover-year">CATALOGO 2026</div>
+      </section>
+      <section class="page back-cover-page">
+        <img class="back-bg" src="/images/contra_capa.png" alt="">
+      </section>
+      ${indexPages}
+      ${productHtml}
+    </body>
+  </html>`;
+}
+
+async function toPrintBlobUrl(path) {
+  if (!path) return "";
+  const assetUrl = convertFileSrc(path);
+  try {
+    const response = await fetch(assetUrl);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const blob = await response.blob();
+    if (!blob || blob.size === 0) throw new Error("blob vazio");
+    return URL.createObjectURL(blob);
+  } catch (_) {
+    try {
+      return await readImageBase64(path);
+    } catch (_) {
+      return "";
+    }
+  }
+}
+
+function printHtmlDocument(html, objectUrls = []) {
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "1px";
+  iframe.style.height = "1px";
+  iframe.style.opacity = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) {
+    iframe.remove();
+    return;
+  }
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  let printed = false;
+  const runPrint = () => {
+    if (printed) return;
+    printed = true;
+    const win = iframe.contentWindow;
+    if (!win) return;
+    win.focus();
+    win.print();
+    setTimeout(() => {
+      iframe.remove();
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    }, 60000);
+  };
+
+  setTimeout(() => {
+    const images = Array.from(doc.images || []);
+    if (!images.length) {
+      runPrint();
+      return;
+    }
+    let pending = images.length;
+    const done = () => {
+      pending -= 1;
+      if (pending <= 0) runPrint();
+    };
+    images.forEach((img) => {
+      if (img.complete) {
+        done();
+      } else {
+        img.onload = done;
+        img.onerror = done;
+      }
+    });
+    setTimeout(runPrint, 5000);
+  }, 250);
+}
+
 function readDetailValue(product, ...keys) {
   if (!product) return null;
   for (const key of keys) {
@@ -228,6 +638,7 @@ function App() {
   const [makes, setMakes] = useState([]);
   const [groups, setGroups] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+  const [allVehicles, setAllVehicles] = useState([]);
 
   const [brandId, setBrandId] = useState("");
   const [brandName, setBrandName] = useState("");
@@ -276,6 +687,19 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [printLoading, setPrintLoading] = useState(false);
+  const [printMsg, setPrintMsg] = useState("");
+  const [printGroups, setPrintGroups] = useState([]);
+  const [printVehicleSearch, setPrintVehicleSearch] = useState("");
+  const [printFilters, setPrintFilters] = useState({
+    lines: [],
+    groups: [],
+    makes: [],
+    vehicles: [],
+    launchOnly: false,
+    favoritesOnly: false,
+  });
 
   const [profile, setProfile] = useState(cachedProfile);
   const [authLoading, setAuthLoading] = useState(true);
@@ -515,6 +939,7 @@ function App() {
         const { brands: b, vehicles: v, makes: mk } = await loadInitialCatalog();
         setBrands(b);
         setVehicles(v);
+        setAllVehicles(v);
         setMakes(mk);
         await loadGroupsFor(null, null);
       } catch (e) {
@@ -643,6 +1068,15 @@ function App() {
   }, [showSettings]);
 
   useEffect(() => {
+    if (!showPrintModal) return;
+    const handler = (ev) => {
+      if (ev.key === "Escape") setShowPrintModal(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [showPrintModal]);
+
+  useEffect(() => {
     const handler = (ev) => {
       if (!launchState.open) return;
       if (ev.key === "Escape") setLaunchState((s) => ({ ...s, open: false }));
@@ -702,6 +1136,89 @@ function App() {
     openExternal(url).catch(() => window.open(url, "_blank", "noreferrer"));
   }
 
+  function togglePrintFilter(key, value) {
+    setPrintMsg("");
+    setPrintFilters((prev) => {
+      const current = new Set(prev[key] || []);
+      if (current.has(value)) current.delete(value);
+      else current.add(value);
+      const next = { ...prev, [key]: Array.from(current) };
+      if (key === "lines") next.vehicles = [];
+      return next;
+    });
+  }
+
+  function clearPrintFilter(key) {
+    setPrintMsg("");
+    setPrintFilters((prev) => {
+      const next = { ...prev, [key]: [] };
+      if (key === "lines") next.vehicles = [];
+      return next;
+    });
+  }
+
+  function updatePrintFlag(key, checked) {
+    setPrintMsg("");
+    setPrintFilters((prev) => ({ ...prev, [key]: checked }));
+  }
+
+  async function loadPrintOptions() {
+    setPrintLoading(true);
+    try {
+      const [{ vehicles: v, makes: mk }, g] = await Promise.all([loadInitialCatalog(), fetchGroups(null, null)]);
+      setAllVehicles(v || []);
+      setMakes(mk || []);
+      setPrintGroups((g || []).filter(Boolean));
+    } catch (e) {
+      setPrintMsg(`Falha ao carregar filtros: ${e}`);
+    } finally {
+      setPrintLoading(false);
+    }
+  }
+
+  async function openPrintFilters() {
+    setPrintMsg("");
+    setShowSettings(false);
+    setShowPrintModal(true);
+    await loadPrintOptions();
+  }
+
+  async function handleGeneratePrint() {
+    setPrintLoading(true);
+    setPrintMsg("Preparando catalogo para impressao...");
+    try {
+      const rows = await fetchPrintCatalog({
+        lines: printFilters.lines,
+        groups: printFilters.groups,
+        makes: printFilters.makes,
+        vehicles: printFilters.vehicles,
+        launch_only: printFilters.launchOnly,
+        favorites_only: printFilters.favoritesOnly,
+        limit: 5000,
+      });
+      if (!rows || rows.length === 0) {
+        setPrintMsg("Nenhum produto encontrado para os filtros selecionados.");
+        return;
+      }
+      const uniqueImages = Array.from(new Set(rows.map((item) => item?.image).filter(Boolean)));
+      const imagePairs = await mapWithConcurrency(uniqueImages, 16, async (path) => [path, await toPrintBlobUrl(path)]);
+      const imageMap = new Map(imagePairs);
+      const objectUrls = imagePairs.map(([, src]) => src).filter((src) => String(src || "").startsWith("blob:"));
+      const items = rows.map((item) => ({
+        ...item,
+        imageSrc: item?.image ? imageMap.get(item.image) || "" : "",
+      }));
+      const html = buildPrintCatalogHtml({ items, filters: printFilters });
+      printHtmlDocument(html, objectUrls);
+      setPrintMsg(
+        `Catalogo preparado com ${rows.length} itens. Use a opcao "Salvar como PDF" na janela de impressao.`
+      );
+    } catch (e) {
+      setPrintMsg(`Falha ao gerar impressao: ${e?.message || e}`);
+    } finally {
+      setPrintLoading(false);
+    }
+  }
 
   async function submitRegistration(ev) {
     ev?.preventDefault();
@@ -812,13 +1329,21 @@ function App() {
       for (const img of dedupByName) {
         const normalized = normalizePath(imagesDir, img);
         try {
-          const b64 = await readImageBase64(normalized);
-          if (b64 && !unique.has(b64)) {
-            unique.add(b64);
-            imgs.push(b64);
+          const src = isEncryptedImagePath(normalized) ? await readImageBase64(normalized) : convertFileSrc(normalized);
+          if (src && !unique.has(src)) {
+            unique.add(src);
+            imgs.push(src);
           }
         } catch (e) {
-          // Se falhar (arquivo ausente/criptografia), apenas ignore para evitar thumbs quebradas
+          try {
+            const fallback = await readImageBase64(normalized);
+            if (fallback && !unique.has(fallback)) {
+              unique.add(fallback);
+              imgs.push(fallback);
+            }
+          } catch (_) {
+            // Se falhar (arquivo ausente/criptografia), apenas ignore para evitar thumbs quebradas
+          }
         }
       }
       setSelectedImages(imgs);
@@ -845,10 +1370,10 @@ function App() {
       for (const f of files) {
         const full = normalizePath(imagesDir, f);
         try {
-          const b64 = await readImageBase64(full);
-          if (b64 && !uniq.has(b64)) {
-            uniq.add(b64);
-            list.push(b64);
+          const src = isEncryptedImagePath(full) ? await readImageBase64(full) : convertFileSrc(full);
+          if (src && !uniq.has(src)) {
+            uniq.add(src);
+            list.push(src);
           }
         } catch (_) {
           const fallback = convertFileSrc(full);
@@ -943,6 +1468,13 @@ function App() {
       setToolsMsg("Importando Excel...");
       const res = await importExcel(picked);
       setToolsMsg(`Importado: linhas ${res?.processed_rows ?? "?"}, produtos ${res?.upserted_products ?? "?"}, versÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o db ${res?.new_db_version ?? "?"}`);
+      const { brands: b, vehicles: v, makes: mk } = await loadInitialCatalog();
+      setBrands(b || []);
+      setVehicles(v || []);
+      setAllVehicles(v || []);
+      setMakes(mk || []);
+      setPrintGroups((await fetchGroups(null, null)) || []);
+      await loadGroupsFor(null, null);
     } catch (e) {
       setToolsMsg(`Falha ao importar Excel: ${e}`);
     }
@@ -1029,6 +1561,17 @@ function App() {
   const detailRows = productDetailRows(selected);
   const configuredVersionCurrent = versionInfo?.resolved_version || "";
   const versionDirty = configuredVersion.trim() && configuredVersion.trim() !== configuredVersionCurrent;
+  const printVehicleSource = allVehicles.length ? allVehicles : vehicles;
+  const printLineOptions = useMemo(
+    () => uniqueTextOptions(printVehicleSource.map((v) => v?.category), lineDisplayLabel),
+    [printVehicleSource]
+  );
+  const printGroupOptions = useMemo(() => uniqueTextOptions((printGroups.length ? printGroups : groups) || []), [printGroups, groups]);
+  const printMakeOptions = useMemo(() => uniqueTextOptions(makes || []), [makes]);
+  const printVehicleOptions = useMemo(
+    () => vehiclePrintOptions(printVehicleSource, printVehicleSearch, printFilters.lines),
+    [printVehicleSource, printVehicleSearch, printFilters.lines]
+  );
 
   if (!ready) {
     return (
@@ -1101,9 +1644,14 @@ function App() {
                   <svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 2v.2l8 4.8 8-4.8V6H4zm0 3.3V18h16V9.3l-8 4.8-8-4.8z" /></svg>
                 </a>
               </nav>
-              <button className="launch-button" onClick={() => loadLaunches(false)} disabled={launchState.loading}>
-                {launchState.loading ? "Carregando..." : "Lançamentos"}
-              </button>
+              <div className="app-actions">
+                <button className="launch-button" onClick={() => loadLaunches(false)} disabled={launchState.loading}>
+                  {launchState.loading ? "Carregando..." : "Lançamentos"}
+                </button>
+                <button className="print-open-button" onClick={openPrintFilters}>
+                  Imprimir
+                </button>
+              </div>
               {launchState.error ? <span className="launch-error">{launchState.error}</span> : null}
             </div>
             <div className="settings-wrap" ref={settingsRef}>
@@ -1489,6 +2037,106 @@ function App() {
                 .
               </p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showPrintModal && (
+        <div className="config-backdrop print-backdrop" onClick={() => setShowPrintModal(false)}>
+          <div className="config-modal print-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="config-header print-modal-header">
+              <div>
+                <p className="auth-kicker">Impressao</p>
+                <h3>Gerador de Impressao</h3>
+              </div>
+              <button className="config-close" onClick={() => setShowPrintModal(false)} aria-label="Fechar">
+                X
+              </button>
+            </div>
+
+            <div className="print-divider" aria-hidden="true">
+              <span />
+              <div className="print-divider-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 5.5C5.7 4.7 7.4 4.3 9.2 4.3c1.3 0 2.3.2 2.8.7.5-.5 1.5-.7 2.8-.7 1.8 0 3.5.4 5.2 1.2v13.4c-1.7-.8-3.4-1.2-5.2-1.2-1.3 0-2.3.2-2.8.7-.5-.5-1.5-.7-2.8-.7-1.8 0-3.5.4-5.2 1.2V5.5Zm7 1.2c-.3-.3-.9-.4-1.8-.4-1.1 0-2.2.2-3.2.5v9.5c1-.3 2.1-.5 3.2-.5.7 0 1.3.1 1.8.3V6.7Zm2 9.4c.5-.2 1.1-.3 1.8-.3 1.1 0 2.2.2 3.2.5V6.8c-1-.3-2.1-.5-3.2-.5-.9 0-1.5.1-1.8.4v9.4Z" />
+                </svg>
+              </div>
+              <span />
+            </div>
+
+            {printLoading ? <div className="auth-wait">Carregando filtros...</div> : null}
+
+            <div className="print-grid">
+              <PrintFilterList
+                title="Linhas de Veiculos"
+                options={printLineOptions}
+                selected={printFilters.lines}
+                onToggle={(value) => togglePrintFilter("lines", value)}
+                onClear={() => clearPrintFilter("lines")}
+                emptyText="Nenhuma linha encontrada."
+              />
+              <PrintFilterList
+                title="Grupos"
+                options={printGroupOptions}
+                selected={printFilters.groups}
+                onToggle={(value) => togglePrintFilter("groups", value)}
+                onClear={() => clearPrintFilter("groups")}
+                emptyText="Nenhum grupo encontrado."
+              />
+              <PrintFilterList
+                title="Montadoras"
+                options={printMakeOptions}
+                selected={printFilters.makes}
+                onToggle={(value) => togglePrintFilter("makes", value)}
+                onClear={() => clearPrintFilter("makes")}
+                emptyText="Nenhuma montadora encontrada."
+              />
+              <PrintFilterList
+                title="Veiculos"
+                options={printVehicleOptions}
+                selected={printFilters.vehicles}
+                onToggle={(value) => togglePrintFilter("vehicles", value)}
+                onClear={() => clearPrintFilter("vehicles")}
+                emptyText="Nenhum veiculo encontrado."
+              >
+                <div className="print-search-row">
+                  <span className="print-search-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M10.5 4a6.5 6.5 0 0 1 5.13 10.5l4.44 4.43-1.42 1.42-4.43-4.44A6.5 6.5 0 1 1 10.5 4Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z" />
+                    </svg>
+                  </span>
+                  <input value={printVehicleSearch} onChange={(e) => setPrintVehicleSearch(e.target.value)} />
+                  <button type="button" onClick={() => setPrintVehicleSearch("")}>
+                    Limpar
+                  </button>
+                </div>
+              </PrintFilterList>
+            </div>
+
+            <div className="print-footer">
+              <div className="print-flags">
+                <label className="print-flag">
+                  <input
+                    type="checkbox"
+                    checked={printFilters.launchOnly}
+                    onChange={(e) => updatePrintFlag("launchOnly", e.target.checked)}
+                  />
+                  <span>Lancamento</span>
+                </label>
+                <label className="print-flag">
+                  <input
+                    type="checkbox"
+                    checked={printFilters.favoritesOnly}
+                    onChange={(e) => updatePrintFlag("favoritesOnly", e.target.checked)}
+                  />
+                  <span>Imprime Itens Favoritos</span>
+                </label>
+              </div>
+              <button className="print-submit" type="button" onClick={handleGeneratePrint} disabled={printLoading}>
+                {printLoading ? "Preparando..." : "Imprimir (Gerar PDF)"}
+              </button>
+            </div>
+            {printMsg ? <div className="print-message">{printMsg}</div> : null}
           </div>
         </div>
       )}
