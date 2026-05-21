@@ -2,6 +2,7 @@
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import {
   initApp,
   getProductDetails,
@@ -19,6 +20,7 @@ import {
   fetchGroups,
   fetchPrintCatalog,
   cleanupImagesFromManifest,
+  savePdfBase64,
 } from "./lib/api";
 import { loadInitialCatalog, loadGroups, loadVehiclesByFilters, searchWithFilters } from "./lib/catalogData";
 import {
@@ -262,8 +264,9 @@ function firstCatalogVehicle(value = "") {
   );
 }
 
-function isEncryptedImagePath(path = "") {
-  return String(path || "").trim().toLowerCase().endsWith(".cimg");
+async function loadLocalImageSrc(path = "") {
+  if (!path) return "";
+  return await readImageBase64(path);
 }
 
 function chunkArray(list, size) {
@@ -372,6 +375,7 @@ function buildPrintCatalogHtml({ items, filters }) {
   const productHtml = productPages
     .map((pageItems, pageIndex) => {
       const pageNo = firstProductPage + pageIndex;
+      const pageIsEven = pageNo % 2 === 0;
       const cards = pageItems
         .map((item) => {
           const make = displayText(item.make, item.brand).toUpperCase();
@@ -392,6 +396,13 @@ function buildPrintCatalogHtml({ items, filters }) {
             </article>`;
         })
         .join("");
+      const footerPage = `<span class="footer-page-no">${pageNo}</span>`;
+      const footerBody = `
+            <div>
+              <strong>www.ipsbrasil.com.br</strong>
+              <small>AS FOTOS CONTIDAS NESSE CATALOGO SAO DE CARATER MERAMENTE ILUSTRATIVO, NAO CORRESPONDENDO A FOTO ORIGINAL DO PRODUTO. AS MARCAS DAS MONTADORAS SAO DE FUNCAO MERAMENTE INFORMATIVAS E COMPARATIVAS.</small>
+            </div>`;
+      const footerLogo = `<img class="footer-logo" src="/images/logo.png" alt="">`;
       return `
         <section class="page product-page">
           <header class="catalog-header product-header">
@@ -405,13 +416,8 @@ function buildPrintCatalogHtml({ items, filters }) {
             </div>
           </header>
           <main class="product-grid">${cards}</main>
-          <footer class="catalog-footer product-footer ${pageNo % 2 === 0 ? "footer-even" : "footer-odd"}">
-            <span class="footer-page-no">${pageNo}</span>
-            <div>
-              <strong>www.ipsbrasil.com.br</strong>
-              <small>AS FOTOS CONTIDAS NESSE CATALOGO SAO DE CARATER MERAMENTE ILUSTRATIVO, NAO CORRESPONDENDO A FOTO ORIGINAL DO PRODUTO. AS MARCAS DAS MONTADORAS SAO DE FUNCAO MERAMENTE INFORMATIVAS E COMPARATIVAS.</small>
-            </div>
-            <img class="footer-logo" src="/images/logo.png" alt="">
+          <footer class="catalog-footer product-footer ${pageIsEven ? "footer-even" : "footer-odd"}">
+            ${pageIsEven ? `${footerLogo}${footerBody}${footerPage}` : `${footerPage}${footerBody}${footerLogo}`}
           </footer>
         </section>`;
     })
@@ -467,19 +473,17 @@ function buildPrintCatalogHtml({ items, filters }) {
         .card-image { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; padding: 2mm 4mm; min-height: 0; overflow: hidden; }
         .card-image img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; }
         .no-image { color: #aaa; border: 1px dashed #ccc; padding: 7mm 10mm; text-align: center; font-size: 10pt; font-weight: 800; }
-        .card-desc { position: relative; z-index: 1; border-top: 1px solid #ddd; padding: 3mm 3mm 1mm; min-height: 12mm; text-align: center; font-size: 10.5pt; line-height: 1.15; }
-        .card-application { position: relative; z-index: 1; padding: 0 3mm 3mm; text-align: center; font-size: 10.5pt; line-height: 1.15; font-weight: 900; }
+        .card-desc { position: relative; z-index: 1; border-top: 1px solid #ddd; padding: 2.5mm 3mm 1mm; min-height: 12mm; text-align: center; font-size: 9.8pt; line-height: 1.13; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+        .card-application { position: relative; z-index: 1; padding: 0 3mm 2.5mm; text-align: center; font-size: 9.8pt; line-height: 1.13; font-weight: 900; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
         .catalog-footer { position: absolute; left: 0; right: 0; bottom: 0; height: 20mm; background: #a00012; color: #fff; display: grid; grid-template-columns: 20mm 1fr 34mm; align-items: center; gap: 5mm; padding: 0 10mm; }
         .catalog-footer span { font-size: 13pt; font-weight: 900; }
         .catalog-footer strong { display: block; text-align: center; font-size: 13pt; }
         .catalog-footer small { display: block; margin-top: 2mm; text-align: center; font-size: 5.8pt; line-height: 1.35; font-style: italic; font-weight: 700; }
         .catalog-footer img { max-width: 30mm; max-height: 13mm; object-fit: contain; filter: brightness(0) invert(1); }
-        .product-footer { grid-template-areas: "page body logo"; grid-template-columns: 34mm 1fr 34mm; }
-        .product-footer.footer-even { grid-template-areas: "logo body page"; }
-        .product-footer .footer-page-no { grid-area: page; justify-self: start; }
+        .product-footer { grid-template-columns: 34mm 1fr 34mm; }
+        .product-footer .footer-page-no { justify-self: start; }
         .product-footer.footer-even .footer-page-no { justify-self: end; }
-        .product-footer div { grid-area: body; }
-        .product-footer .footer-logo { grid-area: logo; justify-self: end; }
+        .product-footer .footer-logo { justify-self: end; }
         .product-footer.footer-even .footer-logo { justify-self: start; }
         .index-page-wrap .catalog-footer { grid-template-columns: 20mm 1fr; height: 14mm; }
         @media screen { .page { margin: 0 auto 12px; box-shadow: 0 6px 22px rgba(0,0,0,.25); } }
@@ -518,41 +522,85 @@ async function toPrintBlobUrl(path) {
   }
 }
 
-function printHtmlDocument(html, objectUrls = []) {
-  const iframe = document.createElement("iframe");
-  iframe.style.position = "fixed";
-  iframe.style.right = "0";
-  iframe.style.bottom = "0";
-  iframe.style.width = "1px";
-  iframe.style.height = "1px";
-  iframe.style.opacity = "0";
-  iframe.style.border = "0";
-  document.body.appendChild(iframe);
-  const doc = iframe.contentDocument || iframe.contentWindow?.document;
-  if (!doc) {
-    iframe.remove();
-    return;
+let activePrintRoot = null;
+let activePrintStyle = null;
+let activePrintObjectUrls = [];
+
+function cleanupActivePrintDocument() {
+  if (activePrintRoot) {
+    activePrintRoot.remove();
+    activePrintRoot = null;
   }
-  doc.open();
-  doc.write(html);
-  doc.close();
+  if (activePrintStyle) {
+    activePrintStyle.remove();
+    activePrintStyle = null;
+  }
+  activePrintObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+  activePrintObjectUrls = [];
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", cleanupActivePrintDocument);
+}
+
+function printHtmlDocument(html, objectUrls = []) {
+  cleanupActivePrintDocument();
+
+  const parsed = new DOMParser().parseFromString(html, "text/html");
+  const styleText = Array.from(parsed.querySelectorAll("style"))
+    .map((style) => style.textContent || "")
+    .join("\n");
+  const root = document.createElement("div");
+  root.id = "catalog-print-root";
+  root.innerHTML = parsed.body?.innerHTML || "";
+
+  const style = document.createElement("style");
+  style.id = "catalog-print-style";
+  style.textContent = `
+    ${styleText}
+    @media screen {
+      #catalog-print-root {
+        position: fixed !important;
+        left: -100000px !important;
+        top: 0 !important;
+        width: 210mm !important;
+        min-height: 297mm !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    }
+    @media print {
+      body > *:not(#catalog-print-root) {
+        display: none !important;
+      }
+      #catalog-print-root {
+        display: block !important;
+        position: static !important;
+        width: 210mm !important;
+        min-height: 297mm !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        pointer-events: auto !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+  document.body.appendChild(root);
+  activePrintRoot = root;
+  activePrintStyle = style;
+  activePrintObjectUrls = objectUrls;
 
   let printed = false;
   const runPrint = () => {
     if (printed) return;
     printed = true;
-    const win = iframe.contentWindow;
-    if (!win) return;
-    win.focus();
-    win.print();
-    setTimeout(() => {
-      iframe.remove();
-      objectUrls.forEach((url) => URL.revokeObjectURL(url));
-    }, 60000);
+    window.focus();
+    window.print();
   };
 
   setTimeout(() => {
-    const images = Array.from(doc.images || []);
+    const images = Array.from(root.querySelectorAll("img"));
     if (!images.length) {
       runPrint();
       return;
@@ -572,6 +620,416 @@ function printHtmlDocument(html, objectUrls = []) {
     });
     setTimeout(runPrint, 5000);
   }, 250);
+}
+
+const PDF_PAGE = { width: 595.28, height: 841.89 };
+const PDF_RED = rgb(0.9, 0, 0.08);
+const PDF_DARK_RED = rgb(0.62, 0, 0.07);
+const PDF_BLACK = rgb(0.04, 0.04, 0.04);
+const PDF_GRAY = rgb(0.82, 0.82, 0.82);
+const PDF_LIGHT = rgb(0.96, 0.96, 0.96);
+const PDF_BORDER = rgb(0.78, 0.78, 0.78);
+
+function mm(value) {
+  return value * 2.8346456693;
+}
+
+function cleanPdfText(value = "") {
+  return String(value ?? "")
+    .replace(/\s+/g, " ")
+    .replace(/[^\x20-\x7E\u00A0-\u00FF]/g, "")
+    .trim();
+}
+
+function textWidth(font, text, size) {
+  try {
+    return font.widthOfTextAtSize(cleanPdfText(text), size);
+  } catch (_) {
+    return font.widthOfTextAtSize(cleanPdfText(text).replace(/[^\x20-\x7E]/g, ""), size);
+  }
+}
+
+function drawPdfText(page, text, options) {
+  try {
+    page.drawText(cleanPdfText(text), options);
+  } catch (_) {
+    page.drawText(cleanPdfText(text).replace(/[^\x20-\x7E]/g, ""), options);
+  }
+}
+
+function fitPdfText(text, font, size, maxWidth) {
+  const clean = cleanPdfText(text);
+  if (!clean || textWidth(font, clean, size) <= maxWidth) return clean;
+  const suffix = "...";
+  let out = clean;
+  while (out.length > 1 && textWidth(font, `${out}${suffix}`, size) > maxWidth) {
+    out = out.slice(0, -1);
+  }
+  return `${out.trimEnd()}${suffix}`;
+}
+
+function wrapPdfText(text, font, size, maxWidth, maxLines = 3) {
+  const words = cleanPdfText(text).split(" ").filter(Boolean);
+  const lines = [];
+  let current = "";
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word;
+    if (textWidth(font, test, size) <= maxWidth) {
+      current = test;
+      continue;
+    }
+    if (current) lines.push(current);
+    current = word;
+    while (textWidth(font, current, size) > maxWidth && current.length > 1) {
+      let part = current;
+      while (part.length > 1 && textWidth(font, part, size) > maxWidth) part = part.slice(0, -1);
+      lines.push(part);
+      current = current.slice(part.length);
+      if (lines.length >= maxLines) break;
+    }
+    if (lines.length >= maxLines) break;
+  }
+  if (current && lines.length < maxLines) lines.push(current);
+  if (lines.length > maxLines) lines.length = maxLines;
+  if (words.length && lines.length === maxLines) {
+    const joined = lines.join(" ");
+    if (joined.length < cleanPdfText(text).length) {
+      lines[maxLines - 1] = fitPdfText(lines[maxLines - 1], font, size, maxWidth);
+    }
+  }
+  return lines;
+}
+
+function similarCodesText(value = "") {
+  return cleanPdfText(value)
+    .replace(/\b[A-Z0-9À-Ý][A-Z0-9À-Ý .\/-]{1,24}:\s*/gi, " ")
+    .replace(/[;,|]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+}
+
+function drawCenteredPdfLines(page, lines, font, size, centerX, topY, maxWidth, color, lineHeight = size * 1.18) {
+  lines.forEach((line, idx) => {
+    const fitted = fitPdfText(line, font, size, maxWidth);
+    drawPdfText(page, fitted, {
+      x: centerX - textWidth(font, fitted, size) / 2,
+      y: topY - idx * lineHeight,
+      size,
+      font,
+      color,
+    });
+  });
+}
+
+function dataUrlToBytes(dataUrl) {
+  const match = String(dataUrl || "").match(/^data:([^;]+);base64,(.*)$/);
+  if (!match) return null;
+  const binary = atob(match[2]);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return { bytes, mime: match[1] };
+}
+
+function guessPdfImageMime(bytes, fallback = "") {
+  if (bytes?.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return "image/png";
+  if (bytes?.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
+  return fallback || "";
+}
+
+async function sourceToImageBytes(source) {
+  if (!source) return null;
+  if (String(source).startsWith("data:")) return dataUrlToBytes(source);
+  const response = await fetch(source);
+  if (!response.ok) return null;
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  return { bytes, mime: guessPdfImageMime(bytes, response.headers.get("content-type") || "") };
+}
+
+async function embedPdfImage(pdfDoc, source) {
+  try {
+    const loaded = await sourceToImageBytes(source);
+    if (!loaded?.bytes?.length) return null;
+    const mime = guessPdfImageMime(loaded.bytes, loaded.mime).toLowerCase();
+    if (mime.includes("png")) return await pdfDoc.embedPng(loaded.bytes);
+    if (mime.includes("jpeg") || mime.includes("jpg")) return await pdfDoc.embedJpg(loaded.bytes);
+    return null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function drawImageContain(page, image, x, y, width, height) {
+  if (!image) return;
+  const scale = Math.min(width / image.width, height / image.height);
+  const drawWidth = image.width * scale;
+  const drawHeight = image.height * scale;
+  page.drawImage(image, {
+    x: x + (width - drawWidth) / 2,
+    y: y + (height - drawHeight) / 2,
+    width: drawWidth,
+    height: drawHeight,
+  });
+}
+
+function drawImageCover(page, image, x, y, width, height) {
+  if (!image) return;
+  const scale = Math.max(width / image.width, height / image.height);
+  const drawWidth = image.width * scale;
+  const drawHeight = image.height * scale;
+  page.drawImage(image, {
+    x: x + (width - drawWidth) / 2,
+    y: y + (height - drawHeight) / 2,
+    width: drawWidth,
+    height: drawHeight,
+  });
+}
+
+function buildCatalogPdfModel(items, filters) {
+  const itemsPerPage = 6;
+  const indexEntriesPerPage = 28;
+  const sortedItems = [...items].sort((a, b) => {
+    const ak = [a.group, a.make, a.vehicle, a.description, a.code].map((v) => String(v || "").toUpperCase()).join("|");
+    const bk = [b.group, b.make, b.vehicle, b.description, b.code].map((v) => String(v || "").toUpperCase()).join("|");
+    return ak.localeCompare(bk, "pt-BR", { numeric: true, sensitivity: "base" });
+  });
+  const groupMap = new Map();
+  sortedItems.forEach((item, index) => {
+    const group = displayText(item.group, "SEM GRUPO").toUpperCase();
+    const make = displayText(item.make, "SEM MONTADORA").toUpperCase();
+    const key = `${group}||${make}`;
+    if (!groupMap.has(key)) groupMap.set(key, { group, make, firstIndex: index });
+  });
+  const groupList = Array.from(groupMap.values());
+  const indexGroupCount = new Set(groupList.map((entry) => entry.group)).size;
+  const indexPageCount = Math.max(1, Math.ceil((groupList.length + indexGroupCount) / indexEntriesPerPage));
+  const firstProductPage = 3 + indexPageCount;
+  const indexRows = [];
+  let lastGroup = "";
+  groupList.forEach((entry) => {
+    if (entry.group !== lastGroup) {
+      indexRows.push({ type: "group", group: entry.group });
+      lastGroup = entry.group;
+    }
+    indexRows.push({ type: "make", make: entry.make, page: firstProductPage + Math.floor(entry.firstIndex / itemsPerPage) });
+  });
+  return {
+    coverTitle: catalogPrintTitle(filters),
+    indexLineTitle: catalogIndexLineTitle(filters),
+    indexPages: chunkArray(indexRows, indexEntriesPerPage),
+    productPages: chunkArray(sortedItems, itemsPerPage),
+    firstProductPage,
+  };
+}
+
+function drawPdfIndexHeader(page, fonts, title) {
+  const headerH = mm(28);
+  const y = PDF_PAGE.height - headerH;
+  page.drawRectangle({ x: 0, y, width: PDF_PAGE.width * 0.45, height: headerH, color: PDF_RED });
+  page.drawRectangle({ x: PDF_PAGE.width * 0.45, y, width: PDF_PAGE.width * 0.55, height: headerH, color: PDF_LIGHT });
+  drawPdfText(page, "IPS DO BRASIL", { x: mm(10), y: y + mm(10), size: 20, font: fonts.boldOblique, color: rgb(1, 1, 1) });
+  const fitted = fitPdfText(title, fonts.boldOblique, 18, PDF_PAGE.width * 0.45);
+  drawPdfText(page, fitted, {
+    x: PDF_PAGE.width - mm(10) - textWidth(fonts.boldOblique, fitted, 18),
+    y: y + mm(16),
+    size: 18,
+    font: fonts.boldOblique,
+    color: PDF_RED,
+  });
+  drawPdfText(page, "CATALOGO 2026", {
+    x: PDF_PAGE.width - mm(10) - textWidth(fonts.bold, "CATALOGO 2026", 15),
+    y: y + mm(6),
+    size: 15,
+    font: fonts.bold,
+    color: PDF_BLACK,
+  });
+}
+
+function drawPdfIndexPage(page, fonts, entries, pageNo, title) {
+  drawPdfIndexHeader(page, fonts, title);
+  let y = PDF_PAGE.height - mm(55);
+  drawPdfText(page, "INDICE:", { x: mm(13), y, size: 24, font: fonts.bold, color: rgb(0.75, 0.12, 0.12) });
+  y -= mm(18);
+  entries.forEach((entry) => {
+    if (entry.type === "group") {
+      y -= mm(3);
+      const group = fitPdfText(entry.group, fonts.bold, 12, PDF_PAGE.width - mm(26));
+      drawPdfText(page, group, { x: mm(13), y, size: 12, font: fonts.bold, color: rgb(0.78, 0.12, 0.12) });
+      y -= mm(8);
+      return;
+    }
+    const make = fitPdfText(entry.make, fonts.bold, 12, mm(55));
+    drawPdfText(page, make, { x: mm(18), y, size: 12, font: fonts.bold, color: PDF_BLACK });
+    page.drawLine({ start: { x: mm(55), y: y + 2 }, end: { x: PDF_PAGE.width - mm(22), y: y + 2 }, thickness: 0.7, color: rgb(0.58, 0.58, 0.58), dashArray: [1, 2] });
+    drawPdfText(page, String(entry.page), { x: PDF_PAGE.width - mm(17), y, size: 12, font: fonts.bold, color: PDF_BLACK });
+    y -= mm(8);
+  });
+  drawPdfText(page, String(pageNo), { x: mm(14), y: mm(7), size: 12, font: fonts.bold, color: rgb(1, 1, 1) });
+}
+
+function drawPdfProductHeader(page, fonts, title) {
+  const headerH = mm(27);
+  const y = PDF_PAGE.height - headerH;
+  page.drawRectangle({ x: 0, y, width: PDF_PAGE.width * 0.48, height: headerH, color: PDF_RED });
+  page.drawRectangle({ x: PDF_PAGE.width * 0.48, y, width: PDF_PAGE.width * 0.52, height: headerH, color: PDF_LIGHT });
+  drawPdfText(page, "YOKOMITSU", { x: mm(12), y: y + mm(11), size: 20, font: fonts.boldOblique, color: rgb(1, 1, 1) });
+  const fitted = fitPdfText(title, fonts.boldOblique, 17, PDF_PAGE.width * 0.45);
+  drawPdfText(page, fitted, {
+    x: PDF_PAGE.width - mm(12) - textWidth(fonts.boldOblique, fitted, 17),
+    y: y + mm(17),
+    size: 17,
+    font: fonts.boldOblique,
+    color: PDF_RED,
+  });
+  drawPdfText(page, "IPS DO BRASIL", { x: PDF_PAGE.width - mm(78), y: y + mm(9), size: 15, font: fonts.boldOblique, color: PDF_BLACK });
+  drawPdfText(page, "CATALOGO 2026", { x: PDF_PAGE.width - mm(70), y: y + mm(3), size: 11, font: fonts.boldOblique, color: PDF_BLACK });
+}
+
+function drawPdfFooter(page, fonts, pageNo) {
+  const footerH = mm(20);
+  page.drawRectangle({ x: 0, y: 0, width: PDF_PAGE.width, height: footerH, color: PDF_DARK_RED });
+  const even = pageNo % 2 === 0;
+  const pageText = String(pageNo);
+  const logoText = "IPS DO BRASIL";
+  drawPdfText(page, pageText, {
+    x: even ? PDF_PAGE.width - mm(18) : mm(14),
+    y: mm(7),
+    size: 13,
+    font: fonts.bold,
+    color: rgb(1, 1, 1),
+  });
+  drawPdfText(page, "www.ipsbrasil.com.br", {
+    x: PDF_PAGE.width / 2 - textWidth(fonts.bold, "www.ipsbrasil.com.br", 13) / 2,
+    y: mm(10),
+    size: 13,
+    font: fonts.bold,
+    color: rgb(1, 1, 1),
+  });
+  const warning = "AS FOTOS CONTIDAS NESSE CATALOGO SAO DE CARATER MERAMENTE ILUSTRATIVO. AS MARCAS DAS MONTADORAS SAO DE FUNCAO INFORMATIVA E COMPARATIVA.";
+  drawPdfText(page, fitPdfText(warning, fonts.oblique, 5.5, PDF_PAGE.width - mm(72)), {
+    x: mm(36),
+    y: mm(4),
+    size: 5.5,
+    font: fonts.oblique,
+    color: rgb(1, 1, 1),
+  });
+  drawPdfText(page, logoText, {
+    x: even ? mm(10) : PDF_PAGE.width - mm(10) - textWidth(fonts.bold, logoText, 9),
+    y: mm(7),
+    size: 9,
+    font: fonts.bold,
+    color: rgb(1, 1, 1),
+  });
+}
+
+function drawNoImage(page, fonts, x, y, width, height) {
+  page.drawRectangle({ x: x + width * 0.26, y: y + height * 0.35, width: width * 0.48, height: height * 0.3, borderColor: PDF_BORDER, borderWidth: 0.7 });
+  drawCenteredPdfLines(page, ["IMAGEM", "INDISPONIVEL"], fonts.bold, 10, x + width / 2, y + height * 0.55, width * 0.45, rgb(0.62, 0.62, 0.62), 12);
+}
+
+function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
+  const topH = mm(10);
+  const textH = mm(25);
+  const imageY = y + textH;
+  const imageH = height - topH - textH;
+  const make = displayText(item.make, item.brand).toUpperCase();
+  const vehicle = displayText(firstCatalogVehicle(item.vehicle), "APLICACAO").toUpperCase();
+  const description = displayText(item.description, "PRODUTO").toUpperCase();
+  const similar = similarCodesText(item.similar);
+
+  page.drawRectangle({ x, y, width, height, color: rgb(1, 1, 1), borderColor: PDF_BORDER, borderWidth: 0.8 });
+  page.drawRectangle({ x, y: y + height - topH, width, height: topH, color: PDF_GRAY });
+  const titleY = y + height - mm(7);
+  const makeText = fitPdfText(make, fonts.boldOblique, 9.5, width * 0.32);
+  drawPdfText(page, makeText, { x: x + mm(4), y: titleY, size: 9.5, font: fonts.boldOblique, color: PDF_RED });
+  const restX = x + mm(4) + textWidth(fonts.boldOblique, makeText, 9.5) + mm(2);
+  const rest = fitPdfText(`// ${vehicle}`, fonts.boldOblique, 9.5, x + width - mm(4) - restX);
+  drawPdfText(page, rest, { x: restX, y: titleY, size: 9.5, font: fonts.boldOblique, color: PDF_BLACK });
+
+  page.drawRectangle({ x, y: imageY, width, height: imageH, borderColor: PDF_BORDER, borderWidth: 0.5 });
+  if (image) drawImageContain(page, image, x, imageY, width, imageH);
+  else drawNoImage(page, fonts, x, imageY, width, imageH);
+
+  page.drawLine({ start: { x, y: y + textH }, end: { x: x + width, y: y + textH }, thickness: 0.6, color: PDF_BORDER });
+  const descLines = wrapPdfText(description, fonts.regular, 9, width - mm(8), 2);
+  drawCenteredPdfLines(page, descLines, fonts.regular, 9, x + width / 2, y + textH - mm(7), width - mm(8), PDF_BLACK, 10.2);
+  const vehicleLines = wrapPdfText(vehicle, fonts.bold, 9.2, width - mm(8), similar ? 1 : 2);
+  drawCenteredPdfLines(page, vehicleLines, fonts.bold, 9.2, x + width / 2, y + mm(similar ? 9.5 : 10.5), width - mm(8), PDF_BLACK, 10.5);
+  if (similar) {
+    const similarLines = wrapPdfText(similar, fonts.regular, 6.4, width - mm(8), 2);
+    drawCenteredPdfLines(page, similarLines, fonts.regular, 6.4, x + width / 2, y + mm(5.2), width - mm(8), rgb(0.25, 0.25, 0.25), 7.2);
+  }
+  if (item.code) {
+    drawPdfText(page, String(item.code), { x: x + 1, y: y + 1, size: 1, font: fonts.regular, color: rgb(1, 1, 1), opacity: 0.01 });
+  }
+}
+
+async function buildCatalogPdfBase64({ items, filters }) {
+  const pdfDoc = await PDFDocument.create();
+  const fonts = {
+    regular: await pdfDoc.embedFont(StandardFonts.Helvetica),
+    bold: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
+    oblique: await pdfDoc.embedFont(StandardFonts.HelveticaOblique),
+    boldOblique: await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique),
+  };
+  const model = buildCatalogPdfModel(items, filters);
+  const coverImage = await embedPdfImage(pdfDoc, "/images/capa.png");
+  const backImage = await embedPdfImage(pdfDoc, "/images/contra_capa.png");
+  const imageCache = new Map();
+
+  const cover = pdfDoc.addPage([PDF_PAGE.width, PDF_PAGE.height]);
+  if (coverImage) drawImageCover(cover, coverImage, 0, 0, PDF_PAGE.width, PDF_PAGE.height);
+  const coverLines = wrapPdfText(model.coverTitle, fonts.bold, 30, PDF_PAGE.width - mm(34), 4);
+  coverLines.forEach((line, idx) => {
+    const size = 30;
+    const x = PDF_PAGE.width / 2 - textWidth(fonts.bold, line, size) / 2;
+    const y = PDF_PAGE.height - mm(132) - idx * 36;
+    [[-1.2, 0], [1.2, 0], [0, -1.2], [0, 1.2]].forEach(([dx, dy]) =>
+      drawPdfText(cover, line, { x: x + dx, y: y + dy, size, font: fonts.bold, color: rgb(1, 1, 1) })
+    );
+    drawPdfText(cover, line, { x, y, size, font: fonts.bold, color: PDF_RED });
+  });
+  drawPdfText(cover, "CATALOGO 2026", { x: PDF_PAGE.width - mm(82), y: mm(112), size: 20, font: fonts.bold, color: rgb(1, 1, 1) });
+
+  const back = pdfDoc.addPage([PDF_PAGE.width, PDF_PAGE.height]);
+  if (backImage) drawImageCover(back, backImage, 0, 0, PDF_PAGE.width, PDF_PAGE.height);
+
+  model.indexPages.forEach((entries, idx) => {
+    const page = pdfDoc.addPage([PDF_PAGE.width, PDF_PAGE.height]);
+    drawPdfIndexPage(page, fonts, entries, 3 + idx, model.indexLineTitle);
+  });
+
+  for (let pageIndex = 0; pageIndex < model.productPages.length; pageIndex += 1) {
+    const pageNo = model.firstProductPage + pageIndex;
+    const page = pdfDoc.addPage([PDF_PAGE.width, PDF_PAGE.height]);
+    drawPdfProductHeader(page, fonts, model.coverTitle);
+    drawPdfFooter(page, fonts, pageNo);
+    const marginX = mm(10);
+    const gap = mm(3);
+    const gridTop = PDF_PAGE.height - mm(31);
+    const gridBottom = mm(23);
+    const cardW = (PDF_PAGE.width - marginX * 2 - gap) / 2;
+    const cardH = (gridTop - gridBottom - gap * 2) / 3;
+    for (let i = 0; i < model.productPages[pageIndex].length; i += 1) {
+      const item = model.productPages[pageIndex][i];
+      let image = null;
+      if (item.imageSrc) {
+        if (!imageCache.has(item.imageSrc)) imageCache.set(item.imageSrc, await embedPdfImage(pdfDoc, item.imageSrc));
+        image = imageCache.get(item.imageSrc);
+      }
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const x = marginX + col * (cardW + gap);
+      const y = gridTop - (row + 1) * cardH - row * gap;
+      drawPdfProductCard(page, fonts, item, image, x, y, cardW, cardH);
+    }
+  }
+
+  return await pdfDoc.saveAsBase64({ dataUri: false });
+}
+
+function ensurePdfExtension(path) {
+  return /\.pdf$/i.test(String(path || "")) ? path : `${path}.pdf`;
 }
 
 function readDetailValue(product, ...keys) {
@@ -1200,6 +1658,14 @@ function App() {
         setPrintMsg("Nenhum produto encontrado para os filtros selecionados.");
         return;
       }
+      const picked = await saveDialog({
+        defaultPath: "catalogo_ips.pdf",
+        filters: [{ name: "PDF", extensions: ["pdf"] }],
+      });
+      if (!picked) {
+        setPrintMsg("Geracao cancelada.");
+        return;
+      }
       const uniqueImages = Array.from(new Set(rows.map((item) => item?.image).filter(Boolean)));
       const imagePairs = await mapWithConcurrency(uniqueImages, 16, async (path) => [path, await toPrintBlobUrl(path)]);
       const imageMap = new Map(imagePairs);
@@ -1208,11 +1674,12 @@ function App() {
         ...item,
         imageSrc: item?.image ? imageMap.get(item.image) || "" : "",
       }));
-      const html = buildPrintCatalogHtml({ items, filters: printFilters });
-      printHtmlDocument(html, objectUrls);
-      setPrintMsg(
-        `Catalogo preparado com ${rows.length} itens. Use a opcao "Salvar como PDF" na janela de impressao.`
-      );
+      setPrintMsg("Gerando arquivo PDF...");
+      const pdfBase64 = await buildCatalogPdfBase64({ items, filters: printFilters });
+      const outputPath = ensurePdfExtension(picked);
+      await savePdfBase64(outputPath, pdfBase64);
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      setPrintMsg(`PDF gerado com ${rows.length} itens: ${outputPath}`);
     } catch (e) {
       setPrintMsg(`Falha ao gerar impressao: ${e?.message || e}`);
     } finally {
@@ -1329,21 +1796,13 @@ function App() {
       for (const img of dedupByName) {
         const normalized = normalizePath(imagesDir, img);
         try {
-          const src = isEncryptedImagePath(normalized) ? await readImageBase64(normalized) : convertFileSrc(normalized);
+          const src = await loadLocalImageSrc(normalized);
           if (src && !unique.has(src)) {
             unique.add(src);
             imgs.push(src);
           }
-        } catch (e) {
-          try {
-            const fallback = await readImageBase64(normalized);
-            if (fallback && !unique.has(fallback)) {
-              unique.add(fallback);
-              imgs.push(fallback);
-            }
-          } catch (_) {
-            // Se falhar (arquivo ausente/criptografia), apenas ignore para evitar thumbs quebradas
-          }
+        } catch (_) {
+          // Se falhar (arquivo ausente/criptografia), apenas ignore para evitar thumbs quebradas
         }
       }
       setSelectedImages(imgs);
@@ -1370,17 +1829,13 @@ function App() {
       for (const f of files) {
         const full = normalizePath(imagesDir, f);
         try {
-          const src = isEncryptedImagePath(full) ? await readImageBase64(full) : convertFileSrc(full);
+          const src = await loadLocalImageSrc(full);
           if (src && !uniq.has(src)) {
             uniq.add(src);
             list.push(src);
           }
         } catch (_) {
-          const fallback = convertFileSrc(full);
-          if (!uniq.has(fallback)) {
-            uniq.add(fallback);
-            list.push(fallback);
-          }
+          // Se falhar (arquivo ausente/criptografia), apenas ignore para evitar thumbs quebradas
         }
       }
       setLaunchImages(list);

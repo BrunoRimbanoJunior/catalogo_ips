@@ -35,17 +35,22 @@ mod core {
 
     fn normalize_launch_token(s: &str) -> String {
         s.to_lowercase()
-            .chars()
-            .map(|c| match c {
-                'ã' | 'á' | 'â' | 'à' | 'ä' => 'a',
-                'ç' => 'c',
-                _ => c,
-            })
-            .collect::<String>()
+            .replace("Ã§", "c")
+            .replace("Ã£", "a")
+            .replace('ã', "a")
+            .replace('á', "a")
+            .replace('â', "a")
+            .replace('à', "a")
+            .replace('ä', "a")
+            .replace('ç', "c")
     }
 
     fn is_launch_component(name: &str) -> bool {
         normalize_launch_token(name) == LAUNCH_CANON
+    }
+
+    fn is_launch_path(path: &str) -> bool {
+        path.replace('\\', "/").split('/').any(is_launch_component)
     }
 
     fn normalize_rel_path(path: &str) -> String {
@@ -132,6 +137,7 @@ mod core {
         pub line: Option<String>,
         pub make: Option<String>,
         pub vehicle: String,
+        pub similar: Option<String>,
         pub image: Option<String>,
     }
 
@@ -940,6 +946,94 @@ mod core {
         }
     }
 
+    fn is_print_image_file(path: &Path) -> bool {
+        let lower = path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        lower.ends_with(".png")
+            || lower.ends_with(".jpg")
+            || lower.ends_with(".jpeg")
+            || lower.ends_with(".webp")
+            || lower.ends_with(".bmp")
+            || lower.ends_with(".cimg")
+    }
+
+    fn print_image_priority(rel: &str) -> i32 {
+        let lower = rel.to_ascii_lowercase();
+        let mut priority = 0;
+        if lower.ends_with(".cimg") {
+            priority += 20;
+        }
+        if lower.contains("_sem_fundo") || lower.contains("-sem-fundo") {
+            priority += 5;
+        }
+        if lower.contains("_1.") || lower.contains("-1.") {
+            priority += 3;
+        }
+        priority
+    }
+
+    fn image_path_available(imgs_dir: &Path, path_or_rel: &str) -> bool {
+        let trimmed = path_or_rel.trim();
+        if trimmed.is_empty() {
+            return false;
+        }
+        if is_launch_path(trimmed) {
+            return false;
+        }
+        let path = PathBuf::from(trimmed);
+        let resolved = if path.is_absolute() {
+            path
+        } else {
+            imgs_dir.join(path)
+        };
+        if resolved.exists() {
+            return true;
+        }
+        if !trimmed.to_ascii_lowercase().ends_with(".cimg") {
+            return PathBuf::from(format!("{}.cimg", resolved.to_string_lossy())).exists();
+        }
+        false
+    }
+
+    fn local_image_code_map(imgs_dir: &Path) -> HashMap<String, String> {
+        let mut best: HashMap<String, (i32, String)> = HashMap::new();
+        if !imgs_dir.exists() {
+            return HashMap::new();
+        }
+
+        for entry in WalkDir::new(imgs_dir).into_iter().filter_map(|e| e.ok()) {
+            let path = entry.path();
+            if !path.is_file() || !is_print_image_file(path) {
+                continue;
+            }
+            let rel = pathdiff::diff_paths(path, imgs_dir).unwrap_or_else(|| path.to_path_buf());
+            let rel = rel.to_string_lossy().replace('\\', "/");
+            if is_launch_path(&rel) {
+                continue;
+            }
+            let file_name = rel.rsplit('/').next().unwrap_or(&rel);
+            let stem = file_name.split('.').next().unwrap_or(file_name);
+            let priority = print_image_priority(&rel);
+            for code in candidate_codes(stem) {
+                match best.get(&code) {
+                    Some((current_priority, current_rel))
+                        if *current_priority < priority
+                            || (*current_priority == priority && current_rel <= &rel) => {}
+                    _ => {
+                        best.insert(code, (priority, rel.clone()));
+                    }
+                }
+            }
+        }
+
+        best.into_iter()
+            .map(|(code, (_, rel))| (code, rel))
+            .collect()
+    }
+
     #[tauri::command]
     pub fn get_print_catalog_cmd(
         app: AppHandle,
@@ -960,6 +1054,7 @@ mod core {
                 NULLIF(MIN(TRIM(COALESCE(v.category,''))), ''),
                 NULLIF(MIN(TRIM(COALESCE(v.make,''))), ''),
                 MIN(TRIM(v.name)),
+                NULLIF(TRIM(COALESCE(p.similar,'')), ''),
                 (
                     SELECT i.filename
                     FROM images i
@@ -1037,13 +1132,44 @@ mod core {
                 line: row.get(5).map_err(|e| e.to_string())?,
                 make: row.get(6).map_err(|e| e.to_string())?,
                 vehicle: row.get(7).map_err(|e| e.to_string())?,
-                image: row.get(8).map_err(|e| e.to_string())?,
+                similar: row.get(8).map_err(|e| e.to_string())?,
+                image: row.get(9).map_err(|e| e.to_string())?,
             });
+        }
+        let (_data_dir, _db_file, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        if out.iter().any(|item| {
+            item.image
+                .as_ref()
+                .map(|s| !image_path_available(&imgs_dir, s))
+                .unwrap_or(true)
+        }) {
+            let image_by_code = local_image_code_map(&imgs_dir);
+            for item in out.iter_mut() {
+                let image_available = item
+                    .image
+                    .as_ref()
+                    .map(|s| image_path_available(&imgs_dir, s))
+                    .unwrap_or(false);
+                if image_available {
+                    continue;
+                }
+                let code_key = item.code.trim().to_ascii_uppercase();
+                if let Some(rel) = image_by_code.get(&code_key) {
+                    item.image = Some(rel.clone());
+                } else {
+                    item.image = None;
+                }
+            }
         }
         let mut unique_images = Vec::new();
         let mut seen_images = HashSet::new();
         for item in out.iter() {
-            if let Some(img) = item.image.as_ref().map(|s| s.trim()).filter(|s| !s.is_empty()) {
+            if let Some(img) = item
+                .image
+                .as_ref()
+                .map(|s| s.trim())
+                .filter(|s| !s.is_empty())
+            {
                 if seen_images.insert(img.to_string()) {
                     unique_images.push(img.to_string());
                 }
@@ -1066,9 +1192,10 @@ mod core {
                     let prepared = Arc::clone(&prepared);
                     scope.spawn(move || {
                         for file in chunk {
-                            let result = crate::call_img::prepare_image_for_print(&app_handle, file.clone())
-                                .ok()
-                                .map(|p| p.to_string_lossy().into_owned());
+                            let result =
+                                crate::call_img::prepare_image_for_print(&app_handle, file.clone())
+                                    .ok()
+                                    .map(|p| p.to_string_lossy().into_owned());
                             if let Ok(mut map) = prepared.lock() {
                                 map.insert(file, result);
                             }
@@ -1734,8 +1861,7 @@ mod core {
             .any(|c| !(c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '+')))
         {
             return Err(
-                "Use apenas letras, numeros, ponto, hifen e sinal de mais na versao"
-                    .to_string(),
+                "Use apenas letras, numeros, ponto, hifen e sinal de mais na versao".to_string(),
             );
         }
         Ok(normalized.to_string())
@@ -1774,9 +1900,8 @@ mod core {
                 break;
             }
             if in_package && trimmed.starts_with("version") {
-                return extract_quoted_value(trimmed).ok_or_else(|| {
-                    format!("Linha de versao invalida em {}", path.display())
-                });
+                return extract_quoted_value(trimmed)
+                    .ok_or_else(|| format!("Linha de versao invalida em {}", path.display()));
             }
         }
         Err(format!(
@@ -1820,7 +1945,11 @@ mod core {
     }
 
     fn render_with_original_newline(lines: Vec<String>, original: &str) -> String {
-        let newline = if original.contains("\r\n") { "\r\n" } else { "\n" };
+        let newline = if original.contains("\r\n") {
+            "\r\n"
+        } else {
+            "\n"
+        };
         let mut rendered = lines.join(newline);
         if original.ends_with("\r\n") {
             rendered.push_str("\r\n");
@@ -1838,7 +1967,11 @@ mod core {
             if !replaced && trimmed.starts_with("\"version\"") {
                 let indent_len = line.len() - trimmed.len();
                 let indent = &line[..indent_len];
-                let suffix = if trimmed.trim_end().ends_with(',') { "," } else { "" };
+                let suffix = if trimmed.trim_end().ends_with(',') {
+                    ","
+                } else {
+                    ""
+                };
                 lines.push(format!("{indent}\"version\": \"{new_version}\"{suffix}"));
                 replaced = true;
             } else {
@@ -1923,12 +2056,8 @@ mod core {
 
     fn read_app_version_info() -> Result<AppVersionInfo, String> {
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
-        let app_root = find_app_root_upwards(&cwd, 8).ok_or_else(|| {
-            format!(
-                "Raiz do app nao encontrada a partir de {}",
-                cwd.display()
-            )
-        })?;
+        let app_root = find_app_root_upwards(&cwd, 8)
+            .ok_or_else(|| format!("Raiz do app nao encontrada a partir de {}", cwd.display()))?;
         let package_json_path = app_root.join("package.json");
         let cargo_toml_path = app_root.join("src-tauri").join("Cargo.toml");
         let tauri_conf_path = app_root.join("src-tauri").join("tauri.conf.json");
@@ -2128,12 +2257,8 @@ mod core {
     pub fn set_app_version_config(version: String) -> Result<AppVersionInfo, String> {
         let next_version = validate_version_string(&version)?;
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
-        let app_root = find_app_root_upwards(&cwd, 8).ok_or_else(|| {
-            format!(
-                "Raiz do app nao encontrada a partir de {}",
-                cwd.display()
-            )
-        })?;
+        let app_root = find_app_root_upwards(&cwd, 8)
+            .ok_or_else(|| format!("Raiz do app nao encontrada a partir de {}", cwd.display()))?;
         let package_json_path = app_root.join("package.json");
         let cargo_toml_path = app_root.join("src-tauri").join("Cargo.toml");
         let tauri_conf_path = app_root.join("src-tauri").join("tauri.conf.json");
@@ -2174,6 +2299,20 @@ mod core {
     #[tauri::command]
     pub fn read_image_base64(app: AppHandle, path_or_rel: String) -> Result<String, String> {
         crate::call_img::read_image_base64(&app, path_or_rel)
+    }
+
+    #[tauri::command]
+    pub fn save_pdf_base64(path: String, data_base64: String) -> Result<(), String> {
+        use base64::Engine;
+        let bytes = base64::engine::general_purpose::STANDARD
+            .decode(data_base64.trim())
+            .map_err(|e| format!("PDF invalido: {}", e))?;
+        let dest = PathBuf::from(&path);
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        fs::write(&dest, bytes).map_err(|e| format!("Falha ao salvar PDF: {}", e))?;
+        Ok(())
     }
 
     #[tauri::command]
@@ -2484,7 +2623,8 @@ pub fn run() {
             core::run_rclone_sync,
             core::get_app_version_config,
             core::set_app_version_config,
-            core::read_image_base64
+            core::read_image_base64,
+            core::save_pdf_base64
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

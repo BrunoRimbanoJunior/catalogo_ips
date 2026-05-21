@@ -171,7 +171,11 @@ fn resolve_with_cimg_fallback(path: &Path) -> Option<PathBuf> {
     None
 }
 
-fn decrypt_if_needed(data: Vec<u8>, key_env: Option<&String>, path: &Path) -> Result<Vec<u8>, String> {
+fn decrypt_if_needed(
+    data: Vec<u8>,
+    key_env: Option<&String>,
+    path: &Path,
+) -> Result<Vec<u8>, String> {
     let encrypted = data.len() > 5 && &data[..4] == b"CIMG";
     if !encrypted {
         return Ok(data);
@@ -245,7 +249,11 @@ pub fn prepare_image_for_print(app: &AppHandle, path_or_rel: String) -> Result<P
     let cache_fresh = match (fs::metadata(&source_path), fs::metadata(&cache_path)) {
         (Ok(src), Ok(dst)) => {
             dst.len() > 0
-                && src.modified().ok().zip(dst.modified().ok()).map_or(false, |(s, d)| d >= s)
+                && src
+                    .modified()
+                    .ok()
+                    .zip(dst.modified().ok())
+                    .map_or(false, |(s, d)| d >= s)
         }
         _ => false,
     };

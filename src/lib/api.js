@@ -90,6 +90,10 @@ export async function readImageBase64(pathOrRel) {
   return await invoke("read_image_base64", { pathOrRel });
 }
 
+export async function savePdfBase64(path, dataBase64) {
+  return await invoke("save_pdf_base64", { path, dataBase64 });
+}
+
 export async function listLaunchImages() {
   return await invoke("list_launch_images");
 }

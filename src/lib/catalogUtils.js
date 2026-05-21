@@ -48,7 +48,11 @@ export function toHeaderLogoPath(name) {
 
 export function normalizePath(base, maybeRelative) {
   if (!maybeRelative) return base;
-  const absolute = maybeRelative.startsWith("/") || /^[A-Za-z]:\\/.test(maybeRelative);
+  const absolute =
+    /^https?:\/\//i.test(maybeRelative) ||
+    maybeRelative.startsWith("/") ||
+    maybeRelative.startsWith("\\\\") ||
+    /^[A-Za-z]:[\\/]/.test(maybeRelative);
   if (absolute) return maybeRelative.replace(/\\/g, "/");
   const sep = base.endsWith("/") || base.endsWith("\\") ? "" : "/";
   return `${base}${sep}${maybeRelative}`.replace(/\\/g, "/");
@@ -61,7 +65,7 @@ export function toDisplaySrc(path) {
     const parts = path.split("/").map((p, idx) => (idx === 0 ? p : encodeURIComponent(p)));
     return parts.join("/");
   }
-  if (/^[A-Za-z]:\\/.test(path) || path.startsWith("\\\\")) return convertFileSrc(path);
+  if (/^[A-Za-z]:[\\/]/.test(path) || path.startsWith("\\\\")) return convertFileSrc(path);
   const clean = path.replace(/^\.?\/?images\/?/i, "");
   const encoded = clean.split("/").map((p) => encodeURIComponent(p)).join("/");
   return `/images/${encoded}`;
