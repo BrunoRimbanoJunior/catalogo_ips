@@ -81,7 +81,8 @@ function updateEnvFile(relPath, fallbackRelPath) {
   // Ensure bundle.macOS exists and set the buildNumber
   if (!data.bundle) data.bundle = {};
   if (!data.bundle.macOS) data.bundle.macOS = {};
-  data.bundle.macOS.fileVersion = buildNumber;
+  delete data.bundle.macOS.fileVersion;
+  data.bundle.macOS.bundleVersion = buildNumber;
   
   writeJson("src-tauri/tauri.conf.json", data);
 }

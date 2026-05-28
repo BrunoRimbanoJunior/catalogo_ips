@@ -24,6 +24,7 @@ tauri-plugin-dialog = "2"
 tauri-plugin-log = ">=0.2"
 tauri-plugin-store = ">=0.2"
 tauri-plugin-updater = "2.0.0"
+tauri-plugin-process = "2"
 # Banco local (lado Rust, mais rápido)
 rusqlite = { version = "0.31", features = ["bundled", "functions"] }
 # HTTP p/ sync

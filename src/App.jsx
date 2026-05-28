@@ -1712,7 +1712,9 @@ function App() {
       try {
         setToolsMsg("Baixando e instalando atualização...");
         await updaterRef.current.downloadAndInstall();
-        setToolsMsg("Atualização aplicada. O app pode reiniciar.");
+        setToolsMsg("Atualização aplicada. Reiniciando...");
+        const process = await import("@tauri-apps/plugin-process");
+        await process.relaunch();
       } catch (e) {
         setToolsMsg(`Falha ao atualizar: ${e.message || e}`);
       }

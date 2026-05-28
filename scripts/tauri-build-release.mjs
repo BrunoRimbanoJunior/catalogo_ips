@@ -5,11 +5,18 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 function getPrivateKey() {
+  if (process.env.TAURI_SIGNING_PRIVATE_KEY?.trim()) {
+    return process.env.TAURI_SIGNING_PRIVATE_KEY.trim();
+  }
   if (process.env.TAURI_PRIVATE_KEY?.trim()) {
     return process.env.TAURI_PRIVATE_KEY.trim();
   }
 
-  const keyPath = resolve(process.env.TAURI_PRIVATE_KEY_PATH || "./private.key");
+  const keyPath = resolve(
+    process.env.TAURI_SIGNING_PRIVATE_KEY_PATH ||
+      process.env.TAURI_PRIVATE_KEY_PATH ||
+      "./private.key"
+  );
   if (!existsSync(keyPath)) {
     throw new Error(
       `TAURI_PRIVATE_KEY not set and file not found at ${keyPath}. Set env TAURI_PRIVATE_KEY or TAURI_PRIVATE_KEY_PATH`
@@ -21,7 +28,9 @@ function getPrivateKey() {
 
 function getKeyPassword() {
   const pwd =
-    process.env.TAURI_KEY_PASSWORD || process.env.TAURI_PRIVATE_KEY_PASSWORD;
+    process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD ||
+    process.env.TAURI_KEY_PASSWORD ||
+    process.env.TAURI_PRIVATE_KEY_PASSWORD;
   if (!pwd?.trim()) {
     throw new Error(
       "Missing TAURI_KEY_PASSWORD (or TAURI_PRIVATE_KEY_PASSWORD) environment variable"
@@ -35,6 +44,9 @@ function main() {
   const keyPassword = getKeyPassword();
 
   // Make sure the Tauri CLI receives the signing material.
+  process.env.TAURI_SIGNING_PRIVATE_KEY = privateKey;
+  process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD = keyPassword;
+  // Legacy names are kept for older local tooling.
   process.env.TAURI_PRIVATE_KEY = privateKey;
   process.env.TAURI_KEY_PASSWORD = keyPassword;
   console.log("Signing env set; invoking pnpm tauri build");
