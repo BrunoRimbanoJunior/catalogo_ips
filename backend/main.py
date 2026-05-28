@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, EmailStr
@@ -8,14 +8,20 @@ from supabase import Client, create_client
 
 app = FastAPI(title="Catalogo IPS - Auth API")
 
+load_dotenv()
+
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("ADMIN_CORS_ORIGINS", "http://localhost:8000").split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-load_dotenv()
 
 
 def get_supabase() -> Client:
@@ -24,6 +30,14 @@ def get_supabase() -> Client:
     if not url or not key:
         raise HTTPException(status_code=500, detail="Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY")
     return create_client(url, key)
+
+
+def verify_admin(x_admin_token: str | None = Header(default=None, alias="X-Admin-Token")):
+    token = os.getenv("ADMIN_TOKEN")
+    if not token:
+        raise HTTPException(status_code=500, detail="Configure ADMIN_TOKEN para usar o painel admin.")
+    if not x_admin_token or x_admin_token != token:
+        raise HTTPException(status_code=401, detail="Token admin invalido.")
 
 
 class Registration(BaseModel):
@@ -99,6 +113,7 @@ def register(payload: Registration, supabase: Client = Depends(get_supabase)):
 def list_profiles(
     status: str | None = None,
     search: str | None = None,
+    _admin: None = Depends(verify_admin),
     supabase: Client = Depends(get_supabase),
 ):
     try:
@@ -117,7 +132,7 @@ def list_profiles(
 
 
 @app.post("/admin/approve")
-def approve(payload: ApproveRequest, supabase: Client = Depends(get_supabase)):
+def approve(payload: ApproveRequest, _admin: None = Depends(verify_admin), supabase: Client = Depends(get_supabase)):
     if not payload.id and not payload.email:
         raise HTTPException(status_code=400, detail="Informe id ou email para aprovar.")
     try:
@@ -133,7 +148,7 @@ def approve(payload: ApproveRequest, supabase: Client = Depends(get_supabase)):
 
 
 @app.post("/admin/block")
-def block(payload: BlockRequest, supabase: Client = Depends(get_supabase)):
+def block(payload: BlockRequest, _admin: None = Depends(verify_admin), supabase: Client = Depends(get_supabase)):
     if not payload.id and not payload.email:
         raise HTTPException(status_code=400, detail="Informe id ou email para bloquear.")
     try:
@@ -149,7 +164,7 @@ def block(payload: BlockRequest, supabase: Client = Depends(get_supabase)):
 
 
 @app.post("/admin/delete")
-def delete_profile(payload: DeleteRequest, supabase: Client = Depends(get_supabase)):
+def delete_profile(payload: DeleteRequest, _admin: None = Depends(verify_admin), supabase: Client = Depends(get_supabase)):
     if not payload.id and not payload.email:
         raise HTTPException(status_code=400, detail="Informe id ou email para excluir.")
     try:
@@ -232,12 +247,15 @@ def admin_ui():
       <script>
         async function load() {
           try {
+            const token = sessionStorage.getItem('adminToken') || prompt('Token admin');
+            if (!token) throw new Error('Token admin obrigatorio.');
+            sessionStorage.setItem('adminToken', token);
             const status = document.getElementById('filter-status').value;
             const search = document.getElementById('filter-search').value;
             const params = new URLSearchParams();
             if (status && status !== 'all') params.set('status', status);
             if (search) params.set('search', search);
-            const res = await fetch('/admin/profiles?' + params.toString());
+            const res = await fetch('/admin/profiles?' + params.toString(), { headers: { 'X-Admin-Token': token } });
             const json = await res.json();
             if (!res.ok) throw new Error(json.detail || res.statusText);
             document.getElementById('status').textContent = 'Total: ' + (json.items?.length || 0);
@@ -245,31 +263,44 @@ def admin_ui():
             tbody.innerHTML = '';
             (json.items || []).forEach(p => {
               const tr = document.createElement('tr');
-              tr.innerHTML = `
-                <td>${p.full_name || '-'}</td>
-                <td>${p.email || '-'}</td>
-                <td>${p.cpf_cnpj || '-'}</td>
-                <td>${p.city || '-'}</td>
-                <td><span class="tag ${p.status || ''}">${p.status || ''}</span></td>
-                <td class="actions">
-                  <button data-id="${p.id}" data-action="approve">Aprovar</button>
-                  <button class="btn-block" data-id="${p.id}" data-action="block">Bloquear</button>
-                  <button class="btn-delete" data-id="${p.id}" data-action="delete">Excluir</button>
-                </td>
-              `;
-              tr.querySelectorAll('button').forEach(btn => {
+              const fields = [p.full_name, p.email, p.cpf_cnpj, p.city];
+              fields.forEach(value => {
+                const td = document.createElement('td');
+                td.textContent = value || '-';
+                tr.appendChild(td);
+              });
+              const statusTd = document.createElement('td');
+              const tag = document.createElement('span');
+              tag.className = 'tag ' + (p.status || '');
+              tag.textContent = p.status || '';
+              statusTd.appendChild(tag);
+              tr.appendChild(statusTd);
+              const actionsTd = document.createElement('td');
+              actionsTd.className = 'actions';
+              [
+                ['approve', 'Aprovar', ''],
+                ['block', 'Bloquear', 'btn-block'],
+                ['delete', 'Excluir', 'btn-delete']
+              ].forEach(([action, label, className]) => {
+                const btn = document.createElement('button');
+                btn.dataset.id = p.id;
+                btn.dataset.action = action;
+                btn.textContent = label;
+                if (className) btn.className = className;
                 btn.onclick = async () => {
                   const action = btn.getAttribute('data-action');
                   const endpoint = action === 'approve' ? '/admin/approve' : action === 'block' ? '/admin/block' : '/admin/delete';
                   if (action === 'delete' && !confirm('Confirmar exclusão?')) return;
                   const r = await fetch(endpoint, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'X-Admin-Token': token },
                     body: JSON.stringify({ id: p.id })
                   });
                   if (r.ok) { load(); } else { alert('Erro na ação: ' + action); }
                 };
+                actionsTd.appendChild(btn);
               });
+              tr.appendChild(actionsTd);
               tbody.appendChild(tr);
             });
           } catch (e) {

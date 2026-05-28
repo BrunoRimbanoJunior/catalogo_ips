@@ -3,6 +3,8 @@
 1. Configure as variáveis no `.env` (copiar `.env.example`):
    - `SUPABASE_URL=https://<projeto>.supabase.co`
    - `SUPABASE_SERVICE_ROLE_KEY=<service-role>` (não expor ao front)
+   - `ADMIN_TOKEN=<token-forte>` (exigido no painel e rotas `/admin*`)
+   - `ADMIN_CORS_ORIGINS=http://localhost:8000` (opcional, lista separada por vírgula)
 2. Instale dependências:
    ```bash
    pip install -r requirements.txt
@@ -22,4 +24,4 @@
   - Usuário pode ler/escrever apenas sua linha (`id = auth.uid()`).
   - Admin (role) pode ler todas.
 
-Use o `SERVICE_ROLE_KEY` somente no backend. O front usa apenas `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
+Use o `SERVICE_ROLE_KEY` somente no backend. O front usa apenas `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`. Não exponha o `ADMIN_TOKEN` fora do ambiente administrativo.

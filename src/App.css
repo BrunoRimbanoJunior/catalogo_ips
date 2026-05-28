@@ -6,7 +6,7 @@
   filter: drop-shadow(0 0 2em #61dafb);
 }
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
@@ -25,6 +25,10 @@ html, body, #root {
   height: 100%;
   min-height: 100%;
   margin: 0;
+}
+
+body {
+  font-family: inherit;
 }
 
 .container {
@@ -76,6 +80,7 @@ h1 {
 }
 
 input,
+select,
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -83,10 +88,12 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
+  line-height: 1.2;
   color: #0f0f0f;
   background-color: #ffffff;
   transition: border-color 0.25s;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
 button {
@@ -102,6 +109,7 @@ button:active {
 }
 
 input,
+select,
 button {
   outline: none;
 }
@@ -121,6 +129,7 @@ button {
   }
 
   input,
+  select,
   button {
     color: #ffffff;
     background-color: #0f0f0f98;
@@ -169,7 +178,7 @@ button {
 .sidebar h3 { margin-top: 0; }
 .sidebar, .panel { color: #111; }
 .panel h3 { color: #111; }
-.filters input, .filters select { color: #111; background: #fff; }
+.filters input, .filters select { color: #111; background-color: #fff; }
 .chips, .chip { color: #111; }
 .list, .item, .item .desc, .item .brand { color: #111; }
 .chips { display: flex; flex-direction: column; gap: 8px; max-height: 70vh; overflow: auto; }
@@ -184,25 +193,37 @@ button {
 .panel { background: #ffffff; border: 1px solid #e6e6e6; border-radius: 8px; padding: 12px; min-width: 0; overflow: hidden; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
 .filters select {
+  appearance: none;
+  -webkit-appearance: none;
   height: 44px;
-  padding: 10px 12px;
+  padding: 10px 36px 10px 12px;
   border-radius: 10px;
   border: 1px solid #dcdcdc;
-  background: #fff;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #555 50%),
+    linear-gradient(135deg, #555 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 19px,
+    calc(100% - 12px) 19px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  box-shadow: none;
 }
 .filters .filter-code {
   height: 44px;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid #dcdcdc;
+  box-shadow: none;
 }
 .filters .filter-code { flex: 1 1 100%; width: 100%; min-width: 0; box-sizing: border-box; }
 .filters select { flex: 1 1 0; min-width: 0; }
 .filters button { flex: 0 0 140px; white-space: nowrap; }
 .filters input, .filters select { flex: 1; }
 
-.list { list-style: none; padding: 0; margin: 0; max-height: 60vh; overflow: auto; }
-.item { padding: 12px; border-bottom: 1px solid #eee; text-align: left; cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.list { list-style: none; padding: 0; margin: 0; max-height: 60vh; overflow: auto; font-size: 12px; line-height: 16px; }
+.item { padding: 12px; border-bottom: 1px solid #eee; text-align: left; cursor: pointer; display: flex; gap: 8px; align-items: center; font-size: 12px; line-height: 16px; }
 .item:hover { background: #fafafa; }
 .item .code { font-weight: 800; min-width: 110px; color: #c62828; }
 .item .brand { margin-left: auto; opacity: 0.7; }
@@ -236,8 +257,10 @@ button {
 .launch-counter { text-align: center; font-weight: 700; font-size: 13px; letter-spacing: 0.6px; opacity: 0.9; }
 
 /* Detalhes: subtÃ­tulo e compatibilidade */
-.details-wrap .subtitle { font-weight: 700; font-size: 14px; opacity: 0.85; text-align: left; margin-top: 4px; }
-.details-wrap .compat-list, .details-wrap .brand-list, .details-wrap .details-text { white-space: pre-line; text-align: left; margin-top: 4px; }
+.details-wrap { font-size: 12px; line-height: 16px; }
+.details-wrap p { font-size: 12px; line-height: 16px; }
+.details-wrap .subtitle { font-weight: 700; font-size: 12px; line-height: 16px; opacity: 0.85; text-align: left; margin-top: 4px; }
+.details-wrap .compat-list, .details-wrap .brand-list, .details-wrap .details-text { white-space: pre-line; text-align: left; margin-top: 4px; font-size: 12px; line-height: 16px; }
 .details-wrap .sep { border-top: 1px solid #e6e6e6; margin: 8px 0; }
 
 /* Status bar (não intrusiva) */

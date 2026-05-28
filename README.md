@@ -29,10 +29,10 @@ Pré-requisitos: Node 20, Rust toolchain, pnpm, Supabase (anon key), manifest p�
 ## Backend de aprovação (FastAPI)
 Local (apenas dev) para aprovar cadastros sem expor service role no front:
 1) `cd backend`
-2) `.env` com `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`
+2) `.env` com `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `ADMIN_TOKEN`
 3) `uv venv && uv pip install -r requirements.txt`
 4) `uv run uvicorn main:app --reload --port 8000`
-5) Painel: `http://localhost:8000/admin`
+5) Painel: `http://localhost:8000/admin` (informe o `ADMIN_TOKEN` quando solicitado)
 
 ## Workflows (CI)
 - `manifest.yml`: gera `manifest.json` a partir do R2 (usa secrets `R2_*`), insere `appVersion/appDownloadUrl`, comita na `main` (inclusive em tags) e anexa na release.

@@ -37,7 +37,7 @@ import {
   toDisplaySrc,
   toHeaderLogoPath,
 } from "./lib/catalogUtils";
-import { supabase, supabaseService, supabaseServiceKey } from "./lib/supabaseClient";
+import { supabase } from "./lib/supabaseClient";
 import "./App.css";
 
 const REG_DEFAULT = {
@@ -779,10 +779,25 @@ function isLocalImageSource(source = "") {
   return /^[a-zA-Z]:[\\/]/.test(text) || text.startsWith("\\\\") || text.startsWith("/");
 }
 
+function isBundledImageAsset(source = "") {
+  return /^\/images\//i.test(String(source || ""));
+}
+
 async function sourceToImageBytes(source) {
   if (!source) return null;
   const text = String(source);
   if (text.startsWith("data:")) return dataUrlToBytes(text);
+  if (isBundledImageAsset(text)) {
+    try {
+      const response = await fetch(text);
+      if (response.ok) {
+        const bytes = new Uint8Array(await response.arrayBuffer());
+        return { bytes, mime: guessPdfImageMime(bytes, response.headers.get("content-type") || "") };
+      }
+    } catch (_) {
+      // fallback to native image reader below
+    }
+  }
   if (isLocalImageSource(text)) {
     return dataUrlToBytes(await readImageBase64(text));
   }
@@ -1310,14 +1325,8 @@ function App() {
   const [form, setForm] = useState({ ...REG_DEFAULT, email: registrationEmail });
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [sentOnce, setSentOnce] = useState(false);
-  const [allowAfterDelay, setAllowAfterDelay] = useState(false);
-
-  const [adminError, setAdminError] = useState("");
-  const [pendingProfiles, setPendingProfiles] = useState([]);
-  const [showAdmin, setShowAdmin] = useState(false);
 
   const supabaseConfigured = !!supabase;
-  const supabaseServiceConfigured = !!supabaseService;
 
   const selectedBrand = useMemo(() => brands.find((b) => String(b.id) === String(brandId)) || null, [brands, brandId]);
   const numericBrandId = useMemo(() => {
@@ -1336,10 +1345,9 @@ function App() {
   const blockAccess = useMemo(() => {
     if (isDev) return false; // Em desenvolvimento nao bloquear pela aprovacao
     if (cachedProfile?.status === "block" || profile?.status === "block") return true;
-    if (allowAfterDelay) return false;
     if (cachedProfile?.status === "approved" || profile?.status === "approved") return false;
     return true;
-  }, [isDev, supabaseConfigured, cachedProfile, profile, allowAfterDelay]);
+  }, [isDev, supabaseConfigured, cachedProfile, profile]);
 
   useEffect(() => {
     const preventContextMenu = (event) => {
@@ -1383,19 +1391,6 @@ function App() {
       unlisten.then((fn) => fn()).catch(() => {});
     };
   }, []);
-
-  useEffect(() => {
-    if (!supabaseConfigured) return;
-    if (profile?.status === "block" || cachedProfile?.status === "block") {
-      setAllowAfterDelay(false);
-      return;
-    }
-    if (profile?.status === "approved" || cachedProfile?.status === "approved") {
-      setAllowAfterDelay(true);
-      return;
-    }
-    if (sentOnce) setAllowAfterDelay(false);
-  }, [supabaseConfigured, profile, cachedProfile, sentOnce]);
 
   // Tenta usar o updater nativo do Tauri: baixa e instala sem abrir link externo.
   useEffect(() => {
@@ -1649,23 +1644,6 @@ function App() {
   }, [supabaseConfigured, fingerprint, registrationEmail]);
 
   useEffect(() => {
-    if (!supabaseServiceConfigured) return;
-    (async () => {
-      try {
-        const { data, error } = await supabaseService
-          .from("profiles")
-          .select("id,full_name,email,cpf_cnpj,city,device_fingerprint,status")
-          .eq("status", "pending")
-          .limit(50);
-        if (error) throw error;
-        setPendingProfiles(data || []);
-      } catch (e) {
-        setAdminError(e.message || String(e));
-      }
-    })();
-  }, [supabaseServiceConfigured]);
-
-  useEffect(() => {
     if (!showSettings) return;
     const handler = (event) => {
       if (settingsRef.current && !settingsRef.current.contains(event.target)) {
@@ -1896,41 +1874,29 @@ function App() {
         ...form,
         cpf_cnpj: validation.cpfCnpj,
         email: validation.email,
-        status: "approved",
+        status: "pending",
         device_fingerprint: profile?.device_fingerprint || fingerprint,
         id: profileId || undefined,
       };
       const { data, error } = await supabase.from("profiles").upsert(payload, { onConflict: "email" }).select().maybeSingle();
       if (error) throw error;
-      const resolved = data ? { ...data, status: "approved" } : null;
+      const resolved = data ? { ...data, status: data.status || "pending" } : null;
       if (resolved) {
         setProfile(resolved);
-        localStorage.setItem("profile.cached", JSON.stringify(resolved));
+        if (resolved.status === "approved") {
+          localStorage.setItem("profile.cached", JSON.stringify(resolved));
+        } else {
+          localStorage.removeItem("profile.cached");
+        }
       }
       setRegistrationEmail(validation.email);
       setForm((prev) => ({ ...prev, cpf_cnpj: validation.cpfCnpj, email: validation.email }));
       setAuthSuccess("Cadastro enviado. Aguarde aprovacao.");
       setSentOnce(true);
-      setAllowAfterDelay(false);
-      setTimeout(() => setAllowAfterDelay(true), 3000);
     } catch (e) {
       setAuthError(`Falha ao salvar cadastro: ${e.message || e}`);
     } finally {
       setFormSubmitting(false);
-    }
-  }
-
-  async function approveProfile(id) {
-    if (!supabaseService || !supabaseServiceKey) {
-      setAdminError("Service role nao configurado (apenas dev).");
-      return;
-    }
-    try {
-      const { error } = await supabaseService.from("profiles").update({ status: "approved" }).eq("id", id);
-      if (error) throw error;
-      setPendingProfiles((prev) => prev.filter((p) => p.id !== id));
-    } catch (e) {
-      setAdminError(e.message || String(e));
     }
   }
 
@@ -2532,7 +2498,7 @@ function App() {
                         <span className="desc">{p.description}</span>
                       </div>
                       {p.vehicles ? (
-                        <div style={{ fontSize: 14, opacity: 0.9 }}>
+                        <div style={{ opacity: 0.9 }}>
                           <strong>Aplicacoes:</strong> {p.vehicles}
                         </div>
                       ) : null}

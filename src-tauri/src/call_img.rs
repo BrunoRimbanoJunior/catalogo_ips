@@ -9,7 +9,6 @@ use crate::db::ensure_dirs;
 use crate::desc::decrypt_image;
 
 const ENV_FILES: [&str; 3] = [".env.production", ".env", ".env.development"];
-const TEST_FALLBACK_KEY: &str = "@Fb264e0d9efg";
 
 pub fn load_env_key(resource_dir: Option<&Path>, data_dir: Option<&Path>) -> Option<String> {
     static KEY_CACHE: OnceLock<Option<String>> = OnceLock::new();
@@ -171,6 +170,23 @@ fn resolve_with_cimg_fallback(path: &Path) -> Option<PathBuf> {
     None
 }
 
+fn ensure_inside_dir(path: PathBuf, base: &Path) -> Result<PathBuf, String> {
+    let base = base.canonicalize().map_err(|e| e.to_string())?;
+    let candidate = if path.exists() {
+        path.canonicalize().map_err(|e| e.to_string())?
+    } else if let Some(parent) = path.parent() {
+        let parent = parent.canonicalize().map_err(|e| e.to_string())?;
+        parent.join(path.file_name().unwrap_or_default())
+    } else {
+        path
+    };
+    if candidate.starts_with(&base) {
+        Ok(candidate)
+    } else {
+        Err("Caminho de imagem fora da pasta permitida.".to_string())
+    }
+}
+
 fn decrypt_if_needed(
     data: Vec<u8>,
     key_env: Option<&String>,
@@ -180,10 +196,10 @@ fn decrypt_if_needed(
     if !encrypted {
         return Ok(data);
     }
-    if key_env.is_none() {
+    let Some(key) = key_env.map(|s| s.as_str()) else {
         eprintln!("decrypt_image: arquivo criptografado, mas DESCRYPT_KEY nao encontrado");
-    }
-    let key = key_env.map(|s| s.as_str()).unwrap_or(TEST_FALLBACK_KEY);
+        return Err("Arquivo criptografado sem chave configurada.".to_string());
+    };
     match decrypt_image(&data, key) {
         Ok(p) => Ok(p),
         Err(e) => {
@@ -225,6 +241,7 @@ pub fn prepare_image_for_print(app: &AppHandle, path_or_rel: String) -> Result<P
             imgs_dir.join(p)
         }
     };
+    let requested = ensure_inside_dir(requested, &imgs_dir)?;
     let Some(source_path) = resolve_with_cimg_fallback(&requested) else {
         return Err(format!(
             "Falha ao ler imagem (nao encontrada): {}",
@@ -278,6 +295,7 @@ pub fn read_image_base64(app: &AppHandle, path_or_rel: String) -> Result<String,
             imgs_dir.join(p)
         }
     };
+    let abs_try = ensure_inside_dir(abs_try, &imgs_dir)?;
     let _name_norm = abs_try
         .file_name()
         .and_then(|s| s.to_str())

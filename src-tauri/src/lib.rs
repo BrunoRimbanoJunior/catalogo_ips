@@ -20,7 +20,7 @@ mod core {
     use sha2::{Digest, Sha256};
     use std::collections::{HashMap, HashSet};
     use std::fs;
-    use std::path::{Path, PathBuf};
+    use std::path::{Component, Path, PathBuf};
     use std::process::{Command as PCommand, Stdio};
     use std::sync::{Arc, Mutex};
     use std::time::Duration;
@@ -1576,6 +1576,32 @@ mod core {
         Ok(())
     }
 
+    fn safe_manifest_rel_path(path: &str) -> Result<PathBuf> {
+        let normalized = path.replace('\\', "/");
+        let rel = Path::new(&normalized);
+        if normalized.trim().is_empty() {
+            anyhow::bail!("caminho vazio no manifest");
+        }
+        if rel.is_absolute() {
+            anyhow::bail!("caminho absoluto no manifest: {}", path);
+        }
+        for component in rel.components() {
+            match component {
+                Component::Normal(_) => {}
+                _ => anyhow::bail!("caminho invalido no manifest: {}", path),
+            }
+        }
+        Ok(rel.to_path_buf())
+    }
+
+    fn sha256_file(path: &Path) -> Result<String> {
+        let bytes = fs::read(path)?;
+        let mut hasher = Sha256::new();
+        hasher.update(&bytes);
+        let out = hasher.finalize();
+        Ok(out.iter().map(|b| format!("{:02x}", b)).collect())
+    }
+
     async fn download_to_file_raw(url: &str, dest: &Path) -> Result<()> {
         let raw_client = Client::builder()
             .timeout(Duration::from_secs(20))
@@ -1621,6 +1647,40 @@ mod core {
             Err(err) => return Err(err.into()),
         };
         write_download_bytes(dest, bytes.as_ref())
+    }
+
+    async fn download_to_file_verified(
+        client: &Client,
+        url: &str,
+        dest: &Path,
+        expected_sha256: Option<&str>,
+    ) -> Result<()> {
+        let tmp = dest.with_extension("download.tmp");
+        if tmp.exists() {
+            let _ = fs::remove_file(&tmp);
+        }
+        download_to_file(client, url, &tmp).await?;
+        if let Some(expected) = expected_sha256.map(|s| s.trim()).filter(|s| !s.is_empty()) {
+            let actual = sha256_file(&tmp)?;
+            if !actual.eq_ignore_ascii_case(expected) {
+                let _ = fs::remove_file(&tmp);
+                anyhow::bail!(
+                    "sha256 invalido para {}: esperado {}, obtido {}",
+                    dest.display(),
+                    expected,
+                    actual
+                );
+            }
+        }
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        fs::rename(&tmp, dest).or_else(|_| {
+            fs::copy(&tmp, dest)?;
+            fs::remove_file(&tmp)?;
+            Ok::<(), std::io::Error>(())
+        })?;
+        Ok(())
     }
 
     fn index_from_file_list(conn: &mut Connection, files: &[String]) -> Result<ImageIndexResult> {
@@ -1824,9 +1884,14 @@ mod core {
         if manifest.db.version > local_version {
             // Manifest mudou: limpar pasta de lancamentos para evitar resquicios antigos
             clear_launches_dir(&imgs_dir).ok();
-            download_to_file(&client, &manifest.db.url, &dbf)
-                .await
-                .map_err(|e| e.to_string())?;
+            download_to_file_verified(
+                &client,
+                &manifest.db.url,
+                &dbf,
+                manifest.db.sha256.as_deref(),
+            )
+            .await
+            .map_err(|e| e.to_string())?;
             let conn = open_db(&dbf).map_err(|e| e.to_string())?;
             migrate(&conn).map_err(|e| e.to_string())?;
             if get_db_version(&conn).unwrap_or(0) < manifest.db.version {
@@ -1916,7 +1981,12 @@ mod core {
         }
         let mut jobs: Vec<DownloadJob> = Vec::new();
         for item in imgs.files.iter() {
-            let local_path = imgs_dir.join(&item.file);
+            let Ok(rel_path) = safe_manifest_rel_path(&item.file) else {
+                eprintln!("Ignorando caminho invalido no manifest: {}", item.file);
+                errors += 1;
+                continue;
+            };
+            let local_path = imgs_dir.join(&rel_path);
             let mut need = !local_path.exists();
             if !need {
                 if let Some(ref man_sha) = item.sha256 {
@@ -2573,9 +2643,15 @@ mod core {
     #[tauri::command]
     pub fn save_pdf_base64(path: String, data_base64: String) -> Result<(), String> {
         use base64::Engine;
+        if !path.to_ascii_lowercase().ends_with(".pdf") {
+            return Err("Destino precisa ter extensao .pdf".to_string());
+        }
         let bytes = base64::engine::general_purpose::STANDARD
             .decode(data_base64.trim())
             .map_err(|e| format!("PDF invalido: {}", e))?;
+        if !bytes.starts_with(b"%PDF-") {
+            return Err("Conteudo nao parece ser um PDF valido.".to_string());
+        }
         let dest = PathBuf::from(&path);
         if let Some(parent) = dest.parent() {
             fs::create_dir_all(parent).map_err(|e| e.to_string())?;
@@ -2622,7 +2698,9 @@ mod core {
             .ok_or_else(|| "Manifest nao possui bloco de imagens".to_string())?;
         let mut manifest_files: HashSet<String> = HashSet::new();
         for item in imgs.files.iter() {
-            manifest_files.insert(normalize_rel_path(&item.file));
+            if safe_manifest_rel_path(&item.file).is_ok() {
+                manifest_files.insert(normalize_rel_path(&item.file));
+            }
         }
         if manifest_files.is_empty() {
             return Err(

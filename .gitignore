@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+dist/
 dist-ssr
 *.local
 
@@ -74,3 +75,11 @@ data/images/
 *.tmp
 *.temp
 rclone.txt
+tmp/
+tmp_*.jsx
+debug_snippet.txt
+teste.sql
+teste2.sql
+backend/build/
+backend/__pycache__/
+backend/*.egg-info/
