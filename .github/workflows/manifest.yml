@@ -35,16 +35,17 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.4.0
+          run_install: false
+
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
           node-version: 20
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Prepare pnpm
-        run: corepack prepare pnpm@11.4.0 --activate
+          cache: pnpm
 
       - name: Install deps (pnpm)
         run: pnpm install --frozen-lockfile
