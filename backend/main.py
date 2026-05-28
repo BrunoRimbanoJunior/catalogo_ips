@@ -215,6 +215,9 @@ def admin_ui():
         .approved { background: #e8fff5; color: #0b6b3a; }
         .block { background: #ffecec; color: #a81b1b; }
         .filters { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+        .auth { display: flex; gap: 8px; align-items: center; margin: 10px 0 14px; }
+        .auth input { min-width: 280px; }
+        .auth .ghost { background: #5a5a5a; }
         input, select { padding: 6px 8px; border-radius: 6px; border: 1px solid #ccc; }
         .actions { display: flex; gap: 6px; flex-wrap: wrap; }
         .btn-block { background: #c62828; }
@@ -223,6 +226,13 @@ def admin_ui():
     </head>
     <body>
       <h1>Gestão de cadastros</h1>
+      <div class="auth">
+        <label>Token admin:
+          <input id="admin-token" type="password" autocomplete="current-password" placeholder="Informe o ADMIN_TOKEN" />
+        </label>
+        <button id="save-token" type="button">Entrar</button>
+        <button id="clear-token" type="button" class="ghost">Sair</button>
+      </div>
       <div class="filters">
         <label>Status:
           <select id="filter-status">
@@ -245,10 +255,62 @@ def admin_ui():
         <tbody></tbody>
       </table>
       <script>
+        const tokenInput = document.getElementById('admin-token');
+        const savedToken = sessionStorage.getItem('adminToken') || '';
+        tokenInput.value = savedToken;
+
+        function getToken() {
+          return tokenInput.value.trim() || sessionStorage.getItem('adminToken') || '';
+        }
+
+        function setStatus(message) {
+          document.getElementById('status').textContent = message;
+        }
+
+        function clearRows() {
+          document.querySelector('#tbl tbody').innerHTML = '';
+        }
+
+        document.getElementById('save-token').addEventListener('click', () => {
+          const token = tokenInput.value.trim();
+          if (!token) {
+            setStatus('Informe o token admin.');
+            clearRows();
+            return;
+          }
+          sessionStorage.setItem('adminToken', token);
+          load();
+        });
+
+        document.getElementById('clear-token').addEventListener('click', () => {
+          sessionStorage.removeItem('adminToken');
+          tokenInput.value = '';
+          clearRows();
+          setStatus('Token removido.');
+        });
+
+        tokenInput.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('save-token').click();
+          }
+        });
+
+        document.getElementById('filter-search').addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            load();
+          }
+        });
+
         async function load() {
           try {
-            const token = sessionStorage.getItem('adminToken') || prompt('Token admin');
-            if (!token) throw new Error('Token admin obrigatorio.');
+            const token = getToken();
+            if (!token) {
+              clearRows();
+              setStatus('Informe o token admin para carregar os cadastros.');
+              return;
+            }
             sessionStorage.setItem('adminToken', token);
             const status = document.getElementById('filter-status').value;
             const search = document.getElementById('filter-search').value;
@@ -257,8 +319,12 @@ def admin_ui():
             if (search) params.set('search', search);
             const res = await fetch('/admin/profiles?' + params.toString(), { headers: { 'X-Admin-Token': token } });
             const json = await res.json();
+            if (res.status === 401) {
+              sessionStorage.removeItem('adminToken');
+              throw new Error('Token admin inválido.');
+            }
             if (!res.ok) throw new Error(json.detail || res.statusText);
-            document.getElementById('status').textContent = 'Total: ' + (json.items?.length || 0);
+            setStatus('Total: ' + (json.items?.length || 0));
             const tbody = document.querySelector('#tbl tbody');
             tbody.innerHTML = '';
             (json.items || []).forEach(p => {
@@ -304,7 +370,7 @@ def admin_ui():
               tbody.appendChild(tr);
             });
           } catch (e) {
-            document.getElementById('status').textContent = 'Erro: ' + e.message;
+            setStatus('Erro: ' + e.message);
             console.error(e);
           }
         }
