@@ -2448,7 +2448,7 @@ function App() {
 
           <section className="panel">
             <div className="filters" style={{ flexWrap: "wrap" }}>
-              <input className="filter-code" placeholder="Pesquisar por codigo ou veiculo (produto/OEM/Similar/Veiculo)" value={codeQuery} onChange={(e) => setCodeQuery(e.target.value)} />
+              <input className="filter-code" placeholder="Pesquisar por descricao, codigo, veiculo ou ano" value={codeQuery} onChange={(e) => setCodeQuery(e.target.value)} />
               <select value={group} onChange={(e) => { setGroup(e.target.value); setVehicleId(""); }}>
                 <option value="">Grupo (todos)</option>
                 {groups.map((g) => (

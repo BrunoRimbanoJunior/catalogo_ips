@@ -138,6 +138,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
     let mut processed = 0usize;
     let mut upserted = 0usize;
     let mut linked = 0usize;
+    let current_year = crate::years::current_year();
 
     // Limpa tabelas principais antes de reimportar para evitar sobras da planilha anterior.
     tx.execute("DELETE FROM product_vehicles", []).ok();
@@ -153,6 +154,8 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
     tx.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", [])
         .ok();
     tx.execute("ALTER TABLE vehicles ADD COLUMN category TEXT", [])
+        .ok();
+    tx.execute("ALTER TABLE vehicles ADD COLUMN years TEXT", [])
         .ok();
     tx.execute("ALTER TABLE products ADD COLUMN ean_gtin TEXT", [])
         .ok();
@@ -350,8 +353,9 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
                 }
                 let primary_make = make_tokens.get(0).cloned().unwrap_or_default();
                 let primary_make_id = make_ids.get(0).copied();
+                let years = crate::years::vehicle_years_from_name(v, current_year);
                 tx.execute(
-                    "INSERT INTO vehicles(name, make, make_id, category) VALUES(?, ?, ?, ?) ON CONFLICT(name) DO UPDATE SET make=COALESCE(NULLIF(excluded.make,''), vehicles.make), make_id=COALESCE(excluded.make_id, vehicles.make_id), category=COALESCE(NULLIF(excluded.category,''), vehicles.category)",
+                    "INSERT INTO vehicles(name, make, make_id, category, years) VALUES(?, ?, ?, ?, ?) ON CONFLICT(name) DO UPDATE SET make=COALESCE(NULLIF(excluded.make,''), vehicles.make), make_id=COALESCE(excluded.make_id, vehicles.make_id), category=COALESCE(NULLIF(excluded.category,''), vehicles.category), years=COALESCE(NULLIF(excluded.years,''), vehicles.years)",
                     params![
                         v,
                         if primary_make.is_empty() {
@@ -364,6 +368,11 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
                             None::<String>
                         } else {
                             Some(category.clone())
+                        },
+                        if years.is_empty() {
+                            None::<String>
+                        } else {
+                            Some(years)
                         }
                     ],
                 )

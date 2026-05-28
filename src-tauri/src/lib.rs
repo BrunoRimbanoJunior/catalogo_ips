@@ -6,6 +6,7 @@ mod call_img;
 mod db;
 mod desc;
 mod importer;
+mod years;
 
 mod core {
     use super::*;
@@ -240,6 +241,7 @@ mod core {
               make TEXT,
               make_id INTEGER,
               category TEXT,
+              years TEXT,
               FOREIGN KEY(make_id) REFERENCES makes(id)
             );
             CREATE TABLE IF NOT EXISTS products (
@@ -301,6 +303,7 @@ mod core {
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN category TEXT", []);
+        let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN years TEXT", []);
         let _ = conn.execute(
             "CREATE TABLE IF NOT EXISTS vehicle_makes (vehicle_id INTEGER NOT NULL, make_id INTEGER NOT NULL, PRIMARY KEY(vehicle_id, make_id))",
             [],
@@ -325,9 +328,62 @@ mod core {
             "INSERT OR IGNORE INTO vehicle_makes(vehicle_id, make_id) SELECT v.id, m.id FROM vehicles v JOIN makes m ON UPPER(TRIM(m.name)) = UPPER(TRIM(COALESCE(v.make,''))) WHERE TRIM(COALESCE(v.make,'')) <> ''",
             [],
         );
+        let _ = backfill_vehicle_years(conn);
         let _ = seed_brand_groups(conn);
         Ok(())
     }
+
+    fn backfill_vehicle_years(conn: &Connection) -> Result<()> {
+        let current_year = crate::years::current_year();
+        let mut stmt =
+            conn.prepare("SELECT id, name FROM vehicles WHERE TRIM(COALESCE(years,'')) = ''")?;
+        let rows = stmt.query_map([], |row| {
+            Ok((row.get::<_, i64>(0)?, row.get::<_, String>(1)?))
+        })?;
+        let mut updates = Vec::new();
+        for row in rows {
+            let (id, name) = row?;
+            let years = crate::years::vehicle_years_from_name(&name, current_year);
+            if !years.is_empty() {
+                updates.push((id, years));
+            }
+        }
+        drop(stmt);
+        for (id, years) in updates {
+            conn.execute(
+                "UPDATE vehicles SET years = ?1 WHERE id = ?2",
+                params![years, id],
+            )?;
+        }
+        Ok(())
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn migrate_adds_and_backfills_vehicle_years() {
+            let conn = Connection::open_in_memory().unwrap();
+            conn.execute_batch(
+                "CREATE TABLE vehicles (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE);
+                 INSERT INTO vehicles(id, name) VALUES (1, 'HILUX 05/15');",
+            )
+            .unwrap();
+
+            migrate(&conn).unwrap();
+
+            let years: String = conn
+                .query_row("SELECT years FROM vehicles WHERE id = 1", [], |row| {
+                    row.get(0)
+                })
+                .unwrap();
+            assert!(years.contains("05"));
+            assert!(years.contains("2006"));
+            assert!(years.contains("2015"));
+        }
+    }
+
     pub(crate) fn get_db_version(conn: &Connection) -> Result<i64> {
         Ok(conn.query_row(
             "SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?1",
@@ -404,6 +460,7 @@ mod core {
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN category TEXT", []);
+        let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN years TEXT", []);
         let _ = conn.execute(
             "CREATE TABLE IF NOT EXISTS makes (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE)",
             [],
@@ -791,6 +848,51 @@ mod core {
         }
     }
 
+    #[derive(Debug, Clone)]
+    struct ParsedSearchQuery {
+        terms: Vec<String>,
+        year_aliases: Vec<Vec<String>>,
+    }
+
+    fn parse_search_query(value: &str) -> Option<ParsedSearchQuery> {
+        let current_year = crate::years::current_year();
+        let mut terms = Vec::new();
+        let mut year_aliases = Vec::new();
+        for token in search_tokens(value) {
+            if let Some(aliases) = crate::years::search_year_aliases(&token, current_year) {
+                year_aliases.push(aliases);
+            } else {
+                terms.push(token);
+            }
+        }
+        if terms.is_empty() && year_aliases.is_empty() {
+            None
+        } else {
+            Some(ParsedSearchQuery {
+                terms,
+                year_aliases,
+            })
+        }
+    }
+
+    fn search_tokens(value: &str) -> Vec<String> {
+        let mut tokens = Vec::new();
+        let mut current = String::new();
+        for ch in value.chars() {
+            if ch.is_alphanumeric() {
+                for upper in ch.to_uppercase() {
+                    current.push(upper);
+                }
+            } else if !current.is_empty() {
+                tokens.push(std::mem::take(&mut current));
+            }
+        }
+        if !current.is_empty() {
+            tokens.push(current);
+        }
+        tokens
+    }
+
     #[tauri::command]
     pub fn search_products_cmd(
         app: AppHandle,
@@ -848,16 +950,27 @@ mod core {
                     .into(),
             );
         }
-        if params
+        let parsed_query = params
             .code_query
             .as_ref()
-            .map(|s| !s.trim().is_empty())
-            .unwrap_or(false)
-        {
-            where_clauses.push(
-                "(p.code LIKE ? OR COALESCE(p.oem,'') LIKE ? OR COALESCE(p.similar,'') LIKE ? OR EXISTS (SELECT 1 FROM product_vehicles pv3 JOIN vehicles v3 ON v3.id=pv3.vehicle_id WHERE pv3.product_id=p.id AND v3.name LIKE ?))"
-                .into()
-            );
+            .filter(|s| !s.trim().is_empty())
+            .and_then(|s| parse_search_query(s));
+        if let Some(parsed) = parsed_query.as_ref() {
+            for _ in parsed.terms.iter() {
+                where_clauses.push(
+                    "(UPPER(p.code) LIKE ? OR UPPER(p.description) LIKE ? OR UPPER(COALESCE(p.oem,'')) LIKE ? OR UPPER(COALESCE(p.similar,'')) LIKE ? OR EXISTS (SELECT 1 FROM product_vehicles pv3 JOIN vehicles v3 ON v3.id=pv3.vehicle_id WHERE pv3.product_id=p.id AND UPPER(v3.name) LIKE ?))"
+                        .into(),
+                );
+            }
+            for aliases in parsed.year_aliases.iter() {
+                let year_checks = std::iter::repeat("(',' || COALESCE(vy.years,'') || ',') LIKE ?")
+                    .take(aliases.len())
+                    .collect::<Vec<_>>()
+                    .join(" OR ");
+                where_clauses.push(format!(
+                    "EXISTS (SELECT 1 FROM product_vehicles pvy JOIN vehicles vy ON vy.id=pvy.vehicle_id WHERE pvy.product_id=p.id AND ({year_checks}))"
+                ));
+            }
         }
         if !where_clauses.is_empty() {
             sql.push_str(" WHERE ");
@@ -897,12 +1010,20 @@ mod core {
                 values.push(rusqlite::types::Value::Null);
             }
         }
-        if let Some(q) = params.code_query.as_ref().filter(|s| !s.trim().is_empty()) {
-            let like = format!("%{}%", q);
-            values.push(like.clone().into()); // code
-            values.push(like.clone().into()); // oem
-            values.push(like.clone().into()); // similar
-            values.push(like.into()); // vehicle name
+        if let Some(parsed) = parsed_query.as_ref() {
+            for term in parsed.terms.iter() {
+                let like = format!("%{}%", term);
+                values.push(like.clone().into()); // code
+                values.push(like.clone().into()); // description
+                values.push(like.clone().into()); // oem
+                values.push(like.clone().into()); // similar
+                values.push(like.into()); // vehicle name
+            }
+            for aliases in parsed.year_aliases.iter() {
+                for alias in aliases {
+                    values.push(format!("%,{},%", alias).into());
+                }
+            }
         }
 
         let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
