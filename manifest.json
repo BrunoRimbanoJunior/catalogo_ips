@@ -1,8 +1,10 @@
 {
+  "appVersion": "1.5.0",
+  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.0/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1764014394,
+    "version": 28052618,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "3bfac1fe7079982a50f16d6fd6a854d699f99690ca71766f6e663bd72226df12"
+    "sha256": "66d85e2ce1c97897c089b24130c7251103fcc5231ab836dbd116db353b00456b"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -1878,6 +1880,410 @@
       {
         "file": "BANDEJAS/7175863062.png",
         "sha256": "806f384a1612753e29c5d5cac0bb6c35"
+      },
+      {
+        "file": "BOMBAS/7111045810.png",
+        "sha256": "4dcd954a1d08ab373ab0176583d65dce"
+      },
+      {
+        "file": "BOMBAS/7111065810.png",
+        "sha256": "c15de1efa2341f2a07c25b7e2a5a333e"
+      },
+      {
+        "file": "BOMBAS/7111305810.png",
+        "sha256": "3bd3ff8a9819f63d2c4753bb307af215"
+      },
+      {
+        "file": "BOMBAS/7111305811.png",
+        "sha256": "a58e54aab3b0514cb6ea39e522cd5409"
+      },
+      {
+        "file": "BOMBAS/7111345810.png",
+        "sha256": "437d6beb3be998b780e4d82a1383f3ed"
+      },
+      {
+        "file": "BOMBAS/7111345820.png",
+        "sha256": "cabf18ae46fd6eb763a48762888eaf0c"
+      },
+      {
+        "file": "BOMBAS/7111445810.png",
+        "sha256": "54ac4db997900b7d7132f4c911823a20"
+      },
+      {
+        "file": "BOMBAS/7111445811.png",
+        "sha256": "669b052be52c9c337516f09effe02238"
+      },
+      {
+        "file": "BOMBAS/7111445820.png",
+        "sha256": "dde1ddcf25358ef15cff288a28733a53"
+      },
+      {
+        "file": "BOMBAS/7111445821.png",
+        "sha256": "9a7066e99eae8564787a8f94942e48fa"
+      },
+      {
+        "file": "BOMBAS/7111825800.png",
+        "sha256": "fa9202940aceb4e7a0a05f634878a1e2"
+      },
+      {
+        "file": "BOMBAS/7111825801.png",
+        "sha256": "7a378852c0b182a771b3dfae3bb19fb5"
+      },
+      {
+        "file": "BOMBAS/7111825802.png",
+        "sha256": "a502eb708eaed9989815d59324ed300c"
+      },
+      {
+        "file": "BOMBAS/7111825803.png",
+        "sha256": "5922f6a0bdfeed2853618dc38d0371b7"
+      },
+      {
+        "file": "BOMBAS/7111825810.png",
+        "sha256": "17962efb5272e564f6848cfcbefa73e9"
+      },
+      {
+        "file": "BOMBAS/7111825821.png",
+        "sha256": "0dc75c82116933f89d8aa86b027a4ce0"
+      },
+      {
+        "file": "BOMBAS/7111825830.png",
+        "sha256": "f549b1021b570edfe75b1162d0797a98"
+      },
+      {
+        "file": "BOMBAS/7111835800.png",
+        "sha256": "ebe0406ab4b17db355932c08f77f2e36"
+      },
+      {
+        "file": "BOMBAS/7111965810.png",
+        "sha256": "550c60bbdf0d34319f66a289e97f8597"
+      },
+      {
+        "file": "BOMBAS/7111965820.png",
+        "sha256": "e13a20cb0ce6b0c8ecad80f46ab29af6"
+      },
+      {
+        "file": "BOMBAS/7115165801.png",
+        "sha256": "e36d62f6bdd1d811445da05aa21eb821"
+      },
+      {
+        "file": "BOMBAS/7115305810.png",
+        "sha256": "d495ff13ca46413c8bdff6a4fe7cdd22"
+      },
+      {
+        "file": "BOMBAS/7115305811.png",
+        "sha256": "96fbd9331ec3afb67ba673d7a5565ee8"
+      },
+      {
+        "file": "BOMBAS/7115325810.png",
+        "sha256": "2cfa23214e3aa7008b83842c92b993e4"
+      },
+      {
+        "file": "BOMBAS/7115345801.png",
+        "sha256": "cc3cf35b92dafbc0ea9cc81eaaa3f915"
+      },
+      {
+        "file": "BOMBAS/7115345802.png",
+        "sha256": "54b50848d6540e308cf085264b646b58"
+      },
+      {
+        "file": "BOMBAS/7115465800.png",
+        "sha256": "d4ad5f8dea72b0847e2a24cafc6375a3"
+      },
+      {
+        "file": "BOMBAS/7115485810.png",
+        "sha256": "c8b17d71da7b4180c1fd8503f04ea4d8"
+      },
+      {
+        "file": "BOMBAS/7115485820.png",
+        "sha256": "2a183fb68ef6a483a5ffd10d3c9528ba"
+      },
+      {
+        "file": "BOMBAS/7115505801.png",
+        "sha256": "27478f2a5745424aec770e0a3cd418e5"
+      },
+      {
+        "file": "BOMBAS/7115505810.png",
+        "sha256": "54d700a64a23393c97a3cbcdc14e886c"
+      },
+      {
+        "file": "BOMBAS/7115545801.png",
+        "sha256": "c8d92c226ee07e88224b9a5d5cbd1b42"
+      },
+      {
+        "file": "BOMBAS/7115585801.png",
+        "sha256": "7cf42a6865d97756566902482b9b9edf"
+      },
+      {
+        "file": "BOMBAS/7115665801.png",
+        "sha256": "06f4659c61a31f418adb09fd6ef1a6b0"
+      },
+      {
+        "file": "BOMBAS/7115665802.png",
+        "sha256": "4954683daefa3eae04b694599774551e"
+      },
+      {
+        "file": "BOMBAS/7115805820.png",
+        "sha256": "ec53681c1a6d672a146910462afeb141"
+      },
+      {
+        "file": "BOMBAS/7115805830.png",
+        "sha256": "4c01a80c4f7b4ce8b925360e897785d6"
+      },
+      {
+        "file": "BOMBAS/7115805840.png",
+        "sha256": "fb6468cbe0fa235ad4db11009071bf4d"
+      },
+      {
+        "file": "BOMBAS/7115805841.png",
+        "sha256": "77165afce6108149f790c793398ce60d"
+      },
+      {
+        "file": "BOMBAS/7115885810.png",
+        "sha256": "e48ae8ae8c01f7ef4ab3c44a9ae4a500"
+      },
+      {
+        "file": "BOMBAS/7134415800.png",
+        "sha256": "4f8827b6b57e89977224cd712378932c"
+      },
+      {
+        "file": "BOMBAS/7134415810.png",
+        "sha256": "620b14e9e0e2e6cc0b9180b20da67537"
+      },
+      {
+        "file": "BOMBAS/7134905800.png",
+        "sha256": "1bd9c69ab811d666a75f19900492c4c6"
+      },
+      {
+        "file": "BOMBAS/7146305801.png",
+        "sha256": "3bbf20defbd1a5b434267d387993084f"
+      },
+      {
+        "file": "BOMBAS/7146335800.png",
+        "sha256": "743edf77698fe13543571632fed6df84"
+      },
+      {
+        "file": "BOMBAS/7146335810.png",
+        "sha256": "b91a226bce2903086e430fdc48b6348b"
+      },
+      {
+        "file": "BOMBAS/7146505800.png",
+        "sha256": "81e30e8a82bf9b18949e3da308773ad1"
+      },
+      {
+        "file": "BOMBAS/7146505801.png",
+        "sha256": "cff4fccf09a3fad00554687d241aef5b"
+      },
+      {
+        "file": "BOMBAS/7146505802.png",
+        "sha256": "7a1840f5ca89fa359253c7c23b2bfde6"
+      },
+      {
+        "file": "BOMBAS/7146505810.png",
+        "sha256": "f003147865f6cc95c01859d23e813e10"
+      },
+      {
+        "file": "BOMBAS/7146505811.png",
+        "sha256": "e67e3e1f813b7d8330a1a9593886bdd3"
+      },
+      {
+        "file": "BOMBAS/7146505812.png",
+        "sha256": "93db3cabc939a1e5958a170d5c02124d"
+      },
+      {
+        "file": "BOMBAS/7146905801.png",
+        "sha256": "07f882fbae9c2795bf53f82688a23b40"
+      },
+      {
+        "file": "BOMBAS/7148265801.png",
+        "sha256": "b836b2b022bbc6ef9b73d5c3be2cd18c"
+      },
+      {
+        "file": "BOMBAS/7148265802.png",
+        "sha256": "c67acfdc302abec3ebe3c53284389836"
+      },
+      {
+        "file": "BOMBAS/7148275801.png",
+        "sha256": "adc94cfb3286b8c312918a4fd9d0d294"
+      },
+      {
+        "file": "BOMBAS/7149805800.png",
+        "sha256": "081f73e563454342cc3226abbf40b61c"
+      },
+      {
+        "file": "BOMBAS/7149805810.png",
+        "sha256": "09367b16cbb10c1e85caef91db6dbee1"
+      },
+      {
+        "file": "BOMBAS/7149805820.png",
+        "sha256": "7391284bff8cf70f1a0c3fde964e576c"
+      },
+      {
+        "file": "BOMBAS/7150365810.png",
+        "sha256": "da8c7d4692f6d0f355373e1398962ffd"
+      },
+      {
+        "file": "BOMBAS/7150365811.png",
+        "sha256": "6362454de0a75077bf4d0cb4751ad489"
+      },
+      {
+        "file": "BOMBAS/7150645810.png",
+        "sha256": "0a4d98e774d94d1f63b3316020fe7f3a"
+      },
+      {
+        "file": "BOMBAS/7150645820.png",
+        "sha256": "349abe9ccc09824e5e696266940e1519"
+      },
+      {
+        "file": "BOMBAS/7150645830.png",
+        "sha256": "7abc653124adaa32ec7b06bc66f91494"
+      },
+      {
+        "file": "BOMBAS/7150685801.png",
+        "sha256": "bde0f2dda3df36dbb51d43ed3c054e40"
+      },
+      {
+        "file": "BOMBAS/7150685802.png",
+        "sha256": "e359b002bfaf5da6afbeeb83266ce15c"
+      },
+      {
+        "file": "BOMBAS/7150785801.png",
+        "sha256": "6762cca705b48b4b2944bdc01992c483"
+      },
+      {
+        "file": "BOMBAS/7150785802.png",
+        "sha256": "48c4fe31837baa5448584d178f023feb"
+      },
+      {
+        "file": "BOMBAS/7150785803.png",
+        "sha256": "71a5ab30a99650d83963f3475e0b7533"
+      },
+      {
+        "file": "BOMBAS/7156025800.png",
+        "sha256": "7c439534153b1428fea32d18a2e106ad"
+      },
+      {
+        "file": "BOMBAS/7156425810.png",
+        "sha256": "418e164e4ab5de8a2b8a752eea4efabf"
+      },
+      {
+        "file": "BOMBAS/7156425811.png",
+        "sha256": "b0a97ecfea54cd6f80948189bf679825"
+      },
+      {
+        "file": "BOMBAS/7156425812.png",
+        "sha256": "991e2a2cf91287917e37adb599caaa22"
+      },
+      {
+        "file": "BOMBAS/7156425821.png",
+        "sha256": "2a48f90fa76e6fa74d8dcca2fe7128d1"
+      },
+      {
+        "file": "BOMBAS/7163225800.png",
+        "sha256": "034a4f74bcb08aeac82177e05f6c63df"
+      },
+      {
+        "file": "BOMBAS/7163225810.png",
+        "sha256": "26638cf769604220b0a276ee8b602a97"
+      },
+      {
+        "file": "BOMBAS/7169375800.png",
+        "sha256": "5d58d11a91bdd53d1476324c1f1e9279"
+      },
+      {
+        "file": "BOMBAS/7169375810.png",
+        "sha256": "dbcd1e82b02b43d15db029a096c70ee2"
+      },
+      {
+        "file": "BOMBAS/7169385800.png",
+        "sha256": "2b9b554c292ea9cb085cf8fa3be308e1"
+      },
+      {
+        "file": "BOMBAS/7169385810.png",
+        "sha256": "03c31d82db6fdc170f840b5a7c00100b"
+      },
+      {
+        "file": "BOMBAS/7169385820.png",
+        "sha256": "dc29eb9d6f0e01c1e62a942d5fb84584"
+      },
+      {
+        "file": "BOMBAS/7169765810.png",
+        "sha256": "5d1f7924f0ab5483da02d43c9e1cce3a"
+      },
+      {
+        "file": "BOMBAS/7169765820.png",
+        "sha256": "e8592db174a30ad3c9bc9cb68467995a"
+      },
+      {
+        "file": "BOMBAS/7170205820.png",
+        "sha256": "8bb3fcfdc3e6ee5782e767e1d1e81281"
+      },
+      {
+        "file": "BOMBAS/7170205830.png",
+        "sha256": "c3d89114cc50c861c3ea435513d205cf"
+      },
+      {
+        "file": "BOMBAS/7170205840.png",
+        "sha256": "3dd577ddf4aef1f538594ff0f620cfaa"
+      },
+      {
+        "file": "BOMBAS/7170205841.png",
+        "sha256": "cbbb43bc520de21c66c0d0904bda8d27"
+      },
+      {
+        "file": "BOMBAS/7175205800.png",
+        "sha256": "bc5727be5e9f131f35705bffa9225401"
+      },
+      {
+        "file": "BOMBAS/7175265850.png",
+        "sha256": "421e3670d1ca2ca9ebbebfe1eedbc5e3"
+      },
+      {
+        "file": "BOMBAS/7175525830.png",
+        "sha256": "843c576a2e06280323152b852b8b6086"
+      },
+      {
+        "file": "BOMBAS/7175525840.png",
+        "sha256": "d2675ebe188a3bfb85601c007de69c62"
+      },
+      {
+        "file": "BOMBAS/7175525850.png",
+        "sha256": "71761f3a24b99e88b01b90eab487b18c"
+      },
+      {
+        "file": "BOMBAS/7175525860.png",
+        "sha256": "0615a7a2b29e1dfc2c527dafdc2c5dc4"
+      },
+      {
+        "file": "BOMBAS/7175525870.png",
+        "sha256": "8dfa10766306c392b6ed908aa0855568"
+      },
+      {
+        "file": "BOMBAS/7182915801.png",
+        "sha256": "65e1dd2c2358f8def1c9eb80ace738dc"
+      },
+      {
+        "file": "BOMBAS/7182945801.png",
+        "sha256": "72329b6fe67b2b8ef311ba4cf0d1e825"
+      },
+      {
+        "file": "BOMBAS/7183915801.png",
+        "sha256": "05536f2817dfd32f8e0ffee387d26cb5"
+      },
+      {
+        "file": "BOMBAS/7183925801.png",
+        "sha256": "2cd8f2f000930674974fd3f6ce4d9d13"
+      },
+      {
+        "file": "BOMBAS/7184915801.png",
+        "sha256": "4b95d1dcc37970f5a85515c3411e9a0a"
+      },
+      {
+        "file": "BOMBAS/7184915802.png",
+        "sha256": "202bf6799093722f3c14ef6eb7844588"
+      },
+      {
+        "file": "BOMBAS/7185915801.png",
+        "sha256": "af53c4130eca41ca8c500655889df81d"
       },
       {
         "file": "CAIXA_DIRECAO/7111006801.png",
@@ -5846,10 +6252,6 @@
       {
         "file": "POLIAS_E_TENSORES/8134990604.png",
         "sha256": "6eec61bbd122cf63a7d71ee290d1d89e"
-      },
-      {
-        "file": "POLIAS_E_TENSORES/8134990604_1.png",
-        "sha256": "b163ca6c299934662bfeb0b24a33d532"
       },
       {
         "file": "POLIAS_E_TENSORES/8134990605.png",
