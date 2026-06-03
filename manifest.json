@@ -2,9 +2,9 @@
   "appVersion": "1.5.0",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.0/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 28052618,
+    "version": 3062614,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "66d85e2ce1c97897c089b24130c7251103fcc5231ab836dbd116db353b00456b"
+    "sha256": "9d79e8ba5b205678ec5410aa5d260a239a1bf33310b789be0792c2dc675b97f0"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -143,7 +143,7 @@
       },
       {
         "file": "AMORTECEDORES/7111822812.png",
-        "sha256": "55c456ac371754bd8b8018e547e7358c"
+        "sha256": "e722072f57bbbc403eebc0f46e3f8b62"
       },
       {
         "file": "AMORTECEDORES/7111852801.png",
@@ -171,7 +171,7 @@
       },
       {
         "file": "AMORTECEDORES/7111962801.png",
-        "sha256": "ef9bd1d037526b35f4149d8c89913385"
+        "sha256": "26073a241fa2cd14ef761350967ae982"
       },
       {
         "file": "AMORTECEDORES/7111962802.png",
@@ -206,6 +206,10 @@
         "sha256": "8d83e2220a7869ef3bbb58c58cae481a"
       },
       {
+        "file": "AMORTECEDORES/7115302801.png",
+        "sha256": "385662e47c3981d935e574c54e1a76e8"
+      },
+      {
         "file": "AMORTECEDORES/7115302802.png",
         "sha256": "418fc63d75b99e837449653d0c3b04e4"
       },
@@ -234,6 +238,10 @@
         "sha256": "56c139d98163b00cfcbff03c0ed0bf40"
       },
       {
+        "file": "AMORTECEDORES/7115342821.png",
+        "sha256": "92459f47c48568411504cc4661d8d9ce"
+      },
+      {
         "file": "AMORTECEDORES/7115342822.png",
         "sha256": "52a028fb989731b0ad1c79922124f8d4"
       },
@@ -254,8 +262,16 @@
         "sha256": "e027119bf6429a772d8e7039c1c1b123"
       },
       {
+        "file": "AMORTECEDORES/7115502801.png",
+        "sha256": "337a8e391236df2c6a61e39ea097e764"
+      },
+      {
         "file": "AMORTECEDORES/7115502802.png",
         "sha256": "898f8b3201bcf2fae1a46e343c191549"
+      },
+      {
+        "file": "AMORTECEDORES/7115502811.png",
+        "sha256": "3faa2e6f71381a398ce6dd9b2031014b"
       },
       {
         "file": "AMORTECEDORES/7115502821.png",
@@ -290,6 +306,10 @@
         "sha256": "372345c65ef8a939ffa9373f1a3bc5f5"
       },
       {
+        "file": "AMORTECEDORES/7115542811.png",
+        "sha256": "531be73aff3b85ac6e88cfe85271491b"
+      },
+      {
         "file": "AMORTECEDORES/7115542812.png",
         "sha256": "93e66a06da4029d122ebf4a3f3c9f093"
       },
@@ -318,8 +338,16 @@
         "sha256": "63378f8ef40a595b4672d2ea6e1db3b6"
       },
       {
+        "file": "AMORTECEDORES/7115662801.png",
+        "sha256": "1cd6560691d90c412af4ad8bf7169998"
+      },
+      {
         "file": "AMORTECEDORES/7115662802.png",
         "sha256": "eeead0cd216627f074c398a82a4fc9f3"
+      },
+      {
+        "file": "AMORTECEDORES/7115662811.png",
+        "sha256": "1705a09d86c8614ac690ea4b8bd96ed3"
       },
       {
         "file": "AMORTECEDORES/7115662812.png",
@@ -336,6 +364,10 @@
       {
         "file": "AMORTECEDORES/7115802811.png",
         "sha256": "37f266f0b9a04e0ff363592fc3e13f94"
+      },
+      {
+        "file": "AMORTECEDORES/7115802812.png",
+        "sha256": "156c890078c89dfd90d75d86886bd989"
       },
       {
         "file": "AMORTECEDORES/7134062801.png",
@@ -614,6 +646,10 @@
         "sha256": "0dbe5e91cfae6f527bfec05994a31131"
       },
       {
+        "file": "AMORTECEDORES/7146392801.png",
+        "sha256": "02f6f0c4594d2ce71bcdec0e4e2a4962"
+      },
+      {
         "file": "AMORTECEDORES/7146392802.png",
         "sha256": "eb3097b0c919ad4c68c1aa2271a148a1"
       },
@@ -858,6 +894,10 @@
         "sha256": "b6666f2814f82d1184147b3b2052cdcd"
       },
       {
+        "file": "AMORTECEDORES/7150302803.png",
+        "sha256": "83399da57b13ea63ea899a87aa989afd"
+      },
+      {
         "file": "AMORTECEDORES/7150302811.png",
         "sha256": "beca42d43eb064ed48acbb7646304871"
       },
@@ -876,6 +916,14 @@
       {
         "file": "AMORTECEDORES/7150362804.png",
         "sha256": "e34d419137a067a0ddf927a8123ec22e"
+      },
+      {
+        "file": "AMORTECEDORES/7150382802.png",
+        "sha256": "0920aae8b0e1cbda64b9949cde130cd4"
+      },
+      {
+        "file": "AMORTECEDORES/7150382804.png",
+        "sha256": "099d43f2754818ab94054fd78000b70e"
       },
       {
         "file": "AMORTECEDORES/7150422801.png",
@@ -912,6 +960,10 @@
       {
         "file": "AMORTECEDORES/7150682801.png",
         "sha256": "74cb9b5c1b755850046681e3b3ed2f5c"
+      },
+      {
+        "file": "AMORTECEDORES/7150682802.png",
+        "sha256": "9d581595091670d1bf6dab2e4eb9440a"
       },
       {
         "file": "AMORTECEDORES/7150782801.png",
@@ -966,8 +1018,20 @@
         "sha256": "9e720cb90dd9bf9eae8d55de8eeb19cd"
       },
       {
+        "file": "AMORTECEDORES/7156422801.png",
+        "sha256": "946b6baa13e48283e29e93f38fbb12d4"
+      },
+      {
+        "file": "AMORTECEDORES/7156422811.png",
+        "sha256": "682c25d64aa1d7ebada12c1877d03990"
+      },
+      {
         "file": "AMORTECEDORES/7156422812.png",
         "sha256": "bde01559f39b341ce03b2ecb44e6747c"
+      },
+      {
+        "file": "AMORTECEDORES/7156422821.png",
+        "sha256": "9f5b20e8eaf433ba0b8e676eaced08c4"
       },
       {
         "file": "AMORTECEDORES/7156422822.png",
@@ -978,8 +1042,24 @@
         "sha256": "67be6c83cd406ef7cb47d110a54ee776"
       },
       {
+        "file": "AMORTECEDORES/7156502802.png",
+        "sha256": "353d981f3b64e593c930b6d578c7ce0f"
+      },
+      {
+        "file": "AMORTECEDORES/7156702801.png",
+        "sha256": "fd7425802a72c9f0f2bfdc5bc07d0a3e"
+      },
+      {
         "file": "AMORTECEDORES/7156802801.png",
         "sha256": "7ae899259d400b710cacce421f684a4c"
+      },
+      {
+        "file": "AMORTECEDORES/7156862801.png",
+        "sha256": "24c7dfcd3567a0f199272f75c0ecacbe"
+      },
+      {
+        "file": "AMORTECEDORES/7156862802.png",
+        "sha256": "f27061f430a60057430d0cf75d956d43"
       },
       {
         "file": "AMORTECEDORES/7156862803 (2).png",
@@ -994,6 +1074,18 @@
         "sha256": "5135560999ce2b53412f3e07dbabce10"
       },
       {
+        "file": "AMORTECEDORES/7156882801.png",
+        "sha256": "5c5a09f50f3146f8cde06c4f26944611"
+      },
+      {
+        "file": "AMORTECEDORES/7156882811.png",
+        "sha256": "d5eba90107072be4438e0f9259a4aa9e"
+      },
+      {
+        "file": "AMORTECEDORES/7156882821.png",
+        "sha256": "883a0fded6535b1d05af88e211f701a2"
+      },
+      {
         "file": "AMORTECEDORES/7156882831.png",
         "sha256": "c69c691da5e6fc3eaf5240b805fcb700"
       },
@@ -1004,6 +1096,10 @@
       {
         "file": "AMORTECEDORES/7156982801.png",
         "sha256": "bc7c9a3b4be814f5668f65238a03c28a"
+      },
+      {
+        "file": "AMORTECEDORES/7156982802.png",
+        "sha256": "83720684604693867d81529d44c6aef9"
       },
       {
         "file": "AMORTECEDORES/7163102801.png",
@@ -1034,6 +1130,18 @@
         "sha256": "1f8e5c128a9e348377cffb89e4c0e5d1"
       },
       {
+        "file": "AMORTECEDORES/7163222811.png",
+        "sha256": "afb73c5abae7bbc946e2e92288959ac8"
+      },
+      {
+        "file": "AMORTECEDORES/7163222812.png",
+        "sha256": "0f73233f2e51bc04524cded131dd086b"
+      },
+      {
+        "file": "AMORTECEDORES/7163222813.png",
+        "sha256": "8c2252c08dac37e826f886cb1cb04bdf"
+      },
+      {
         "file": "AMORTECEDORES/7163222821.png",
         "sha256": "4c76b7bf9dc9f5ed336497419610c390"
       },
@@ -1058,6 +1166,10 @@
         "sha256": "30e23eb3d49ec129f4e1a853962328d1"
       },
       {
+        "file": "AMORTECEDORES/7163282821.png",
+        "sha256": "031961f59ad69a8c3f998bbea6f6c2ff"
+      },
+      {
         "file": "AMORTECEDORES/7163282822.png",
         "sha256": "bb35f394a46f851bbb8227294c01c3bb"
       },
@@ -1072,6 +1184,14 @@
       {
         "file": "AMORTECEDORES/7163362801.png",
         "sha256": "62e29756c7a1cbcfe2ea35115c6db7e1"
+      },
+      {
+        "file": "AMORTECEDORES/7163362802.png",
+        "sha256": "24f9a5367fad7e9d1935178bb38af229"
+      },
+      {
+        "file": "AMORTECEDORES/7163362803.png",
+        "sha256": "db21ce49838c58499b67aea09e20b545"
       },
       {
         "file": "AMORTECEDORES/7169362801.png",
@@ -1099,7 +1219,11 @@
       },
       {
         "file": "AMORTECEDORES/7169362822.png",
-        "sha256": "e807db9f0a47a4375ba5b89d66c62743"
+        "sha256": "cb360d0407655e6595f9a77f4022323e"
+      },
+      {
+        "file": "AMORTECEDORES/7169712801.png",
+        "sha256": "ba3230cfc32661f02222bd69c7934436"
       },
       {
         "file": "AMORTECEDORES/7169712802.png",
@@ -1116,6 +1240,10 @@
       {
         "file": "AMORTECEDORES/7169762801.png",
         "sha256": "4778bc0b092fba439534bc4499048f30"
+      },
+      {
+        "file": "AMORTECEDORES/7169762802.png",
+        "sha256": "20af999f31e4d077bdb70f7ca041e260"
       },
       {
         "file": "AMORTECEDORES/7169762811.png",
@@ -1146,6 +1274,14 @@
         "sha256": "60175010d544d0c20eccca11c08d9099"
       },
       {
+        "file": "AMORTECEDORES/7170202803.png",
+        "sha256": "abc0fa3f823b0a2fcda46230e4e81625"
+      },
+      {
+        "file": "AMORTECEDORES/7170202804.png",
+        "sha256": "34e906aac4a917e3251fe4316e93b2ea"
+      },
+      {
         "file": "AMORTECEDORES/7170382801.png",
         "sha256": "e921a377a32428c048b8697cece85659"
       },
@@ -1162,6 +1298,14 @@
         "sha256": "5b36f54220c2a9f5bf603cfb1093a11c"
       },
       {
+        "file": "AMORTECEDORES/7170422802.png",
+        "sha256": "1cfc78bf8f98628bb68bc6579492d810"
+      },
+      {
+        "file": "AMORTECEDORES/7170422803.png",
+        "sha256": "7784670822a5ce5f8ed34e08dd092da3"
+      },
+      {
         "file": "AMORTECEDORES/7170602801.png",
         "sha256": "19d97c3e5560ff7bd5e8d65b6d285f84"
       },
@@ -1174,12 +1318,20 @@
         "sha256": "07572f2330a4ce7bcd4d67df1fb489ff"
       },
       {
+        "file": "AMORTECEDORES/7175262801.png",
+        "sha256": "006bfc8ea86cc3a778bac93d50441ccd"
+      },
+      {
         "file": "AMORTECEDORES/7175262802.png",
         "sha256": "8f0c25d90d5d4dc62db669503038cd12"
       },
       {
         "file": "AMORTECEDORES/7175262803.png",
         "sha256": "977febb43dd0015c5e938a5d8fa27dcf"
+      },
+      {
+        "file": "AMORTECEDORES/7175262811.png",
+        "sha256": "3d97cc11e02c49334ed5b63581c86ad5"
       },
       {
         "file": "AMORTECEDORES/7175262812.png",
@@ -1190,6 +1342,14 @@
         "sha256": "11e70ae2a194981a8b5be4b783fb0294"
       },
       {
+        "file": "AMORTECEDORES/7175262822.png",
+        "sha256": "fa0897360999a90c11303b159cc9f7be"
+      },
+      {
+        "file": "AMORTECEDORES/7175262823.png",
+        "sha256": "3fe814ab2f2d3060a126a3cfa4b3f0d4"
+      },
+      {
         "file": "AMORTECEDORES/7175522811.png",
         "sha256": "60af61339fa20d634bc729073a88bb7a"
       },
@@ -1198,8 +1358,16 @@
         "sha256": "be72a38a5843baf41e68378519941538"
       },
       {
+        "file": "AMORTECEDORES/7175522813.png",
+        "sha256": "50ebeffeff2901cb6061b689b9c5cbbe"
+      },
+      {
         "file": "AMORTECEDORES/7175802801.png",
         "sha256": "2976efa85704dfc1d302837530a0ab77"
+      },
+      {
+        "file": "AMORTECEDORES/7175802802.png",
+        "sha256": "5dcdb455e91dceb8d442b6b967664281"
       },
       {
         "file": "BANDEJAS/7111043001.png",
@@ -2296,6 +2464,10 @@
       {
         "file": "CAIXA_DIRECAO/7111306010.png",
         "sha256": "b5253f24a83c39e029d8aee39c6bcf63"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7111385900.png",
+        "sha256": "cadab627164e35216bc6a49b0b20272c"
       },
       {
         "file": "CAIXA_DIRECAO/7111445900.png",
