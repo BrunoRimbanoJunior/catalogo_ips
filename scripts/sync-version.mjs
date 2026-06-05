@@ -20,7 +20,7 @@ if (!version) {
   throw new Error("APP_VERSION not set (expected from tag, env, or package.json)");
 }
 
-if (!/^\d+\.\d+\.\d+(?:[-.+][0-9A-Za-z.-]+)?$/.test(version)) {
+if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/.test(version)) {
   throw new Error(`APP_VERSION must be a semver string (received ${JSON.stringify(rawVersion)})`);
 }
 
