@@ -40,7 +40,7 @@
     },
     "macOS": {
       "minimumSystemVersion": "10.13",
-      "bundleVersion": "10503"
+      "bundleVersion": "10509"
     },
     "icon": [
       "icons/32x32.png",

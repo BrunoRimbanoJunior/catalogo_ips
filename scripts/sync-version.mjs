@@ -3,7 +3,7 @@
 import fs from "fs";
 import path from "path";
 
-const version =
+const rawVersion =
   process.env.APP_VERSION?.trim() ||
   (() => {
     try {
@@ -14,8 +14,14 @@ const version =
     }
   })();
 
+const version = rawVersion.replace(/^v\.?/, "");
+
 if (!version) {
   throw new Error("APP_VERSION not set (expected from tag, env, or package.json)");
+}
+
+if (!/^\d+\.\d+\.\d+(?:[-.+][0-9A-Za-z.-]+)?$/.test(version)) {
+  throw new Error(`APP_VERSION must be a semver string (received ${JSON.stringify(rawVersion)})`);
 }
 
 const root = process.cwd();
