@@ -15,10 +15,19 @@ jobs:
       matrix:
         include:
           - os: windows-latest
+            args: ""
+            rustTarget: ""
           - os: ubuntu-latest
+            args: ""
+            rustTarget: ""
           - os: macos-13
+            args: "--target x86_64-apple-darwin"
+            rustTarget: "x86_64-apple-darwin"
           - os: macos-latest
+            args: "--target aarch64-apple-darwin"
+            rustTarget: "aarch64-apple-darwin"
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -59,6 +68,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install macOS Rust target
+        if: matrix.rustTarget != ''
+        run: rustup target add ${{ matrix.rustTarget }}
+
       - name: Apply frontend env overrides
         shell: bash
         env:
@@ -92,6 +105,7 @@ jobs:
             Automated release for ${{ github.ref_name }}.
             Includes installers for Windows, macOS and Linux when available.
           includeUpdaterJson: true
+          args: ${{ matrix.args }}
 
       - name: Create stable Windows installer name
         if: matrix.os == 'windows-latest'
