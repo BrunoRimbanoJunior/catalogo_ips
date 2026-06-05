@@ -101,6 +101,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify local Tauri CLI
+        run: pnpm exec tauri --version
+
       - name: Install macOS Rust target
         if: matrix.rustTarget != ''
         run: rustup target add ${{ matrix.rustTarget }}
@@ -132,7 +135,9 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           projectPath: .
-          tauriScript: pnpm tauri
+          tauriScript: pnpm exec tauri
+          appName: catalogo_ips
+          appVersion: ${{ env.APP_VERSION }}
           tagName: ${{ github.ref_name }}
           releaseName: ${{ github.ref_name }}
           releaseBody: |
