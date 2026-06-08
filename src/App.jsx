@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
@@ -55,6 +55,7 @@ const REG_DEFAULT = {
 const GITHUB_REPO = "BrunoRimbanoJunior/catalogo_ips";
 const GITHUB_RELEASES_LATEST = `https://github.com/${GITHUB_REPO}/releases/latest`;
 const GITHUB_LATEST_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
+const PROFILE_SELECT = "id,status,person_type,country,state,city,cpf_cnpj,full_name,phone_area,phone_number,email,device_fingerprint";
 
 function onlyDigits(value = "") {
   return String(value || "").replace(/\D/g, "");
@@ -1327,6 +1328,78 @@ function App() {
   const [sentOnce, setSentOnce] = useState(false);
 
   const supabaseConfigured = !!supabase;
+  const applyProfileData = useCallback(
+    (data) => {
+      if (!data) return null;
+      setProfile(data);
+      setForm((prev) => ({
+        ...prev,
+        person_type: data.person_type || prev.person_type,
+        country: data.country || prev.country,
+        state: data.state || prev.state,
+        city: data.city || prev.city,
+        cpf_cnpj: data.cpf_cnpj || prev.cpf_cnpj,
+        full_name: data.full_name || prev.full_name,
+        phone_area: data.phone_area || prev.phone_area,
+        phone_number: data.phone_number || prev.phone_number,
+        email: data.email || prev.email || registrationEmail,
+      }));
+      if (data.status === "approved") {
+        localStorage.setItem("profile.cached", JSON.stringify(data));
+      } else {
+        localStorage.removeItem("profile.cached");
+      }
+      return data;
+    },
+    [registrationEmail]
+  );
+  const loadProfile = useCallback(
+    async (emailOverride = registrationEmail) => {
+      if (!supabase) return null;
+      const email = String(emailOverride || "").trim().toLowerCase();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(PROFILE_SELECT)
+        .or(`device_fingerprint.eq.${fingerprint}${email ? `,email.eq.${email}` : ""}`)
+        .maybeSingle();
+      if (error && error.code !== "PGRST116") throw error;
+      return applyProfileData(data);
+    },
+    [applyProfileData, fingerprint, registrationEmail]
+  );
+  const refreshAuthStatus = useCallback(
+    async ({ silent = false } = {}) => {
+      if (!supabaseConfigured) return null;
+      if (!silent) {
+        setAuthLoading(true);
+        setAuthError("");
+        setAuthSuccess("");
+      }
+      try {
+        const data = await loadProfile();
+        if (!data) {
+          if (!silent) setAuthError("Cadastro nao localizado. Confira o e-mail e envie novamente.");
+          return null;
+        }
+        if (!silent) {
+          if (data.status === "approved") {
+            setAuthSuccess("Cadastro aprovado. Acesso liberado.");
+          } else if (data.status === "block") {
+            setAuthError("Cadastro bloqueado. Entre em contato com o administrador.");
+          } else {
+            setAuthSuccess("Cadastro ainda pendente. Aguarde aprovacao.");
+          }
+        }
+        return data;
+      } catch (e) {
+        if (!silent) setAuthError(`Falha ao verificar cadastro: ${e.message || e}`);
+        return null;
+      } finally {
+        if (!silent) setAuthLoading(false);
+      }
+    },
+    [loadProfile, supabaseConfigured]
+  );
 
   const selectedBrand = useMemo(() => brands.find((b) => String(b.id) === String(brandId)) || null, [brands, brandId]);
   const numericBrandId = useMemo(() => {
@@ -1611,37 +1684,24 @@ function App() {
       setAuthLoading(true);
       setAuthError("");
       try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("id,status,person_type,country,state,city,cpf_cnpj,full_name,phone_area,phone_number,email,device_fingerprint")
-          .or(`device_fingerprint.eq.${fingerprint}${registrationEmail ? `,email.eq.${registrationEmail}` : ""}`)
-          .maybeSingle();
-        if (error && error.code !== "PGRST116") throw error;
-        if (data) {
-          setProfile(data);
-          setForm((prev) => ({
-            ...prev,
-            person_type: data.person_type || prev.person_type,
-            country: data.country || prev.country,
-            state: data.state || prev.state,
-            city: data.city || prev.city,
-            cpf_cnpj: data.cpf_cnpj || prev.cpf_cnpj,
-            full_name: data.full_name || prev.full_name,
-            phone_area: data.phone_area || prev.phone_area,
-            phone_number: data.phone_number || prev.phone_number,
-            email: data.email || prev.email || registrationEmail,
-          }));
-          if (data.status === "approved") {
-            localStorage.setItem("profile.cached", JSON.stringify(data));
-          }
-        }
+        await loadProfile();
       } catch (e) {
         setAuthError(`Falha ao carregar cadastro: ${e.message || e}`);
       } finally {
         setAuthLoading(false);
       }
     })();
-  }, [supabaseConfigured, fingerprint, registrationEmail]);
+  }, [loadProfile, supabaseConfigured]);
+
+  useEffect(() => {
+    if (!supabaseConfigured || isDev) return undefined;
+    if (profile?.status === "approved" || profile?.status === "block") return undefined;
+    if (!registrationEmail && !sentOnce) return undefined;
+    const timer = setInterval(() => {
+      refreshAuthStatus({ silent: true });
+    }, 15000);
+    return () => clearInterval(timer);
+  }, [isDev, profile?.status, refreshAuthStatus, registrationEmail, sentOnce, supabaseConfigured]);
 
   useEffect(() => {
     if (!showSettings) return;
@@ -1868,33 +1928,47 @@ function App() {
     try {
       if (!supabase) throw new Error("Supabase nao configurado.");
       let profileId = profile?.id || null;
-      if (!profileId && validation.email) {
-        const { data } = await supabase.from("profiles").select("id").eq("email", validation.email).maybeSingle();
-        if (data?.id) profileId = data.id;
+      let existingProfile = profile || null;
+      if (validation.email) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id,status,device_fingerprint")
+          .eq("email", validation.email)
+          .maybeSingle();
+        if (error && error.code !== "PGRST116") throw error;
+        if (data?.id) {
+          profileId = data.id;
+          existingProfile = { ...existingProfile, ...data };
+        }
       }
+      const statusToSave =
+        existingProfile?.status === "approved" || existingProfile?.status === "block" ? existingProfile.status : "pending";
       const payload = {
         ...form,
         cpf_cnpj: validation.cpfCnpj,
         email: validation.email,
-        status: "pending",
-        device_fingerprint: profile?.device_fingerprint || fingerprint,
+        status: statusToSave,
+        device_fingerprint: existingProfile?.device_fingerprint || fingerprint,
         id: profileId || undefined,
       };
       const { data, error } = await supabase.from("profiles").upsert(payload, { onConflict: "email" }).select().maybeSingle();
       if (error) throw error;
-      const resolved = data ? { ...data, status: data.status || "pending" } : null;
+      const resolved = data ? { ...data, status: data.status || statusToSave } : null;
       if (resolved) {
-        setProfile(resolved);
-        if (resolved.status === "approved") {
-          localStorage.setItem("profile.cached", JSON.stringify(resolved));
-        } else {
-          localStorage.removeItem("profile.cached");
-        }
+        applyProfileData(resolved);
       }
       setRegistrationEmail(validation.email);
       setForm((prev) => ({ ...prev, cpf_cnpj: validation.cpfCnpj, email: validation.email }));
-      setAuthSuccess("Cadastro enviado. Aguarde aprovacao.");
-      setSentOnce(true);
+      if (resolved?.status === "approved") {
+        setAuthSuccess("Cadastro aprovado. Acesso liberado.");
+        setSentOnce(false);
+      } else if (resolved?.status === "block") {
+        setAuthError("Cadastro bloqueado. Entre em contato com o administrador.");
+        setSentOnce(true);
+      } else {
+        setAuthSuccess("Cadastro enviado. Aguarde aprovacao.");
+        setSentOnce(true);
+      }
     } catch (e) {
       setAuthError(`Falha ao salvar cadastro: ${e.message || e}`);
     } finally {
@@ -2827,6 +2901,9 @@ function App() {
                     <div className="auth-wait">
                       <p><strong>Cadastro enviado.</strong> Aguarde aprovacao do time.</p>
                       <p className="auth-muted small">Se precisar corrigir algo, reabra a ficha e reenvie.</p>
+                      <button type="button" onClick={() => refreshAuthStatus()} disabled={authLoading}>
+                        {authLoading ? "Verificando..." : "Verificar aprovacao"}
+                      </button>
                     </div>
                   ) : (
                     <form className="auth-grid" onSubmit={submitRegistration}>
