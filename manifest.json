@@ -2,9 +2,9 @@
   "appVersion": "1.5.11",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.11/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 9062614,
+    "version": 9062619,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "a1518ce3b927b83107bd7ae23a4edb839eca6d607332c104f43776d971dbe076"
+    "sha256": "640465965d0a280e38c61143c5749f79e62c17a2a1193352f61c8d26bed26326"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -2946,6 +2946,10 @@
         "sha256": "8455151ef47384133f89beba9d59f492"
       },
       {
+        "file": "CAIXA_DIRECAO/7146336021.png",
+        "sha256": "e3b2ea04a15cb566f1a874847a0f1be2"
+      },
+      {
         "file": "CAIXA_DIRECAO/7146396010.png",
         "sha256": "4290fcbea4f05711dc6d096c62e00c1e"
       },
@@ -5078,24 +5082,12 @@
         "sha256": "f09c97e82dd5e5850b61c9e241665192"
       },
       {
-        "file": "LANCAMENTOS/7111826011.png",
-        "sha256": "bdaa27d79e4698551de8f2616fe13ead"
-      },
-      {
         "file": "LANCAMENTOS/7114566802.png",
         "sha256": "fb6389d857c50200a58e9e7d39c4476f"
       },
       {
-        "file": "LANCAMENTOS/7115466802.png",
-        "sha256": "ba886364eea89ecb0ea6e4bc59875eb3"
-      },
-      {
         "file": "LANCAMENTOS/7115466803.png",
         "sha256": "f5821e79e878f0b5049c5537857f3255"
-      },
-      {
-        "file": "LANCAMENTOS/7115486802.png",
-        "sha256": "7c33daee4b8087f4af31949671acfcdb"
       },
       {
         "file": "LANCAMENTOS/7115885810.png",
@@ -5110,12 +5102,20 @@
         "sha256": "fa3eac28a7fc966ca831525ee332d3f3"
       },
       {
+        "file": "LANCAMENTOS/7146336021.png",
+        "sha256": "5efd29b168bde950ffe68ec5b37dc5c7"
+      },
+      {
         "file": "LANCAMENTOS/7146505811.png",
         "sha256": "327b4abcb1c68a5f413a322cdcde5b73"
       },
       {
         "file": "LANCAMENTOS/7146505812.png",
         "sha256": "b5245f78de2b18dfdef63005344aa78e"
+      },
+      {
+        "file": "LANCAMENTOS/7146906010.png",
+        "sha256": "d1f55d006d170852edbdb6cd60c9cde9"
       },
       {
         "file": "LANCAMENTOS/7149146030.png",
@@ -5128,18 +5128,6 @@
       {
         "file": "LANCAMENTOS/7169766802.png",
         "sha256": "dbed6c3e1305ee1890c4a7051d6bfff8"
-      },
-      {
-        "file": "LANCAMENTOS/7170556010.png",
-        "sha256": "58b8161d0b9abd23496e826ee1dbafc7"
-      },
-      {
-        "file": "LANCAMENTOS/7185946801.png",
-        "sha256": "da7cd457adb34600097b10b510761272"
-      },
-      {
-        "file": "LANCAMENTOS/7188106801.png",
-        "sha256": "6401b79abf92dc69d4087bdbb5835680"
       },
       {
         "file": "LANCAMENTOS/SEMI-EIXOS.png",
