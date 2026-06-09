@@ -36,8 +36,8 @@ mod core {
 
     fn normalize_launch_token(s: &str) -> String {
         s.to_lowercase()
-            .replace("Ã§", "c")
-            .replace("Ã£", "a")
+            .replace("\u{00c3}\u{00a7}", "c")
+            .replace("\u{00c3}\u{00a3}", "a")
             .replace('ã', "a")
             .replace('á', "a")
             .replace('â', "a")
@@ -900,7 +900,7 @@ mod core {
     ) -> Result<Vec<ProductListItem>, String> {
         let conn =
             open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-        // Agrega veiculos sem filtrar montadora para nao baguncar a ordem de parametros
+        // Agrega veículos sem filtrar montadora para não bagunçar a ordem de parâmetros.
         let mut sql = String::from("SELECT p.id, p.code, p.description, b.name, (SELECT group_concat(DISTINCT v2.name) FROM product_vehicles pv2 JOIN vehicles v2 ON v2.id=pv2.vehicle_id WHERE pv2.product_id=p.id) AS vehicles FROM products p JOIN brands b ON b.id=p.brand_id");
         // Quando filtra por veículo, precisamos do nome para permitir match parcial no texto.
         let vehicle_name: Option<String> = if let Some(vid) = params.vehicle_id {
@@ -1371,7 +1371,7 @@ mod core {
                     .into(),
             );
         }
-        // Ainda nao existe tabela/flag de favoritos no catalogo local; mantemos o campo
+        // Ainda não existe tabela/flag de favoritos no catálogo local; mantemos o campo.
         // no contrato para ativar o filtro quando essa origem estiver disponivel.
         let _ = params.favorites_only;
 
@@ -1709,7 +1709,7 @@ mod core {
         for component in rel.components() {
             match component {
                 Component::Normal(_) => {}
-                _ => anyhow::bail!("caminho invalido no manifest: {}", path),
+                _ => anyhow::bail!("caminho inválido no manifest: {}", path),
             }
         }
         Ok(rel.to_path_buf())
@@ -1786,7 +1786,7 @@ mod core {
             if !actual.eq_ignore_ascii_case(expected) {
                 let _ = fs::remove_file(&tmp);
                 anyhow::bail!(
-                    "sha256 invalido para {}: esperado {}, obtido {}",
+                    "sha256 inválido para {}: esperado {}, obtido {}",
                     dest.display(),
                     expected,
                     actual
@@ -2003,7 +2003,7 @@ mod core {
             last.as_deref() != Some(&manifest_hash)
         };
         if manifest.db.version > local_version {
-            // Manifest mudou: limpar pasta de lancamentos para evitar resquicios antigos
+            // Manifest mudou: limpar pasta de lançamentos para evitar resquícios antigos.
             clear_launches_dir(&imgs_dir).ok();
             download_to_file_verified(
                 &client,
@@ -2020,7 +2020,7 @@ mod core {
             }
             updated_db = true;
         } else if manifest_changed {
-            // Mesmo sem alterar o DB, se o manifest mudou (imagens novas), limpa lancamentos
+            // Mesmo sem alterar o DB, se o manifest mudou (imagens novas), limpa lançamentos.
             clear_launches_dir(&imgs_dir).ok();
         }
         let mut downloaded_images: usize = 0;
@@ -2103,7 +2103,7 @@ mod core {
         let mut jobs: Vec<DownloadJob> = Vec::new();
         for item in imgs.files.iter() {
             let Ok(rel_path) = safe_manifest_rel_path(&item.file) else {
-                eprintln!("Ignorando caminho invalido no manifest: {}", item.file);
+                eprintln!("Ignorando caminho inválido no manifest: {}", item.file);
                 errors += 1;
                 continue;
             };
@@ -2297,13 +2297,13 @@ mod core {
             .map(str::trim)
             .find(|line| !line.is_empty() && !line.starts_with('#') && !line.starts_with("//"))
             .map(|line| line.to_string())
-            .ok_or_else(|| format!("Nenhum comando valido encontrado em {}", path.display()))
+            .ok_or_else(|| format!("Nenhum comando válido encontrado em {}", path.display()))
     }
 
     fn validate_version_string(version: &str) -> Result<String, String> {
         let normalized = version.trim();
         if normalized.is_empty() {
-            return Err("Informe uma versao".to_string());
+            return Err("Informe uma versão".to_string());
         }
         if !normalized
             .chars()
@@ -2311,17 +2311,17 @@ mod core {
             .map(|c| c.is_ascii_digit())
             .unwrap_or(false)
         {
-            return Err("A versao precisa comecar com numero".to_string());
+            return Err("A versão precisa começar com número".to_string());
         }
         if normalized.chars().any(|c| c.is_whitespace()) {
-            return Err("A versao nao pode conter espacos".to_string());
+            return Err("A versão não pode conter espaços".to_string());
         }
         if normalized
             .chars()
             .any(|c| !(c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '+')))
         {
             return Err(
-                "Use apenas letras, numeros, ponto, hifen e sinal de mais na versao".to_string(),
+                "Use apenas letras, números, ponto, hífen e sinal de mais na versão".to_string(),
             );
         }
         Ok(normalized.to_string())
@@ -2343,7 +2343,7 @@ mod core {
             .get("version")
             .and_then(|v| v.as_str())
             .map(|v| v.to_string())
-            .ok_or_else(|| format!("Campo version nao encontrado em {}", path.display()))
+            .ok_or_else(|| format!("Campo version não encontrado em {}", path.display()))
     }
 
     fn read_cargo_toml_version(path: &Path) -> Result<String, String> {
@@ -2361,11 +2361,11 @@ mod core {
             }
             if in_package && trimmed.starts_with("version") {
                 return extract_quoted_value(trimmed)
-                    .ok_or_else(|| format!("Linha de versao invalida em {}", path.display()));
+                    .ok_or_else(|| format!("Linha de versão inválida em {}", path.display()));
             }
         }
         Err(format!(
-            "Campo version nao encontrado na secao [package] de {}",
+            "Campo version não encontrado na seção [package] de {}",
             path.display()
         ))
     }
@@ -2439,7 +2439,7 @@ mod core {
             }
         }
         if !replaced {
-            return Err("Campo version nao encontrado no JSON".to_string());
+            return Err("Campo version não encontrado no JSON".to_string());
         }
         Ok(render_with_original_newline(lines, contents))
     }
@@ -2467,7 +2467,7 @@ mod core {
             lines.push(line_to_push);
         }
         if !replaced {
-            return Err("Campo version nao encontrado na secao [package]".to_string());
+            return Err("Campo version não encontrado na seção [package]".to_string());
         }
         Ok(render_with_original_newline(lines, contents))
     }
@@ -2517,7 +2517,7 @@ mod core {
     fn read_app_version_info() -> Result<AppVersionInfo, String> {
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
         let app_root = find_app_root_upwards(&cwd, 8)
-            .ok_or_else(|| format!("Raiz do app nao encontrada a partir de {}", cwd.display()))?;
+            .ok_or_else(|| format!("Raiz do app não encontrada a partir de {}", cwd.display()))?;
         let package_json_path = app_root.join("package.json");
         let cargo_toml_path = app_root.join("src-tauri").join("Cargo.toml");
         let tauri_conf_path = app_root.join("src-tauri").join("tauri.conf.json");
@@ -2566,7 +2566,7 @@ mod core {
         }
 
         if in_single || in_double {
-            return Err("Aspas nao fechadas no comando do rclone".to_string());
+            return Err("Aspas não fechadas no comando do rclone".to_string());
         }
         if !current.is_empty() {
             parts.push(current);
@@ -2593,7 +2593,7 @@ mod core {
         {
             Ok(())
         } else {
-            Err("O comando em rclone.txt precisa usar a operacao sync".to_string())
+            Err("O comando em rclone.txt precisa usar a operação sync".to_string())
         }
     }
 
@@ -2617,7 +2617,7 @@ mod core {
             cwd.join("scripts").join("gen-manifest-r2.mjs")
         };
         if !script_path.exists() {
-            return Err(format!("Script nao encontrado: {}", script_path.display()));
+            return Err(format!("Script não encontrado: {}", script_path.display()));
         }
         let mut cmd = PCommand::new("node");
         cmd.arg(script_path.as_os_str())
@@ -2627,8 +2627,8 @@ mod core {
             .arg(&db_url)
             .arg("--out")
             .arg(&out_path);
-        // Env do R2:  define variaveis se valores nao estiverem vazios,
-        // permitindo que o script leia de .env/.env.development quando nao passadas pela UI.
+        // Env do R2: define variáveis se valores não estiverem vazios,
+        // permitindo que o script leia de .env/.env.development quando não passadas pela UI.
         if !r2.account_id.trim().is_empty() {
             cmd.env("R2_ACCOUNT_ID", &r2.account_id);
         }
@@ -2673,7 +2673,7 @@ mod core {
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
         let command_file = find_file_upwards(&cwd, "rclone.txt", 6).ok_or_else(|| {
             format!(
-                "Arquivo rclone.txt nao encontrado a partir de {}",
+                "Arquivo rclone.txt não encontrado a partir de {}",
                 cwd.display()
             )
         })?;
@@ -2718,7 +2718,7 @@ mod core {
         let next_version = validate_version_string(&version)?;
         let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
         let app_root = find_app_root_upwards(&cwd, 8)
-            .ok_or_else(|| format!("Raiz do app nao encontrada a partir de {}", cwd.display()))?;
+            .ok_or_else(|| format!("Raiz do app não encontrada a partir de {}", cwd.display()))?;
         let package_json_path = app_root.join("package.json");
         let cargo_toml_path = app_root.join("src-tauri").join("Cargo.toml");
         let tauri_conf_path = app_root.join("src-tauri").join("tauri.conf.json");
@@ -2765,13 +2765,13 @@ mod core {
     pub fn save_pdf_base64(path: String, data_base64: String) -> Result<(), String> {
         use base64::Engine;
         if !path.to_ascii_lowercase().ends_with(".pdf") {
-            return Err("Destino precisa ter extensao .pdf".to_string());
+            return Err("Destino precisa ter extensão .pdf".to_string());
         }
         let bytes = base64::engine::general_purpose::STANDARD
             .decode(data_base64.trim())
-            .map_err(|e| format!("PDF invalido: {}", e))?;
+            .map_err(|e| format!("PDF inválido: {}", e))?;
         if !bytes.starts_with(b"%PDF-") {
-            return Err("Conteudo nao parece ser um PDF valido.".to_string());
+            return Err("Conteúdo não parece ser um PDF válido.".to_string());
         }
         let dest = PathBuf::from(&path);
         if let Some(parent) = dest.parent() {
@@ -2816,7 +2816,7 @@ mod core {
             fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
         let imgs = manifest
             .images
-            .ok_or_else(|| "Manifest nao possui bloco de imagens".to_string())?;
+            .ok_or_else(|| "Manifest não possui bloco de imagens".to_string())?;
         let mut manifest_files: HashSet<String> = HashSet::new();
         for item in imgs.files.iter() {
             if safe_manifest_rel_path(&item.file).is_ok() {
@@ -2825,7 +2825,7 @@ mod core {
         }
         if manifest_files.is_empty() {
             return Err(
-                "Manifest sem arquivos de imagens; abortando limpeza para evitar remocao total"
+                "Manifest sem arquivos de imagens; abortando limpeza para evitar remoção total"
                     .to_string(),
             );
         }
@@ -2876,13 +2876,13 @@ mod core {
         app: &AppHandle,
         manifest_url: &str,
     ) -> Result<(CatalogManifest, String), String> {
-        // Se nao for http(s), tenta ler como arquivo local
+        // Se não for http(s), tenta ler como arquivo local.
         if !(manifest_url.starts_with("http://") || manifest_url.starts_with("https://")) {
             let txt = std::fs::read_to_string(manifest_url)
-                .map_err(|e| format!("Falha lendo manifest local: {}", e))?;
+                .map_err(|e| format!("Falha ao ler manifest local: {}", e))?;
             let h = hash_str(&txt);
             let m: CatalogManifest = serde_json::from_str(&txt)
-                .map_err(|e| format!("Falha parse manifest local: {}", e))?;
+                .map_err(|e| format!("Falha ao interpretar manifest local: {}", e))?;
             return Ok((m, h));
         }
         let http_res = client

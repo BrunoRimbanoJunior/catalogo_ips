@@ -197,7 +197,7 @@ fn decrypt_if_needed(
         return Ok(data);
     }
     let Some(key) = key_env.map(|s| s.as_str()) else {
-        eprintln!("decrypt_image: arquivo criptografado, mas DESCRYPT_KEY nao encontrado");
+        eprintln!("decrypt_image: arquivo criptografado, mas DESCRYPT_KEY não encontrado");
         return Err("Arquivo criptografado sem chave configurada.".to_string());
     };
     match decrypt_image(&data, key) {
@@ -244,7 +244,7 @@ pub fn prepare_image_for_print(app: &AppHandle, path_or_rel: String) -> Result<P
     let requested = ensure_inside_dir(requested, &imgs_dir)?;
     let Some(source_path) = resolve_with_cimg_fallback(&requested) else {
         return Err(format!(
-            "Falha ao ler imagem (nao encontrada): {}",
+            "Falha ao ler imagem (não encontrada): {}",
             requested.display()
         ));
     };
@@ -315,11 +315,11 @@ pub fn read_image_base64(app: &AppHandle, path_or_rel: String) -> Result<String,
     }
 
     eprintln!(
-        "read_image_base64: arquivo nao encontrado {}",
+        "read_image_base64: arquivo não encontrado {}",
         abs_try.display()
     );
     Err(format!(
-        "Falha ao ler imagem (nao encontrada): {}",
+        "Falha ao ler imagem (não encontrada): {}",
         abs_try.display()
     ))
 }

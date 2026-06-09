@@ -2,9 +2,9 @@
   "appVersion": "1.5.11",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.11/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 3062614,
+    "version": 9062614,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "9d79e8ba5b205678ec5410aa5d260a239a1bf33310b789be0792c2dc675b97f0"
+    "sha256": "a1518ce3b927b83107bd7ae23a4edb839eca6d607332c104f43776d971dbe076"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -2666,6 +2666,10 @@
         "sha256": "829758cb35581c0306f38a236bb3210d"
       },
       {
+        "file": "CAIXA_DIRECAO/7115706000.png",
+        "sha256": "fab33ad0fd83771044593c3407ed119e"
+      },
+      {
         "file": "CAIXA_DIRECAO/7115766010.png",
         "sha256": "d516f4ac2257cd6c41ba2d68086f15fb"
       },
@@ -2994,6 +2998,10 @@
         "sha256": "74105569af3d27cff7d3b9d8c2d2567d"
       },
       {
+        "file": "CAIXA_DIRECAO/7146745900.png",
+        "sha256": "afc4d929bb4ed417f4dca28fb2018567"
+      },
+      {
         "file": "CAIXA_DIRECAO/7146905900.png",
         "sha256": "cc2ef148985b8f719baadd8b9930e195"
       },
@@ -3050,12 +3058,20 @@
         "sha256": "a622ea8d3cc94c79b0485379f1b21bbb"
       },
       {
+        "file": "CAIXA_DIRECAO/7149076010.png",
+        "sha256": "c90c23aea435c3ca0483739d71844441"
+      },
+      {
         "file": "CAIXA_DIRECAO/7149076020.png",
         "sha256": "25173d19f11b767df0a07fafd9cd2866"
       },
       {
         "file": "CAIXA_DIRECAO/7149076021.png",
         "sha256": "1edda3959f1f98c3f80f3ca8de8a7321"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7149136030.png",
+        "sha256": "9921ef0fa7cb0401fb4ba42a1151cf64"
       },
       {
         "file": "CAIXA_DIRECAO/7149146030.png",
@@ -3152,6 +3168,10 @@
       {
         "file": "CAIXA_DIRECAO/7156106000.png",
         "sha256": "c21403ee4687c3f09882711f9ff90500"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7156305910.png",
+        "sha256": "481b3a36158ae2c06adbbdafd273aa69"
       },
       {
         "file": "CAIXA_DIRECAO/7156305911.png",
@@ -3512,6 +3532,10 @@
       {
         "file": "CAIXA_DIRECAO/7177146610.png",
         "sha256": "d7ff539ba0fc0d55742844fcbbfc3c82"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7177236000.png",
+        "sha256": "9a273204bbbc328a5e16980e9028dd57"
       },
       {
         "file": "CAIXA_DIRECAO/7181906801.png",

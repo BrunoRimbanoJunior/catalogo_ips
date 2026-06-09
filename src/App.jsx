@@ -109,13 +109,13 @@ function validateRegistrationForm(form, fallbackEmail = "") {
   const isCompany = form.person_type === "pj";
 
   if (!isValidRegistrationEmail(email)) {
-    return { error: "Informe um e-mail valido." };
+    return { error: "Informe um e-mail válido." };
   }
   if (isCompany && !isValidCnpj(cpfCnpj)) {
-    return { error: "Informe um CNPJ valido." };
+    return { error: "Informe um CNPJ válido." };
   }
   if (!isCompany && !isValidCpf(cpfCnpj)) {
-    return { error: "Informe um CPF valido." };
+    return { error: "Informe um CPF válido." };
   }
   return { error: "", email, cpfCnpj };
 }
@@ -306,15 +306,6 @@ function PrintFilterList({ title, options, selected, onToggle, onClear, emptyTex
   );
 }
 
-function escapeHtml(value = "") {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
 function displayText(value, fallback = "") {
   const text = String(value || "").trim();
   return text || fallback;
@@ -346,317 +337,12 @@ function yieldToUi() {
 
 function catalogPrintTitle(filters) {
   const groups = filters?.groups || [];
-  return groups.length === 1 ? displayText(groups[0], "CATALOGO DE PRODUTOS").toUpperCase() : "CATALOGO DE PRODUTOS";
+  return groups.length === 1 ? displayText(groups[0], "CATÁLOGO DE PRODUTOS").toUpperCase() : "CATÁLOGO DE PRODUTOS";
 }
 
 function catalogIndexLineTitle(filters) {
   const lines = filters?.lines || [];
-  return lines.length === 1 ? displayText(lines[0], "").toUpperCase() : "CATALOGO DE PRODUTOS";
-}
-
-function buildPrintCatalogHtml({ items, filters }) {
-  const itemsPerPage = 6;
-  const indexEntriesPerPage = 28;
-  const sortedItems = [...items].sort((a, b) => {
-    const ak = [a.group, a.make, a.vehicle, a.description, a.code].map((v) => String(v || "").toUpperCase()).join("|");
-    const bk = [b.group, b.make, b.vehicle, b.description, b.code].map((v) => String(v || "").toUpperCase()).join("|");
-    return ak.localeCompare(bk, "pt-BR", { numeric: true, sensitivity: "base" });
-  });
-
-  const groupMap = new Map();
-  sortedItems.forEach((item, index) => {
-    const group = displayText(item.group, "SEM GRUPO").toUpperCase();
-    const make = displayText(item.make, "SEM MONTADORA").toUpperCase();
-    const key = `${group}||${make}`;
-    if (!groupMap.has(key)) groupMap.set(key, { group, make, firstIndex: index, total: 0 });
-    groupMap.get(key).total += 1;
-  });
-  const groupListBase = Array.from(groupMap.values());
-  const indexGroupCount = new Set(groupListBase.map((entry) => entry.group)).size;
-  const indexPageCount = Math.max(1, Math.ceil((groupListBase.length + indexGroupCount) / indexEntriesPerPage));
-  const firstProductPage = 3 + indexPageCount;
-  const indexGroups = groupListBase.map((entry) => ({
-    ...entry,
-    page: firstProductPage + Math.floor(entry.firstIndex / itemsPerPage),
-  }));
-  const productPages = chunkArray(sortedItems, itemsPerPage);
-  const coverTitle = catalogPrintTitle(filters);
-  const indexLineTitle = catalogIndexLineTitle(filters);
-  const indexRows = [];
-  let lastIndexGroup = "";
-  indexGroups.forEach((entry) => {
-    if (entry.group !== lastIndexGroup) {
-      indexRows.push({ type: "group", group: entry.group });
-      lastIndexGroup = entry.group;
-    }
-    indexRows.push({ type: "make", make: entry.make, page: entry.page });
-  });
-
-  const indexPages = chunkArray(indexRows, indexEntriesPerPage)
-    .map((entries, pageOffset) => {
-      const rows = entries
-        .map((entry) =>
-          entry.type === "group"
-            ? `<div class="index-group-title">${escapeHtml(entry.group)}</div>`
-            : `
-            <div class="index-row">
-              <span class="index-sub">${escapeHtml(entry.make)}</span>
-              <span class="index-dots"></span>
-              <span class="index-page">${entry.page}</span>
-            </div>`
-        )
-        .join("");
-      return `
-        <section class="page index-page-wrap">
-          <header class="catalog-header index-header">
-            <div class="header-brand">IPS DO BRASIL</div>
-            <div class="index-header-copy">
-              <strong>${escapeHtml(indexLineTitle)}</strong>
-              <span>CATALOGO 2026</span>
-            </div>
-          </header>
-          <main class="index-content">
-            <h1>Indice:</h1>
-            <div class="index-list">${rows || '<div class="index-empty">Nenhum item selecionado.</div>'}</div>
-          </main>
-          <footer class="catalog-footer">
-            <span>${3 + pageOffset}</span>
-            <strong>www.ipsbrasil.com.br</strong>
-          </footer>
-        </section>`;
-    })
-    .join("");
-
-  const productHtml = productPages
-    .map((pageItems, pageIndex) => {
-      const pageNo = firstProductPage + pageIndex;
-      const pageIsEven = pageNo % 2 === 0;
-      const cards = pageItems
-        .map((item) => {
-          const make = displayText(item.make, item.brand).toUpperCase();
-          const vehicle = displayText(firstCatalogVehicle(item.vehicle), "APLICACAO").toUpperCase();
-          const description = displayText(item.description, "PRODUTO").toUpperCase();
-          const image = item.imageSrc
-            ? `<img src="${escapeHtml(item.imageSrc)}" alt="">`
-            : `<div class="no-image">IMAGEM<br>INDISPONIVEL</div>`;
-          return `
-            <article class="product-card">
-              <div class="card-top">
-                <div class="card-vehicle"><strong>${escapeHtml(make)}</strong><span>// ${escapeHtml(vehicle)}</span></div>
-                <span class="card-code">${escapeHtml(item.code)}</span>
-              </div>
-              <div class="card-image">${image}</div>
-              <div class="card-desc">${escapeHtml(description)}</div>
-              <div class="card-application">${escapeHtml(vehicle)}</div>
-            </article>`;
-        })
-        .join("");
-      const footerPage = `<span class="footer-page-no">${pageNo}</span>`;
-      const footerBody = `
-            <div>
-              <strong>www.ipsbrasil.com.br</strong>
-              <small>AS FOTOS CONTIDAS NESSE CATALOGO SAO DE CARATER MERAMENTE ILUSTRATIVO, NAO CORRESPONDENDO A FOTO ORIGINAL DO PRODUTO. AS MARCAS DAS MONTADORAS SAO DE FUNCAO MERAMENTE INFORMATIVAS E COMPARATIVAS.</small>
-            </div>`;
-      const footerLogo = `<img class="footer-logo" src="/images/logo.png" alt="">`;
-      return `
-        <section class="page product-page">
-          <header class="catalog-header product-header">
-            <div class="header-red">
-              <img src="/images/logo.png" alt="">
-            </div>
-            <div class="header-copy">
-              <strong>${escapeHtml(coverTitle)}</strong>
-              <span>IPS DO BRASIL</span>
-              <small>CATALOGO 2026</small>
-            </div>
-          </header>
-          <main class="product-grid">${cards}</main>
-          <footer class="catalog-footer product-footer ${pageIsEven ? "footer-even" : "footer-odd"}">
-            ${pageIsEven ? `${footerLogo}${footerBody}${footerPage}` : `${footerPage}${footerBody}${footerLogo}`}
-          </footer>
-        </section>`;
-    })
-    .join("");
-
-  return `<!doctype html>
-  <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Catalogo IPS - Impressao</title>
-      <style>
-        @page { size: A4 portrait; margin: 0; }
-        * { box-sizing: border-box; }
-        body { margin: 0; background: #d9d9d9; color: #111; font-family: Arial, Helvetica, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .page { position: relative; width: 210mm; height: 297mm; overflow: hidden; background: #fff; page-break-after: always; break-after: page; }
-        .cover-bg, .back-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-        .cover-title { position: absolute; left: 17mm; right: 17mm; top: 118mm; text-align: center; color: #f50812; font-size: 28pt; line-height: 1.12; font-weight: 900; letter-spacing: 1px; text-shadow: -1.3px -1.3px #fff, 1.3px -1.3px #fff, -1.3px 1.3px #fff, 1.3px 1.3px #fff, 0 4px 8px rgba(0,0,0,.45); }
-        .cover-year { position: absolute; right: 24mm; bottom: 68mm; color: #fff; font-size: 20pt; font-weight: 900; text-shadow: 0 3px 8px rgba(0,0,0,.6); }
-        .catalog-header { min-height: 32mm; display: grid; grid-template-columns: 1fr minmax(0, 1.15fr) auto; align-items: center; gap: 8mm; padding: 7mm 10mm 4mm; background: linear-gradient(110deg, #e60018 0 45%, #f7f7f7 45% 100%); border-bottom: 1px solid #ddd; }
-        .catalog-header .header-brand { color: #fff; font-size: 22pt; font-weight: 900; font-style: italic; white-space: normal; word-wrap: break-word; overflow-wrap: break-word; }
-        .catalog-header .header-title { color: #e60018; font-size: 18pt; font-weight: 900; font-style: italic; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; text-align: center; }
-        .catalog-header .header-year { color: #111; font-size: 14pt; font-weight: 900; }
-        .index-header { min-height: 30mm; grid-template-columns: minmax(0, 45%) minmax(0, 1fr); gap: 6mm; padding: 7mm 10mm 4mm; background: linear-gradient(110deg, #e60018 0 45%, #f7f7f7 45% 100%); align-items: center; }
-        .index-header .header-brand { min-width: 0; color: #fff; font-size: 18pt; line-height: 1.2; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; }
-        .index-header-copy { min-width: 0; text-align: right; line-height: 1.15; }
-        .index-header-copy strong { display: block; color: #e60018; font-size: 17pt; font-style: italic; font-weight: 900; white-space: normal; overflow-wrap: break-word; word-wrap: break-word; }
-        .index-header-copy span { display: block; margin-top: 3mm; color: #111; font-size: 14pt; font-weight: 900; white-space: nowrap; }
-        .index-content { padding: 8mm 13mm 12mm; min-height: calc(297mm - 30mm - 16mm - 8mm); display: flex; flex-direction: column; justify-content: space-between; }
-        .index-content h1 { margin: 0; color: #c62828; font-size: 24pt; text-transform: uppercase; }
-        .index-content p { margin: 2mm 0 7mm; font-size: 10pt; color: #555; }
-        .index-list { display: flex; flex-direction: column; gap: 2.2mm; margin-top: 5mm; }
-        .index-group-title { margin-top: 2mm; color: #c62828; font-size: 12pt; line-height: 1.15; font-weight: 900; text-transform: uppercase; }
-        .index-row { display: grid; grid-template-columns: auto 1fr auto; gap: 3mm; align-items: baseline; font-size: 11pt; padding-left: 5mm; }
-        .index-sub { font-weight: 800; }
-        .index-dots { border-bottom: 1px dotted #999; transform: translateY(-1.5mm); }
-        .index-page { font-weight: 900; }
-        .index-empty { padding: 10mm; color: #777; border: 1px solid #ddd; }
-        .product-header { grid-template-columns: 1fr 1fr; padding: 0; background: #f5f5f5; min-height: 30mm; }
-        .header-red { height: 100%; background: #e60018; clip-path: polygon(0 0, 93% 0, 84% 100%, 0 100%); display: flex; align-items: center; padding-left: 12mm; }
-        .header-red img { max-width: 58mm; max-height: 20mm; object-fit: contain; filter: brightness(0) invert(1); }
-        .header-copy { text-align: center; padding-right: 8mm; line-height: 1.15; display: flex; flex-direction: column; justify-content: center; }
-        .header-copy strong { display: block; color: #e60018; font-size: 18pt; font-style: italic; font-weight: 900; white-space: normal; overflow-wrap: break-word; }
-        .header-copy span { display: block; color: #111; font-size: 16pt; font-style: italic; font-weight: 900; white-space: normal; overflow-wrap: break-word; }
-        .header-copy small { display: block; color: #111; font-size: 12pt; font-style: italic; font-weight: 900; white-space: normal; overflow-wrap: break-word; }
-        .product-grid { height: calc(297mm - 30mm - 24mm - 6mm); padding: 4mm 10mm 3mm; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr); gap: 3mm; }
-        .product-card { position: relative; overflow: hidden; border: 1px solid #d3d3d3; background: #fff; display: grid; grid-template-rows: 10mm 1fr auto auto; }
-        .product-card::before { content: ""; position: absolute; inset: 10mm 0 24mm; background: radial-gradient(circle at 75% 0%, rgba(0,0,0,.08), transparent 45%), linear-gradient(135deg, transparent 0 67%, rgba(0,0,0,.07) 67% 70%, transparent 70%); pointer-events: none; }
-        .card-top { position: relative; z-index: 1; height: 10mm; background: #d4d4d4; display: flex; align-items: center; padding: 0 4mm; border-bottom: 1px solid #aaa; }
-        .card-vehicle { width: 100%; min-width: 0; font-size: 10pt; font-weight: 900; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-vehicle strong { color: #ef2630; margin-right: 2mm; }
-        .card-vehicle span { color: #111; }
-        .card-code { position: absolute; left: 1mm; top: 1mm; width: 1px; height: 1px; overflow: hidden; opacity: 0.01; color: transparent; font-size: 1pt; line-height: 1; pointer-events: none; }
-        .card-image { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; padding: 2mm 4mm; min-height: 0; overflow: hidden; }
-        .card-image img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; }
-        .no-image { color: #aaa; border: 1px dashed #ccc; padding: 7mm 10mm; text-align: center; font-size: 10pt; font-weight: 800; }
-        .card-desc { position: relative; z-index: 1; border-top: 1px solid #ddd; padding: 2.5mm 3mm 1mm; min-height: 12mm; text-align: center; font-size: 9.8pt; line-height: 1.13; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
-        .card-application { position: relative; z-index: 1; padding: 0 3mm 2.5mm; text-align: center; font-size: 9.8pt; line-height: 1.13; font-weight: 900; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
-        .catalog-footer { position: absolute; left: 0; right: 0; bottom: 0; min-height: 24mm; background: #a00012; color: #fff; display: grid; grid-template-columns: 20mm 1fr 34mm; align-items: center; gap: 5mm; padding: 6mm 10mm; }
-        .catalog-footer span { font-size: 13pt; font-weight: 900; }
-        .catalog-footer strong { display: block; text-align: center; font-size: 13pt; white-space: normal; overflow-wrap: break-word; }
-        .catalog-footer small { display: block; margin-top: 2mm; text-align: center; font-size: 5.8pt; line-height: 1.5; font-style: italic; font-weight: 700; white-space: normal; overflow-wrap: break-word; }
-        .catalog-footer img { max-width: 30mm; max-height: 13mm; object-fit: contain; filter: brightness(0) invert(1); }
-        .product-footer { grid-template-columns: 34mm 1fr 34mm; }
-        .product-footer .footer-page-no { justify-self: start; }
-        .product-footer.footer-even .footer-page-no { justify-self: end; }
-        .product-footer .footer-logo { justify-self: end; }
-        .product-footer.footer-even .footer-logo { justify-self: start; }
-        .index-page-wrap .catalog-footer { grid-template-columns: 20mm 1fr; min-height: 16mm; padding: 4mm 10mm; }
-        @media screen { .page { margin: 0 auto 12px; box-shadow: 0 6px 22px rgba(0,0,0,.25); } }
-      </style>
-    </head>
-    <body>
-      <section class="page cover-page">
-        <img class="cover-bg" src="/images/capa.png" alt="">
-        <div class="cover-title">${escapeHtml(coverTitle)}</div>
-        <div class="cover-year">CATALOGO 2026</div>
-      </section>
-      <section class="page back-cover-page">
-        <img class="back-bg" src="/images/contra_capa.png" alt="">
-      </section>
-      ${indexPages}
-      ${productHtml}
-    </body>
-  </html>`;
-}
-
-let activePrintRoot = null;
-let activePrintStyle = null;
-let activePrintObjectUrls = [];
-
-function cleanupActivePrintDocument() {
-  if (activePrintRoot) {
-    activePrintRoot.remove();
-    activePrintRoot = null;
-  }
-  if (activePrintStyle) {
-    activePrintStyle.remove();
-    activePrintStyle = null;
-  }
-  activePrintObjectUrls.forEach((url) => URL.revokeObjectURL(url));
-  activePrintObjectUrls = [];
-}
-
-if (typeof window !== "undefined") {
-  window.addEventListener("beforeunload", cleanupActivePrintDocument);
-}
-
-function printHtmlDocument(html, objectUrls = []) {
-  cleanupActivePrintDocument();
-
-  const parsed = new DOMParser().parseFromString(html, "text/html");
-  const styleText = Array.from(parsed.querySelectorAll("style"))
-    .map((style) => style.textContent || "")
-    .join("\n");
-  const root = document.createElement("div");
-  root.id = "catalog-print-root";
-  root.innerHTML = parsed.body?.innerHTML || "";
-
-  const style = document.createElement("style");
-  style.id = "catalog-print-style";
-  style.textContent = `
-    ${styleText}
-    @media screen {
-      #catalog-print-root {
-        position: fixed !important;
-        left: -100000px !important;
-        top: 0 !important;
-        width: 210mm !important;
-        min-height: 297mm !important;
-        overflow: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-    }
-    @media print {
-      body > *:not(#catalog-print-root) {
-        display: none !important;
-      }
-      #catalog-print-root {
-        display: block !important;
-        position: static !important;
-        width: 210mm !important;
-        min-height: 297mm !important;
-        opacity: 1 !important;
-        overflow: visible !important;
-        pointer-events: auto !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-  document.body.appendChild(root);
-  activePrintRoot = root;
-  activePrintStyle = style;
-  activePrintObjectUrls = objectUrls;
-
-  let printed = false;
-  const runPrint = () => {
-    if (printed) return;
-    printed = true;
-    window.focus();
-    window.print();
-  };
-
-  setTimeout(() => {
-    const images = Array.from(root.querySelectorAll("img"));
-    if (!images.length) {
-      runPrint();
-      return;
-    }
-    let pending = images.length;
-    const done = () => {
-      pending -= 1;
-      if (pending <= 0) runPrint();
-    };
-    images.forEach((img) => {
-      if (img.complete) {
-        done();
-      } else {
-        img.onload = done;
-        img.onerror = done;
-      }
-    });
-    setTimeout(runPrint, 5000);
-  }, 250);
+  return lines.length === 1 ? displayText(lines[0], "").toUpperCase() : "CATÁLOGO DE PRODUTOS";
 }
 
 const PDF_PAGE = { width: 595.28, height: 841.89 };
@@ -948,8 +634,8 @@ function drawPdfIndexHeader(page, fonts, title) {
     font: fonts.boldOblique,
     color: PDF_RED,
   });
-  drawPdfText(page, "CATALOGO 2026", {
-    x: PDF_PAGE.width - mm(10) - textWidth(fonts.bold, "CATALOGO 2026", 15),
+  drawPdfText(page, "CATÁLOGO 2026", {
+    x: PDF_PAGE.width - mm(10) - textWidth(fonts.bold, "CATÁLOGO 2026", 15),
     y: y + mm(6),
     size: 15,
     font: fonts.bold,
@@ -995,8 +681,8 @@ function drawPdfProductHeader(page, fonts, title) {
     font: fonts.boldOblique,
     color: PDF_RED,
   });
-  drawPdfText(page, "CATALOGO 2026", {
-    x: rightX + (rightW - textWidth(fonts.boldOblique, "CATALOGO 2026", 11)) / 2,
+  drawPdfText(page, "CATÁLOGO 2026", {
+    x: rightX + (rightW - textWidth(fonts.boldOblique, "CATÁLOGO 2026", 11)) / 2,
     y: y + mm(3),
     size: 11,
     font: fonts.boldOblique,
@@ -1024,7 +710,7 @@ function drawPdfFooter(page, fonts, pageNo) {
     font: fonts.bold,
     color: rgb(1, 1, 1),
   });
-  const warning = "AS FOTOS CONTIDAS NESSE CATALOGO SAO DE CARATER MERAMENTE ILUSTRATIVO. AS MARCAS DAS MONTADORAS SAO DE FUNCAO INFORMATIVA E COMPARATIVA.";
+  const warning = "AS FOTOS CONTIDAS NESSE CATÁLOGO SÃO DE CARÁTER MERAMENTE ILUSTRATIVO. AS MARCAS DAS MONTADORAS SÃO DE FUNÇÃO INFORMATIVA E COMPARATIVA.";
   drawCenteredPdfLines(page, wrapPdfText(warning, fonts.oblique, 5.4, PDF_PAGE.width - mm(92), 3), fonts.oblique, 5.4, PDF_PAGE.width / 2, mm(7.2), PDF_PAGE.width - mm(92), rgb(1, 1, 1), 6.1);
   drawPdfText(page, logoText, {
     x: even ? mm(10) : PDF_PAGE.width - mm(10) - textWidth(fonts.bold, logoText, 9),
@@ -1037,7 +723,7 @@ function drawPdfFooter(page, fonts, pageNo) {
 
 function drawNoImage(page, fonts, x, y, width, height) {
   page.drawRectangle({ x: x + width * 0.26, y: y + height * 0.35, width: width * 0.48, height: height * 0.3, borderColor: PDF_BORDER, borderWidth: 0.7 });
-  drawCenteredPdfLines(page, ["IMAGEM", "INDISPONIVEL"], fonts.bold, 10, x + width / 2, y + height * 0.55, width * 0.45, rgb(0.62, 0.62, 0.62), 12);
+  drawCenteredPdfLines(page, ["IMAGEM", "INDISPONÍVEL"], fonts.bold, 10, x + width / 2, y + height * 0.55, width * 0.45, rgb(0.62, 0.62, 0.62), 12);
 }
 
 function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
@@ -1046,7 +732,7 @@ function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
   const imageY = y + textH;
   const imageH = height - topH - textH;
   const make = displayText(item.make, item.brand).toUpperCase();
-  const vehicle = displayText(firstCatalogVehicle(item.vehicle), "APLICACAO").toUpperCase();
+  const vehicle = displayText(firstCatalogVehicle(item.vehicle), "APLICAÇÃO").toUpperCase();
   const description = displayText(item.description, "PRODUTO").toUpperCase();
   const similar = similarCodesText(item.similar);
 
@@ -1102,7 +788,7 @@ async function buildCatalogPdfBase64({ items, filters, onProgress, volumeLabel =
     );
     drawPdfText(cover, line, { x, y, size, font: fonts.bold, color: PDF_RED });
   });
-  drawPdfText(cover, "CATALOGO 2026", { x: PDF_PAGE.width - mm(82), y: mm(112), size: 20, font: fonts.bold, color: rgb(1, 1, 1) });
+  drawPdfText(cover, "CATÁLOGO 2026", { x: PDF_PAGE.width - mm(82), y: mm(112), size: 20, font: fonts.bold, color: rgb(1, 1, 1) });
   if (volumeLabel) {
     drawPdfText(cover, volumeLabel, {
       x: PDF_PAGE.width - mm(82),
@@ -1378,7 +1064,7 @@ function App() {
       try {
         const data = await loadProfile();
         if (!data) {
-          if (!silent) setAuthError("Cadastro nao localizado. Confira o e-mail e envie novamente.");
+          if (!silent) setAuthError("Cadastro não localizado. Confira o e-mail e envie novamente.");
           return null;
         }
         if (!silent) {
@@ -1387,7 +1073,7 @@ function App() {
           } else if (data.status === "block") {
             setAuthError("Cadastro bloqueado. Entre em contato com o administrador.");
           } else {
-            setAuthSuccess("Cadastro ainda pendente. Aguarde aprovacao.");
+            setAuthSuccess("Cadastro ainda pendente. Aguarde aprovação.");
           }
         }
         return data;
@@ -1416,7 +1102,7 @@ function App() {
   );
 
   const blockAccess = useMemo(() => {
-    if (isDev) return false; // Em desenvolvimento nao bloquear pela aprovacao
+    if (isDev) return false; // Em desenvolvimento, não bloquear pela aprovação.
     if (cachedProfile?.status === "block" || profile?.status === "block") return true;
     if (cachedProfile?.status === "approved" || profile?.status === "approved") return false;
     return true;
@@ -1559,7 +1245,7 @@ function App() {
         setVersionInfo(info);
         setConfiguredVersion(info?.resolved_version || "");
       } catch (e) {
-        if (!cancelled) setToolsMsg(`Falha ao carregar versao configurada: ${e}`);
+        if (!cancelled) setToolsMsg(`Falha ao carregar versão configurada: ${e}`);
       }
     })();
     return () => {
@@ -1926,7 +1612,7 @@ function App() {
     }
     setFormSubmitting(true);
     try {
-      if (!supabase) throw new Error("Supabase nao configurado.");
+      if (!supabase) throw new Error("Supabase não configurado.");
       let profileId = profile?.id || null;
       let existingProfile = profile || null;
       if (validation.email) {
@@ -1941,8 +1627,7 @@ function App() {
           existingProfile = { ...existingProfile, ...data };
         }
       }
-      const statusToSave =
-        existingProfile?.status === "approved" || existingProfile?.status === "block" ? existingProfile.status : "pending";
+      const statusToSave = existingProfile?.status === "block" ? "block" : "approved";
       const payload = {
         ...form,
         cpf_cnpj: validation.cpfCnpj,
@@ -1966,7 +1651,7 @@ function App() {
         setAuthError("Cadastro bloqueado. Entre em contato com o administrador.");
         setSentOnce(true);
       } else {
-        setAuthSuccess("Cadastro enviado. Aguarde aprovacao.");
+        setAuthSuccess("Cadastro enviado. Aguarde aprovação.");
         setSentOnce(true);
       }
     } catch (e) {
@@ -2053,13 +1738,13 @@ function App() {
     setLaunchState((s) => ({ ...s, loading: true, error: "" }));
     try {
       if (!imagesDir) {
-        setLaunchState((s) => ({ ...s, loading: false, error: "Pasta de imagens nao localizada." }));
+        setLaunchState((s) => ({ ...s, loading: false, error: "Pasta de imagens não localizada." }));
         return;
       }
       const files = await listLaunchImages();
       if (!files || files.length === 0) {
         setLaunchImages([]);
-        setLaunchState((s) => ({ ...s, loading: false, error: "Nenhuma imagem de lancamento encontrada." }));
+        setLaunchState((s) => ({ ...s, loading: false, error: "Nenhuma imagem de lançamento encontrada." }));
         return;
       }
       const list = [];
@@ -2081,7 +1766,7 @@ function App() {
       setLaunchState((s) => ({ ...s, loading: false, open: true, index: 0 }));
     } catch (e) {
       setLaunchImages([]);
-      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar Lancamentos: ${e.message || e}` });
+      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar lançamentos: ${e.message || e}` });
     }
   }
 
@@ -2108,7 +1793,7 @@ function App() {
   }
 
   async function runRcloneUpload() {
-    setToolsMsg("Executando sincronizacao via rclone. O progresso aparece no terminal do dev...");
+    setToolsMsg("Executando sincronização via rclone. O progresso aparece no terminal do dev...");
     setRcloneRunning(true);
     try {
       const res = await runRcloneSync();
@@ -2136,10 +1821,10 @@ function App() {
       setVersionInfo(info);
       setConfiguredVersion(info?.resolved_version || nextVersion);
       setToolsMsg(
-        `Versao configurada atualizada para ${info?.resolved_version || nextVersion}. O executavel atual continua em ${appVersion} ate rebuild/release.`
+        `Versão configurada atualizada para ${info?.resolved_version || nextVersion}. O executável atual continua em ${appVersion} até rebuild/release.`
       );
     } catch (e) {
-      setToolsMsg(`Falha ao salvar versao: ${e}`);
+      setToolsMsg(`Falha ao salvar versão: ${e}`);
     } finally {
       setVersionSaving(false);
     }
@@ -2167,7 +1852,7 @@ function App() {
       setExcelPath(picked);
       setToolsMsg("Importando Excel...");
       const res = await importExcel(picked);
-      setToolsMsg(`Importado: linhas ${res?.processed_rows ?? "?"}, produtos ${res?.upserted_products ?? "?"}, versÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½o db ${res?.new_db_version ?? "?"}`);
+      setToolsMsg(`Importado: linhas ${res?.processed_rows ?? "?"}, produtos ${res?.upserted_products ?? "?"}, versão do banco ${res?.new_db_version ?? "?"}`);
       const { brands: b, vehicles: v, makes: mk } = await loadInitialCatalog();
       setBrands(b || []);
       setVehicles(v || []);
@@ -2302,7 +1987,7 @@ function App() {
             ) : null}
           </div>
           <div className="appbar-title">
-            <h1>Catalogo IPS</h1>
+            <h1>Catálogo IPS</h1>
             {displayLogos.length ? (
               <div className="logo-strip" role="list">
                 {displayLogos.map((src, idx) => (
@@ -2322,7 +2007,7 @@ function App() {
             {updateInfo && !updateDismissed && (
               <div className="update-banner">
                 <span>
-                  Nova versao disponivel: {updateInfo.availableVersion} (atual {appVersion})
+                  Nova versão disponível: {updateInfo.availableVersion} (atual {appVersion})
                 </span>
                 <button className="launch-button" style={{ padding: "6px 10px" }} onClick={(e) => handleUpdateClick(e)}>
                   {updaterAvailable ? "Atualizar agora" : updateInfo?.downloadKind === "direct" ? "Baixar atualizacao" : "Ver no GitHub"}
@@ -2358,7 +2043,7 @@ function App() {
               {launchState.error ? <span className="launch-error">{launchState.error}</span> : null}
             </div>
             <div className="settings-wrap" ref={settingsRef}>
-              <button className="settings-button" onClick={() => setShowSettings((s) => !s)} aria-label="Configuracoes">
+              <button className="settings-button" onClick={() => setShowSettings((s) => !s)} aria-label="Configurações">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M19.14 12.94a7.19 7.19 0 000-1.88l2.03-1.58a.5.5 0 00.12-.64l-1.92-3.32a.5.5 0 00-.6-.22l-2.39.96a7.17 7.17 0 00-1.63-.94l-.36-2.54a.5.5 0 00-.5-.42h-3.84a.5.5 0 00-.5.42l-.36 2.54a7.17 7.17 0 00-1.63.94l-2.39-.96a.5.5 0 00-.6.22L2.7 8.84a.5.5 0 00.12.64l2.03 1.58a7.19 7.19 0 000 1.88L2.82 14.52a.5.5 0 00-.12.64l1.92 3.32a.5.5 0 00.6.22l2.39-.96c.5.38 1.05.7 1.63.94l.36 2.54a.5.5 0 00.5.42h3.84a.5.5 0 00.5-.42l.36-2.54c.58-.24 1.13-.56 1.63-.94l2.39.96a.5.5 0 00.6-.22l1.92-3.32a.5.5 0 00-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z" />
                 </svg>
@@ -2381,7 +2066,7 @@ function App() {
                       setShowSettings(false);
                     }}
                   >
-                    Politica de Privacidade
+                    Política de Privacidade
                   </button>
                 </div>
               )}
@@ -2405,24 +2090,24 @@ function App() {
                     {rcloneRunning ? "Sincronizando rclone..." : "Executar rclone"}
                   </button>
                   <button onClick={() => loadLaunches(true)} disabled={launchState.loading}>
-                    Abrir Lancamentos
+                    Abrir lançamentos
                   </button>
                 </div>
                 <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#555" }}>
-                  O botao acima usa o comando salvo em rclone.txt e mostra o progresso no terminal do dev.
+                  O botão acima usa o comando salvo em rclone.txt e mostra o progresso no terminal do dev.
                 </span>
                 <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "1fr auto", gap: 8, alignItems: "center" }}>
                   <input
-                    placeholder="Versao da proxima build"
+                    placeholder="Versão da próxima build"
                     value={configuredVersion}
                     onChange={(e) => setConfiguredVersion(e.target.value)}
                   />
                   <button onClick={saveConfiguredAppVersion} disabled={versionSaving || !configuredVersion.trim() || !versionDirty}>
-                    {versionSaving ? "Salvando versao..." : "Salvar versao"}
+                    {versionSaving ? "Salvando versão..." : "Salvar versão"}
                   </button>
                   <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#555" }}>
                     Executavel atual: {appVersion} | Configurada: {configuredVersionCurrent || "?"}{" "}
-                    {versionInfo?.consistent ? "(arquivos sincronizados)" : "(arquivos com versoes diferentes)"}
+                    {versionInfo?.consistent ? "(arquivos sincronizados)" : "(arquivos com versões diferentes)"}
                   </span>
                   {versionInfo ? (
                     <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#555" }}>
@@ -2434,9 +2119,9 @@ function App() {
                 </div>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={runImportExcel}>Importar Excel</button>
-                  {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>Ultimo: {excelPath}</span> : null}
+                  {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>Último: {excelPath}</span> : null}
                   <button onClick={runExportDb}>Exportar DB</button>
-                  {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>Ultimo: {exportPath}</span> : null}
+                  {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>Último: {exportPath}</span> : null}
                   <button onClick={() => runSetBranding("logo")}>Aplicar logo</button>
                   {logoInput ? <span style={{ fontSize: 12, color: "#555" }}>Atual: {logoInput}</span> : null}
                   <button onClick={() => runSetBranding("background")}>Aplicar fundo</button>
@@ -2522,7 +2207,7 @@ function App() {
 
           <section className="panel">
             <div className="filters" style={{ flexWrap: "wrap" }}>
-              <input className="filter-code" placeholder="Pesquisar por descricao, codigo, veiculo ou ano" value={codeQuery} onChange={(e) => setCodeQuery(e.target.value)} />
+              <input className="filter-code" placeholder="Pesquisar por descrição, código, veículo ou ano" value={codeQuery} onChange={(e) => setCodeQuery(e.target.value)} />
               <select value={group} onChange={(e) => { setGroup(e.target.value); setVehicleId(""); }}>
                 <option value="">Grupo (todos)</option>
                 {groups.map((g) => (
@@ -2656,15 +2341,15 @@ function App() {
               <form className="auth-grid" onSubmit={submitRegistration}>
                 <div className="auth-radio">
                   <label>
-                    <input type="radio" name="personTypeConfig" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa Juridica
+                    <input type="radio" name="personTypeConfig" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa Jurídica
                   </label>
                   <label>
-                    <input type="radio" name="personTypeConfig" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa Fisica
+                    <input type="radio" name="personTypeConfig" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa Física
                   </label>
                 </div>
 
                 <label className="auth-field wide">
-                  Nome/Razao Social
+                  Nome/Razão Social
                   <input value={form.full_name} onChange={(e) => setForm((s) => ({ ...s, full_name: e.target.value }))} placeholder="Nome completo ou razão social" />
                 </label>
                 <label className="auth-field wide">
@@ -2673,7 +2358,7 @@ function App() {
                 </label>
 
                 <label className="auth-field">
-                  Pais
+                  País
                   <input value={form.country} onChange={(e) => setForm((s) => ({ ...s, country: e.target.value }))} placeholder="Brasil" />
                 </label>
                 <label className="auth-field">
@@ -2702,7 +2387,7 @@ function App() {
                 </label>
 
                 <div className="auth-meta">
-                  <span>Codigo do cadastro: {profile?.id || "aguardando.."}</span>
+                  <span>Código do cadastro: {profile?.id || "aguardando..."}</span>
                   <span>Dispositivo vinculado: {profile?.device_fingerprint || fingerprint}</span>
                 </div>
 
@@ -2723,19 +2408,19 @@ function App() {
         <div className="config-backdrop" onClick={() => setShowPrivacyModal(false)}>
           <div className="config-modal" onClick={(e) => e.stopPropagation()}>
             <div className="config-header">
-              <h3>Politica de Privacidade / LGPD</h3>
+              <h3>Política de Privacidade / LGPD</h3>
               <button className="config-close" onClick={() => setShowPrivacyModal(false)} aria-label="Fechar">
                 X
               </button>
             </div>
             <div className="privacy-body">
-              <p>Para continuar utilizando esse Catálogo é necessário concordar com a Politica de Privacidade.</p>
+              <p>Para continuar utilizando esse Catálogo é necessário concordar com a Política de Privacidade.</p>
               <p>Você já se cadastrou nesse Catálogo e pode consultar, alterar ou excluir o seu Cadastro a qualquer momento, através do botão Configurações.</p>
               <p>Informamos que coletamos dados ref. à utilização do catálogo para fins estatísticos e melhoria desse produto.</p>
               <p>
                 Para saber mais, verifique a nossa{" "}
                 <button className="privacy-link" onClick={() => openExternal("http://ipsbrasil.com.br/politica_privacidade/")}>
-                  Politica de Privacidade
+                  Política de Privacidade
                 </button>
                 .
               </p>
@@ -2749,8 +2434,8 @@ function App() {
           <div className="config-modal print-modal" onClick={(e) => e.stopPropagation()}>
             <div className="config-header print-modal-header">
               <div>
-                <p className="auth-kicker">Impressao</p>
-                <h3>Gerador de Impressao</h3>
+                <p className="auth-kicker">Impressão</p>
+                <h3>Gerador de Impressão</h3>
               </div>
               <button className="config-close" onClick={() => setShowPrintModal(false)} aria-label="Fechar">
                 X
@@ -2800,7 +2485,7 @@ function App() {
                 selected={printFilters.vehicles}
                 onToggle={(value) => togglePrintFilter("vehicles", value)}
                 onClear={() => clearPrintFilter("vehicles")}
-                emptyText="Nenhum veiculo encontrado."
+                emptyText="Nenhum veículo encontrado."
               >
                 <div className="print-search-row">
                   <span className="print-search-icon" aria-hidden="true">
@@ -2868,8 +2553,8 @@ function App() {
               <button className="launch-arrow" onClick={() => cycleLaunch(-1)} aria-label="Anterior">
                 &lt;
               </button>
-              <img src={launchImages[launchState.index]} alt="lancamento" />
-              <button className="launch-arrow" onClick={() => cycleLaunch(1)} aria-label="Proximo">
+              <img src={launchImages[launchState.index]} alt="lançamento" />
+              <button className="launch-arrow" onClick={() => cycleLaunch(1)} aria-label="Próximo">
                 &gt;
               </button>
             </div>
@@ -2885,39 +2570,39 @@ function App() {
               <div>
                 <p className="auth-kicker">Acesso restrito</p>
                 <h2>Meu Cadastro</h2>
-                <p className="auth-muted">Envie a ficha e Aguarde aprovaÃ§Ã£o. Enquanto o status nÃ£o for aprovado, o catÃ¡logo fica bloqueado.</p>
-                <p className="auth-status">Status atual: {profile?.status || "pending"}</p>
+                <p className="auth-muted">Envie a ficha para liberar o acesso ao catálogo.</p>
+                <p className="auth-status">Status atual: {profile?.status || "não enviado"}</p>
               </div>
-              <div className="auth-brand">CatÃ¡logo IPS</div>
+              <div className="auth-brand">Catálogo IPS</div>
             </div>
 
             {supabaseConfigured ? (
               <>
                 <section className="auth-section">
                   <h3>Ficha de cadastro</h3>
-                  <p className="auth-muted">Envie seus dados; o time aprova manualmente e libera o acesso.</p>
+                  <p className="auth-muted">Envie seus dados; o acesso é liberado automaticamente.</p>
 
                   {sentOnce ? (
                     <div className="auth-wait">
-                      <p><strong>Cadastro enviado.</strong> Aguarde aprovacao do time.</p>
+                      <p><strong>Cadastro enviado.</strong> Aguarde aprovação do time.</p>
                       <p className="auth-muted small">Se precisar corrigir algo, reabra a ficha e reenvie.</p>
                       <button type="button" onClick={() => refreshAuthStatus()} disabled={authLoading}>
-                        {authLoading ? "Verificando..." : "Verificar aprovacao"}
+                        {authLoading ? "Verificando..." : "Verificar aprovação"}
                       </button>
                     </div>
                   ) : (
                     <form className="auth-grid" onSubmit={submitRegistration}>
                       <div className="auth-radio">
                         <label>
-                          <input type="radio" name="personType" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa Juridica
+                          <input type="radio" name="personType" checked={form.person_type === "pj"} onChange={() => setForm((s) => ({ ...s, person_type: "pj" }))} /> Pessoa Jurídica
                         </label>
                         <label>
-                          <input type="radio" name="personType" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa Fisica
+                          <input type="radio" name="personType" checked={form.person_type === "pf"} onChange={() => setForm((s) => ({ ...s, person_type: "pf" }))} /> Pessoa Física
                         </label>
                       </div>
 
                       <label className="auth-field wide">
-                        Nome/Razao Social
+                        Nome/Razão Social
                         <input value={form.full_name} onChange={(e) => setForm((s) => ({ ...s, full_name: e.target.value }))} placeholder="Nome completo ou razão social" />
                       </label>
                       <label className="auth-field wide">
@@ -2926,7 +2611,7 @@ function App() {
                       </label>
 
                       <label className="auth-field">
-                        Pais
+                        País
                         <input value={form.country} onChange={(e) => setForm((s) => ({ ...s, country: e.target.value }))} placeholder="Brasil" />
                       </label>
                       <label className="auth-field">
@@ -2955,14 +2640,14 @@ function App() {
                       </label>
 
                       <div className="auth-meta">
-                        <span>Codigo do cadastro: {profile?.id || "aguardando.."}</span>
+                        <span>Código do cadastro: {profile?.id || "aguardando..."}</span>
                         <span>Dispositivo vinculado: {profile?.device_fingerprint || fingerprint}</span>
                       </div>
 
                       <button type="submit" disabled={formSubmitting}>
                         {formSubmitting ? "Enviando..." : "Enviar cadastro"}
                       </button>
-                      <p className="auth-muted small">Após enviar, o admin aprova manualmente. Caso troque de máquina, solicite nova aprovação ou reset do dispositivo.</p>
+                      <p className="auth-muted small">Após enviar, o acesso é liberado automaticamente. Caso troque de máquina, solicite reset do dispositivo.</p>
                     </form>
                   )}
                 </section>

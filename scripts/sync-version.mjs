@@ -48,7 +48,7 @@ function updateTextFile(relPath, pattern, replacement) {
 function updateEnvFile(relPath, fallbackRelPath) {
   let filePath = path.join(root, relPath);
   if (!fs.existsSync(filePath) && fallbackRelPath) {
-    // Se o env de dev nao existir (CI), atualiza o de producao.
+    // Se o env de dev não existir (CI), atualiza o de produção.
     filePath = path.join(root, fallbackRelPath);
   }
   if (!fs.existsSync(filePath)) {
@@ -101,8 +101,8 @@ updateTextFile(
   `$1${version}$2`
 );
 
-// .env files que expoem versao ao front; se .env.development nao existir (CI),
-// caimos para .env.production.
+// .env files que expõem versão ao front; se .env.development não existir (CI),
+// caímos para .env.production.
 updateEnvFile(".env.production");
 updateEnvFile(".env.development", ".env.production");
 updateEnvFile(".env.example");

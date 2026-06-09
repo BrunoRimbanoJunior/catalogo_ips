@@ -36,20 +36,8 @@ export async function importExcel(path) {
   return await invoke("import_excel", { path });
 }
 
-export async function indexImages(root) {
-  return await invoke("index_images", { root });
-}
-
 export async function fetchMakes() {
   return await invoke("get_makes_cmd");
-}
-
-export async function fetchVehiclesByMake(make) {
-  return await invoke("get_vehicles_by_make_cmd", { make });
-}
-
-export async function fetchTypes(brandId) {
-  return await invoke("get_types_cmd", { brandId });
 }
 
 export async function fetchGroups(brandId, brandName) {
@@ -64,10 +52,6 @@ export async function fetchGroups(brandId, brandName) {
 
 export async function fetchVehiclesFiltered(brandId, group, make) {
   return await invoke("get_vehicles_filtered_cmd", { brand_id: brandId, group, make });
-}
-
-export async function fetchGroupsStats() {
-  return await invoke("get_groups_stats_cmd");
 }
 
 export async function indexImagesFromManifest(manifestUrl) {
@@ -100,23 +84,6 @@ export async function savePdfBase64(path, dataBase64) {
 
 export async function listLaunchImages() {
   return await invoke("list_launch_images");
-}
-
-export async function genManifestR2(params) {
-  // params: { version, dbUrl, outPath, r2: { account_id, bucket, access_key_id, secret_access_key, endpoint?, public_base_url? } }
-  return await invoke("gen_manifest_r2", {
-    version: params.version,
-    dbUrl: params.dbUrl,
-    outPath: params.outPath,
-    r2: {
-      account_id: params.r2.account_id,
-      bucket: params.r2.bucket,
-      access_key_id: params.r2.access_key_id,
-      secret_access_key: params.r2.secret_access_key,
-      endpoint: params.r2.endpoint || null,
-      public_base_url: params.r2.public_base_url || null,
-    },
-  });
 }
 
 export async function runRcloneSync() {

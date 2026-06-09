@@ -256,7 +256,7 @@ button {
 .launch-close { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
 .launch-counter { text-align: center; font-weight: 700; font-size: 13px; letter-spacing: 0.6px; opacity: 0.9; }
 
-/* Detalhes: subtÃ­tulo e compatibilidade */
+/* Detalhes: subtítulo e compatibilidade */
 .details-wrap { font-size: 12px; line-height: 16px; }
 .details-wrap p { font-size: 12px; line-height: 16px; }
 .details-wrap .subtitle { font-weight: 700; font-size: 12px; line-height: 16px; opacity: 0.85; text-align: left; margin-top: 4px; }
@@ -309,7 +309,7 @@ button {
 .auth-success { margin-top: 10px; padding: 10px; background: #e8fff5; color: #0c6b3d; border: 1px solid #b1e5c8; border-radius: 8px; }
 .auth-error { margin-top: 10px; padding: 10px; background: #ffecec; color: #9a1b1b; border: 1px solid #f3bbbb; border-radius: 8px; }
 
-/* Configuracoes */
+/* Configurações */
 .settings-wrap { position: relative; display: flex; align-items: center; }
 .settings-button { width: 40px; height: 40px; background: #0b4d91; color: #fff; border: 0; padding: 8px; border-radius: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .settings-button:hover { background: #093e76; }
@@ -328,7 +328,7 @@ button {
 .privacy-body p { margin: 8px 0; }
 .privacy-link { background: none; border: 0; padding: 0; color: #0b4d91; font-weight: 700; cursor: pointer; text-decoration: underline; }
 
-/* Impressao */
+/* Impressão */
 .print-backdrop { align-items: center; }
 .print-modal { width: min(980px, 96vw); max-height: calc(100vh - 20px); padding: 14px 16px; }
 .print-modal-header { align-items: center; }

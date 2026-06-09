@@ -12,7 +12,7 @@ pub struct ImportResult {
     pub new_db_version: i64,
 }
 
-/// Normaliza cabecalhos para uma chave ASCII previsivel.
+/// Normaliza cabeçalhos para uma chave ASCII previsível.
 fn norm(s: &str) -> String {
     s.trim()
         .chars()
@@ -79,7 +79,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
     let range = wb.worksheet_range(&sheet).map_err(|e| e.to_string())?;
 
     let mut rows = range.rows();
-    let header = rows.next().ok_or("XLSX sem cabecalho")?;
+    let header = rows.next().ok_or("XLSX sem cabeçalho")?;
     let mut idx = (
         usize::MAX,
         usize::MAX,
@@ -128,7 +128,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
     }
 
     if idx.1 == usize::MAX || idx.2 == usize::MAX {
-        return Err("Cabecalhos minimos ausentes (codigo/descricao)".into());
+        return Err("Cabeçalhos mínimos ausentes (código/descrição)".into());
     }
 
     let mut conn = open_db(&dbf).map_err(|e| e.to_string())?;
@@ -208,7 +208,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
         } else {
             String::new()
         };
-        // Veiculos: se nao existir coluna dedicada, derivamos da aplicacao.
+        // Veículos: se não existir coluna dedicada, derivamos da aplicação.
         let vehicles_raw = if idx.5 != usize::MAX {
             cell(idx.5)
         } else {

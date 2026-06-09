@@ -1,11 +1,11 @@
 # Catálogo IPS
 
-App desktop (Tauri + React) para consulta de peças com sincronização de banco/imagens via manifest. Fluxo de controle de acesso usando Supabase e aprovação manual.
+App desktop (Tauri + React) para consulta de peças com sincronização de banco/imagens via manifest. Fluxo de controle de acesso usando Supabase.
 
 ## Como funciona
 - Manifest público (`VITE_DEFAULT_MANIFEST_URL`): aponta para o `manifest.json` publicado (asset de release). Contém `appVersion`, `appDownloadUrl`, `db.version/url` e lista de imagens (R2).
 - Cliente: ao abrir, lê o manifest, avisa se há nova versão do app, baixa DB/imagens se `db.version` subir e indexa imagens no SQLite local.
-- Auth: formulário de cadastro salva no Supabase (`profiles`), status `pending`; admin aprova (service role) e o app libera quando `status=approved`.
+- Auth: formulário de cadastro salva no Supabase (`profiles`) com status `approved`, liberando o app automaticamente.
 
 ## Instalação do cliente
 - Baixar na aba Releases do GitHub (tags `v*`).
@@ -26,8 +26,8 @@ Pré-requisitos: Node 20, Rust toolchain, pnpm, Supabase (anon key), manifest p�
    ```
 3) Rodar front/Tauri dev: `pnpm dev` e em outro terminal `pnpm tauri dev`.
 
-## Backend de aprovação (FastAPI)
-Local (apenas dev) para aprovar cadastros sem expor service role no front:
+## Backend administrativo (FastAPI)
+Local (apenas dev) para gerenciar cadastros sem expor service role no front:
 1) `cd backend`
 2) `.env` com `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `ADMIN_TOKEN`
 3) `uv venv && uv pip install -r requirements.txt`

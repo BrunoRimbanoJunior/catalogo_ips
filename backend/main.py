@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, EmailStr
 from supabase import Client, create_client
 
-app = FastAPI(title="Catalogo IPS - Auth API")
+app = FastAPI(title="Catálogo IPS - API de autenticação")
 
 load_dotenv()
 
@@ -37,7 +37,7 @@ def verify_admin(x_admin_token: str | None = Header(default=None, alias="X-Admin
     if not token:
         raise HTTPException(status_code=500, detail="Configure ADMIN_TOKEN para usar o painel admin.")
     if not x_admin_token or x_admin_token != token:
-        raise HTTPException(status_code=401, detail="Token admin invalido.")
+        raise HTTPException(status_code=401, detail="Token admin inválido.")
 
 
 class Registration(BaseModel):
@@ -87,6 +87,9 @@ def register(payload: Registration, supabase: Client = Depends(get_supabase)):
                 raise HTTPException(status_code=400, detail="Falha ao criar usuário no Supabase.")
             user_id = created.user.id
 
+        existing_profile = supabase.table("profiles").select("status").eq("id", user_id).maybe_single().execute()
+        status_to_save = "block" if existing_profile.data and existing_profile.data.get("status") == "block" else "approved"
+
         row = supabase.table("profiles").upsert(
             {
                 "id": user_id,
@@ -100,7 +103,7 @@ def register(payload: Registration, supabase: Client = Depends(get_supabase)):
                 "phone_area": payload.phone_area,
                 "phone_number": payload.phone_number,
                 "device_fingerprint": payload.device_fingerprint,
-                "status": "pending",
+                "status": status_to_save,
             }
         ).execute()
 
@@ -134,7 +137,7 @@ def list_profiles(
 @app.post("/admin/approve")
 def approve(payload: ApproveRequest, _admin: None = Depends(verify_admin), supabase: Client = Depends(get_supabase)):
     if not payload.id and not payload.email:
-        raise HTTPException(status_code=400, detail="Informe id ou email para aprovar.")
+        raise HTTPException(status_code=400, detail="Informe ID ou e-mail para aprovar.")
     try:
         query = supabase.table("profiles").update({"status": "approved"})
         if payload.id:
@@ -150,7 +153,7 @@ def approve(payload: ApproveRequest, _admin: None = Depends(verify_admin), supab
 @app.post("/admin/block")
 def block(payload: BlockRequest, _admin: None = Depends(verify_admin), supabase: Client = Depends(get_supabase)):
     if not payload.id and not payload.email:
-        raise HTTPException(status_code=400, detail="Informe id ou email para bloquear.")
+        raise HTTPException(status_code=400, detail="Informe ID ou e-mail para bloquear.")
     try:
         query = supabase.table("profiles").update({"status": "block"})
         if payload.id:
@@ -166,7 +169,7 @@ def block(payload: BlockRequest, _admin: None = Depends(verify_admin), supabase:
 @app.post("/admin/delete")
 def delete_profile(payload: DeleteRequest, _admin: None = Depends(verify_admin), supabase: Client = Depends(get_supabase)):
     if not payload.id and not payload.email:
-        raise HTTPException(status_code=400, detail="Informe id ou email para excluir.")
+        raise HTTPException(status_code=400, detail="Informe ID ou e-mail para excluir.")
     try:
         user_id = payload.id
         if not user_id and payload.email:
@@ -242,14 +245,14 @@ def admin_ui():
             <option value="block">Bloqueados</option>
           </select>
         </label>
-        <input id="filter-search" placeholder="Buscar (nome, email, CPF/CNPJ, cidade)" />
+        <input id="filter-search" placeholder="Buscar (nome, e-mail, CPF/CNPJ, cidade)" />
         <button onclick="load()">Filtrar</button>
       </div>
       <div class="status" id="status">Carregando...</div>
       <table id="tbl">
         <thead>
           <tr>
-            <th>Nome</th><th>Email</th><th>CPF/CNPJ</th><th>Cidade</th><th>Status</th><th>Ações</th>
+            <th>Nome</th><th>E-mail</th><th>CPF/CNPJ</th><th>Cidade</th><th>Status</th><th>Ações</th>
           </tr>
         </thead>
         <tbody></tbody>

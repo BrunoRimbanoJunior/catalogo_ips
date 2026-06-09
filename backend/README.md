@@ -16,7 +16,7 @@
 
 ### Endpoints
 - `GET /health` – teste.
-- `POST /auth/register` – cria/atualiza usuário no Supabase Auth (via service role) e faz upsert na tabela `profiles` com status `pending`.
+- `POST /auth/register` – cria/atualiza usuário no Supabase Auth (via service role) e faz upsert na tabela `profiles` com status `approved`.
 
 ### Tabelas/policies esperadas
 - Tabela `profiles` com colunas: `id (uuid PK)`, `status text`, `person_type`, `country`, `state`, `city`, `cpf_cnpj`, `full_name`, `phone_area`, `phone_number`, `email`, `device_fingerprint`, `created_at timestamp`.
