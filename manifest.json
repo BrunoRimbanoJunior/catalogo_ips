@@ -2,9 +2,9 @@
   "appVersion": "1.5.11",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.11/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 9062619,
+    "version": 10062616,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/data/catalog.db",
-    "sha256": "640465965d0a280e38c61143c5749f79e62c17a2a1193352f61c8d26bed26326"
+    "sha256": "1cccffbf4d04762c9324afe70751f91b4e9e9d44ef462e3c0256bc2d97172405"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -2810,6 +2810,10 @@
         "sha256": "0507cee4aaa2268d0b31b614db05077a"
       },
       {
+        "file": "CAIXA_DIRECAO/7134905910.png",
+        "sha256": "e9a564358cb364fda31fceb15d00422e"
+      },
+      {
         "file": "CAIXA_DIRECAO/7134906000.png",
         "sha256": "c887aeab00af57a72c468ca01ed4437d"
       },
@@ -5078,10 +5082,6 @@
         "sha256": "7a6a9c3a09934265b25ae9b2b49547fd"
       },
       {
-        "file": "LANCAMENTOS/3156881631.png",
-        "sha256": "f09c97e82dd5e5850b61c9e241665192"
-      },
-      {
         "file": "LANCAMENTOS/7114566802.png",
         "sha256": "fb6389d857c50200a58e9e7d39c4476f"
       },
@@ -5100,6 +5100,10 @@
       {
         "file": "LANCAMENTOS/7134455912.png",
         "sha256": "fa3eac28a7fc966ca831525ee332d3f3"
+      },
+      {
+        "file": "LANCAMENTOS/7134905910.png",
+        "sha256": "b0512935279b8c28372a84b679ae2dd6"
       },
       {
         "file": "LANCAMENTOS/7146336021.png",
