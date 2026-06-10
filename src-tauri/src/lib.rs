@@ -177,7 +177,13 @@ mod core {
         pub package_json_version: String,
         pub cargo_toml_version: String,
         pub tauri_conf_version: String,
+        pub tauri_conf_bundle_version: Option<String>,
         pub cargo_lock_version: Option<String>,
+        pub env_production_version: Option<String>,
+        pub env_development_version: Option<String>,
+        pub env_example_version: Option<String>,
+        pub manifest_app_version: Option<String>,
+        pub manifest_download_url: Option<String>,
         pub app_root: String,
     }
     #[derive(Debug, Serialize, Deserialize)]
@@ -2404,6 +2410,74 @@ mod core {
         Ok(None)
     }
 
+    fn read_json_string_field(path: &Path, field: &str) -> Result<Option<String>, String> {
+        if !path.exists() {
+            return Ok(None);
+        }
+        let raw = std::fs::read_to_string(path)
+            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
+        let parsed: serde_json::Value = serde_json::from_str(&raw)
+            .map_err(|e| format!("Falha ao interpretar {}: {}", path.display(), e))?;
+        Ok(parsed
+            .get(field)
+            .and_then(|v| v.as_str())
+            .map(|v| v.to_string()))
+    }
+
+    fn read_tauri_bundle_version(path: &Path) -> Result<Option<String>, String> {
+        if !path.exists() {
+            return Ok(None);
+        }
+        let raw = std::fs::read_to_string(path)
+            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
+        let parsed: serde_json::Value = serde_json::from_str(&raw)
+            .map_err(|e| format!("Falha ao interpretar {}: {}", path.display(), e))?;
+        Ok(parsed.pointer("/bundle/macOS/bundleVersion").and_then(|v| {
+            v.as_str()
+                .map(|s| s.to_string())
+                .or_else(|| v.as_i64().map(|n| n.to_string()))
+        }))
+    }
+
+    fn read_env_app_version(path: &Path) -> Result<Option<String>, String> {
+        if !path.exists() {
+            return Ok(None);
+        }
+        let raw = std::fs::read_to_string(path)
+            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
+        Ok(raw.lines().find_map(|line| {
+            line.trim_start()
+                .strip_prefix("VITE_APP_VERSION=")
+                .map(|value| value.trim().to_string())
+        }))
+    }
+
+    fn leading_number(input: Option<&str>) -> u64 {
+        input
+            .map(|part| {
+                part.chars()
+                    .take_while(|ch| ch.is_ascii_digit())
+                    .collect::<String>()
+                    .parse::<u64>()
+                    .unwrap_or(0)
+            })
+            .unwrap_or(0)
+    }
+
+    fn build_number_from_version(version: &str) -> String {
+        let mut parts = version.split('.');
+        let major = leading_number(parts.next());
+        let minor = leading_number(parts.next());
+        let patch = leading_number(parts.next());
+        (major * 10000 + minor * 100 + patch).to_string()
+    }
+
+    fn default_app_download_url(version: &str) -> String {
+        format!(
+            "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v{version}/catalogo_ips_x64-setup.exe"
+        )
+    }
+
     fn render_with_original_newline(lines: Vec<String>, original: &str) -> String {
         let newline = if original.contains("\r\n") {
             "\r\n"
@@ -2417,6 +2491,50 @@ mod core {
             rendered.push('\n');
         }
         rendered
+    }
+
+    fn replace_env_app_version(contents: &str, new_version: &str) -> String {
+        let newline = if contents.contains("\r\n") {
+            "\r\n"
+        } else {
+            "\n"
+        };
+        let mut replaced = false;
+        let mut lines = Vec::new();
+
+        for line in contents.lines() {
+            let trimmed = line.trim_start();
+            if trimmed.starts_with("VITE_APP_VERSION=") {
+                let indent_len = line.len() - trimmed.len();
+                let indent = &line[..indent_len];
+                lines.push(format!("{indent}VITE_APP_VERSION={new_version}"));
+                replaced = true;
+            } else {
+                lines.push(line.to_string());
+            }
+        }
+
+        if replaced {
+            return render_with_original_newline(lines, contents);
+        }
+
+        let mut rendered = render_with_original_newline(lines, contents);
+        if !rendered.is_empty() && !rendered.ends_with(newline) {
+            rendered.push_str(newline);
+        }
+        rendered.push_str(&format!("VITE_APP_VERSION={new_version}{newline}"));
+        rendered
+    }
+
+    fn write_env_app_version_if_exists(path: &Path, new_version: &str) -> Result<(), String> {
+        if !path.exists() {
+            return Ok(());
+        }
+        let raw = std::fs::read_to_string(path)
+            .map_err(|e| format!("Falha ao ler {}: {}", path.display(), e))?;
+        let updated = replace_env_app_version(&raw, new_version);
+        std::fs::write(path, updated)
+            .map_err(|e| format!("Falha ao gravar {}: {}", path.display(), e))
     }
 
     fn replace_first_json_version(contents: &str, new_version: &str) -> Result<String, String> {
@@ -2442,6 +2560,108 @@ mod core {
             return Err("Campo version não encontrado no JSON".to_string());
         }
         Ok(render_with_original_newline(lines, contents))
+    }
+
+    fn update_tauri_conf_version(contents: &str, new_version: &str) -> Result<String, String> {
+        let mut parsed: serde_json::Value = serde_json::from_str(contents)
+            .map_err(|e| format!("Falha ao interpretar tauri.conf.json: {}", e))?;
+        let root = parsed
+            .as_object_mut()
+            .ok_or_else(|| "tauri.conf.json precisa ser um objeto JSON".to_string())?;
+
+        root.insert("version".to_string(), json!(new_version));
+
+        let bundle = root
+            .entry("bundle".to_string())
+            .or_insert_with(|| json!({}));
+        if !bundle.is_object() {
+            *bundle = json!({});
+        }
+        let bundle_obj = bundle
+            .as_object_mut()
+            .ok_or_else(|| "Campo bundle invalido em tauri.conf.json".to_string())?;
+        let macos = bundle_obj
+            .entry("macOS".to_string())
+            .or_insert_with(|| json!({}));
+        if !macos.is_object() {
+            *macos = json!({});
+        }
+        let macos_obj = macos
+            .as_object_mut()
+            .ok_or_else(|| "Campo bundle.macOS invalido em tauri.conf.json".to_string())?;
+        macos_obj.remove("fileVersion");
+        macos_obj.insert(
+            "bundleVersion".to_string(),
+            json!(build_number_from_version(new_version)),
+        );
+
+        serde_json::to_string_pretty(&parsed)
+            .map(|mut rendered| {
+                rendered.push('\n');
+                rendered
+            })
+            .map_err(|e| format!("Falha ao renderizar tauri.conf.json: {}", e))
+    }
+
+    fn json_string_literal(value: &str) -> Result<String, String> {
+        serde_json::to_string(value).map_err(|e| format!("Falha ao serializar valor JSON: {}", e))
+    }
+
+    fn replace_top_level_json_string_field(
+        contents: &str,
+        field: &str,
+        value: &str,
+    ) -> Result<(String, bool), String> {
+        let literal = json_string_literal(value)?;
+        let marker = format!("\"{field}\"");
+        let mut replaced = false;
+        let mut lines = Vec::new();
+
+        for line in contents.lines() {
+            let trimmed = line.trim_start();
+            if !replaced && trimmed.starts_with(&marker) {
+                let indent_len = line.len() - trimmed.len();
+                let indent = &line[..indent_len];
+                let suffix = if trimmed.trim_end().ends_with(',') {
+                    ","
+                } else {
+                    ""
+                };
+                lines.push(format!("{indent}\"{field}\": {literal}{suffix}"));
+                replaced = true;
+            } else {
+                lines.push(line.to_string());
+            }
+        }
+
+        Ok((render_with_original_newline(lines, contents), replaced))
+    }
+
+    fn update_manifest_release_fields(contents: &str, new_version: &str) -> Result<String, String> {
+        let download_url = default_app_download_url(new_version);
+        let (updated, app_version_found) =
+            replace_top_level_json_string_field(contents, "appVersion", new_version)?;
+        let (updated, download_found) =
+            replace_top_level_json_string_field(&updated, "appDownloadUrl", &download_url)?;
+
+        if app_version_found && download_found {
+            return Ok(updated);
+        }
+
+        let mut parsed: serde_json::Value = serde_json::from_str(&updated)
+            .map_err(|e| format!("Falha ao interpretar manifest.json: {}", e))?;
+        let root = parsed
+            .as_object_mut()
+            .ok_or_else(|| "manifest.json precisa ser um objeto JSON".to_string())?;
+        root.insert("appVersion".to_string(), json!(new_version));
+        root.insert("appDownloadUrl".to_string(), json!(download_url));
+
+        serde_json::to_string_pretty(&parsed)
+            .map(|mut rendered| {
+                rendered.push('\n');
+                rendered
+            })
+            .map_err(|e| format!("Falha ao renderizar manifest.json: {}", e))
     }
 
     fn replace_cargo_toml_version(contents: &str, new_version: &str) -> Result<String, String> {
@@ -2522,17 +2742,53 @@ mod core {
         let cargo_toml_path = app_root.join("src-tauri").join("Cargo.toml");
         let tauri_conf_path = app_root.join("src-tauri").join("tauri.conf.json");
         let cargo_lock_path = app_root.join("src-tauri").join("Cargo.lock");
+        let env_production_path = app_root.join(".env.production");
+        let env_development_path = app_root.join(".env.development");
+        let env_example_path = app_root.join(".env.example");
+        let manifest_path = app_root.join("manifest.json");
 
         let package_json_version = read_json_version(&package_json_path)?;
         let cargo_toml_version = read_cargo_toml_version(&cargo_toml_path)?;
         let tauri_conf_version = read_json_version(&tauri_conf_path)?;
+        let tauri_conf_bundle_version = read_tauri_bundle_version(&tauri_conf_path)?;
         let cargo_lock_version = read_cargo_lock_version(&cargo_lock_path, "catalogo_ips")?;
+        let env_production_version = read_env_app_version(&env_production_path)?;
+        let env_development_version = read_env_app_version(&env_development_path)?;
+        let env_example_version = read_env_app_version(&env_example_path)?;
+        let manifest_app_version = read_json_string_field(&manifest_path, "appVersion")?;
+        let manifest_download_url = read_json_string_field(&manifest_path, "appDownloadUrl")?;
+        let expected_bundle_version = build_number_from_version(&package_json_version);
+        let expected_download_url = default_app_download_url(&package_json_version);
 
         let consistent = package_json_version == cargo_toml_version
             && package_json_version == tauri_conf_version
+            && tauri_conf_bundle_version
+                .as_ref()
+                .map(|v| v == &expected_bundle_version)
+                .unwrap_or(true)
             && cargo_lock_version
                 .as_ref()
                 .map(|v| v == &package_json_version)
+                .unwrap_or(true)
+            && env_production_version
+                .as_ref()
+                .map(|v| v == &package_json_version)
+                .unwrap_or(true)
+            && env_development_version
+                .as_ref()
+                .map(|v| v == &package_json_version)
+                .unwrap_or(true)
+            && env_example_version
+                .as_ref()
+                .map(|v| v == &package_json_version)
+                .unwrap_or(true)
+            && manifest_app_version
+                .as_ref()
+                .map(|v| v == &package_json_version)
+                .unwrap_or(true)
+            && manifest_download_url
+                .as_ref()
+                .map(|v| v == &expected_download_url)
                 .unwrap_or(true);
 
         Ok(AppVersionInfo {
@@ -2541,7 +2797,13 @@ mod core {
             package_json_version,
             cargo_toml_version,
             tauri_conf_version,
+            tauri_conf_bundle_version,
             cargo_lock_version,
+            env_production_version,
+            env_development_version,
+            env_example_version,
+            manifest_app_version,
+            manifest_download_url,
             app_root: app_root.display().to_string(),
         })
     }
@@ -2723,6 +2985,10 @@ mod core {
         let cargo_toml_path = app_root.join("src-tauri").join("Cargo.toml");
         let tauri_conf_path = app_root.join("src-tauri").join("tauri.conf.json");
         let cargo_lock_path = app_root.join("src-tauri").join("Cargo.lock");
+        let env_production_path = app_root.join(".env.production");
+        let env_development_path = app_root.join(".env.development");
+        let env_example_path = app_root.join(".env.example");
+        let manifest_path = app_root.join("manifest.json");
 
         let package_json_raw = std::fs::read_to_string(&package_json_path)
             .map_err(|e| format!("Falha ao ler {}: {}", package_json_path.display(), e))?;
@@ -2733,7 +2999,7 @@ mod core {
 
         let package_json_updated = replace_first_json_version(&package_json_raw, &next_version)?;
         let cargo_toml_updated = replace_cargo_toml_version(&cargo_toml_raw, &next_version)?;
-        let tauri_conf_updated = replace_first_json_version(&tauri_conf_raw, &next_version)?;
+        let tauri_conf_updated = update_tauri_conf_version(&tauri_conf_raw, &next_version)?;
 
         std::fs::write(&package_json_path, package_json_updated)
             .map_err(|e| format!("Falha ao gravar {}: {}", package_json_path.display(), e))?;
@@ -2751,6 +3017,18 @@ mod core {
                 std::fs::write(&cargo_lock_path, cargo_lock_updated)
                     .map_err(|e| format!("Falha ao gravar {}: {}", cargo_lock_path.display(), e))?;
             }
+        }
+
+        write_env_app_version_if_exists(&env_production_path, &next_version)?;
+        write_env_app_version_if_exists(&env_development_path, &next_version)?;
+        write_env_app_version_if_exists(&env_example_path, &next_version)?;
+
+        if manifest_path.exists() {
+            let manifest_raw = std::fs::read_to_string(&manifest_path)
+                .map_err(|e| format!("Falha ao ler {}: {}", manifest_path.display(), e))?;
+            let manifest_updated = update_manifest_release_fields(&manifest_raw, &next_version)?;
+            std::fs::write(&manifest_path, manifest_updated)
+                .map_err(|e| format!("Falha ao gravar {}: {}", manifest_path.display(), e))?;
         }
 
         read_app_version_info()

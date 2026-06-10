@@ -1945,7 +1945,21 @@ function App() {
   const displayLogos = headerLogos.filter(Boolean);
   const detailRows = productDetailRows(selected);
   const configuredVersionCurrent = versionInfo?.resolved_version || "";
-  const versionDirty = configuredVersion.trim() && configuredVersion.trim() !== configuredVersionCurrent;
+  const versionDirty =
+    configuredVersion.trim() && (configuredVersion.trim() !== configuredVersionCurrent || versionInfo?.consistent === false);
+  const versionSummaryParts = versionInfo
+    ? [
+        `package.json ${versionInfo.package_json_version}`,
+        `Cargo.toml ${versionInfo.cargo_toml_version}`,
+        `tauri.conf.json ${versionInfo.tauri_conf_version}`,
+        versionInfo.tauri_conf_bundle_version ? `macOS build ${versionInfo.tauri_conf_bundle_version}` : null,
+        versionInfo.cargo_lock_version ? `Cargo.lock ${versionInfo.cargo_lock_version}` : null,
+        versionInfo.env_production_version ? `.env.production ${versionInfo.env_production_version}` : null,
+        versionInfo.env_example_version ? `.env.example ${versionInfo.env_example_version}` : null,
+        versionInfo.env_development_version ? `.env.development ${versionInfo.env_development_version}` : null,
+        versionInfo.manifest_app_version ? `manifest ${versionInfo.manifest_app_version}` : null,
+      ].filter(Boolean)
+    : [];
   const printVehicleSource = allVehicles.length ? allVehicles : vehicles;
   const printLineOptions = useMemo(
     () => uniqueTextOptions(printVehicleSource.map((v) => v?.category), lineDisplayLabel),
@@ -2111,9 +2125,7 @@ function App() {
                   </span>
                   {versionInfo ? (
                     <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#555" }}>
-                      package.json {versionInfo.package_json_version} | Cargo.toml {versionInfo.cargo_toml_version} | tauri.conf.json{" "}
-                      {versionInfo.tauri_conf_version}
-                      {versionInfo.cargo_lock_version ? ` | Cargo.lock ${versionInfo.cargo_lock_version}` : ""}
+                      {versionSummaryParts.join(" | ")}
                     </span>
                   ) : null}
                 </div>

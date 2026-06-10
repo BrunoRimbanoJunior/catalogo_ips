@@ -62,6 +62,10 @@ function updateEnvFile(relPath, fallbackRelPath) {
   fs.writeFileSync(filePath, updated);
 }
 
+function defaultAppDownloadUrl(version) {
+  return `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v${version}/catalogo_ips_x64-setup.exe`;
+}
+
 // package.json
 {
   const { data } = readJson("package.json");
@@ -106,5 +110,16 @@ updateTextFile(
 updateEnvFile(".env.production");
 updateEnvFile(".env.development", ".env.production");
 updateEnvFile(".env.example");
+
+// manifest.json used by local/dev release checks.
+{
+  const manifestPath = path.join(root, "manifest.json");
+  if (fs.existsSync(manifestPath)) {
+    const { data } = readJson("manifest.json");
+    data.appVersion = version;
+    data.appDownloadUrl = defaultAppDownloadUrl(version);
+    writeJson("manifest.json", data);
+  }
+}
 
 console.log(`Synced version to ${version}`);
