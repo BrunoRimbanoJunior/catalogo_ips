@@ -67,6 +67,7 @@ pnpm manifest -- --app-version 1.5.0 --app-download-url https://github.com/<org>
 ## Build de release (assinada + updater)
 - Gere as chaves uma única vez: `pnpm tauri signer generate` (guarde a `private.key` fora do git; `public.key` fica no `tauri.conf.json`).
 - Build local assinada e com artefatos de updater: `TAURI_SIGNING_PRIVATE_KEY_PATH=./private.key TAURI_SIGNING_PRIVATE_KEY_PASSWORD=*** pnpm tauri:build:signed`.
+- No Windows/local, você pode colocar `TAURI_SIGNING_PRIVATE_KEY_PATH` e `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` em `.env.local` ou `.env.development` e rodar `pnpm tauri:build:signed`; não coloque a chave privada em `.env.production`.
 - Saída: `src-tauri/target/release/bundle/*` com instaladores, bundles de updater e arquivos `.sig`.
 - CI: defina secrets `TAURI_PRIVATE_KEY` (conteúdo do `private.key`) e `TAURI_KEY_PASSWORD` e rode o mesmo comando ou habilite `includeUpdaterJson` no `tauri-action` para anexar o `latest.json` na Release.
 - Endpoint default no `tauri.conf.json` usa Releases do GitHub: o app consulta `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/latest.json`.

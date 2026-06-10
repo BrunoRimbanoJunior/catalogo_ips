@@ -1982,6 +1982,126 @@ mod core {
         })
     }
 
+    fn branding_images_dir() -> Result<PathBuf, String> {
+        let cwd = std::env::current_dir().map_err(|e| e.to_string())?;
+        Ok(if cwd.ends_with("src-tauri") {
+            cwd.parent().unwrap_or(&cwd).join("public").join("images")
+        } else {
+            cwd.join("public").join("images")
+        })
+    }
+
+    fn is_branding_image(path: &Path) -> bool {
+        path.extension()
+            .and_then(|e| e.to_str())
+            .map(|ext| {
+                matches!(
+                    ext.to_ascii_lowercase().as_str(),
+                    "png" | "jpg" | "jpeg" | "webp" | "gif" | "svg"
+                )
+            })
+            .unwrap_or(false)
+    }
+
+    fn read_branding_json(
+        json_path: &Path,
+    ) -> (Option<String>, Option<String>, Option<Vec<String>>) {
+        if !json_path.exists() {
+            return (None, None, None);
+        }
+        let Ok(bytes) = fs::read(json_path) else {
+            return (None, None, None);
+        };
+        let Ok(val) = serde_json::from_slice::<serde_json::Value>(&bytes) else {
+            return (None, None, None);
+        };
+        let logo = val
+            .get("logo")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let background = val
+            .get("background")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+        let header_logos = val
+            .get("headerLogos")
+            .and_then(|v| v.as_array())
+            .map(|arr| {
+                arr.iter()
+                    .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                    .collect::<Vec<String>>()
+            });
+        (logo, background, header_logos)
+    }
+
+    fn relative_branding_file_exists(images_dir: &Path, rel: &str) -> bool {
+        let clean = rel
+            .replace('\\', "/")
+            .trim_start_matches('/')
+            .trim_start_matches("./")
+            .trim_start_matches("images/")
+            .to_string();
+        if clean.contains("..") || clean.starts_with("http://") || clean.starts_with("https://") {
+            return false;
+        }
+        images_dir.join(clean).is_file()
+    }
+
+    #[tauri::command]
+    pub fn refresh_branding_config() -> Result<BrandingResult, String> {
+        use std::io::Write;
+
+        let out_dir = branding_images_dir()?;
+        let logos_dir = out_dir.join("header-logos");
+        fs::create_dir_all(&logos_dir).map_err(|e| e.to_string())?;
+
+        let json_path = out_dir.join("branding.json");
+        let (logo, background, existing_header_logos) = read_branding_json(&json_path);
+
+        let logo = logo.filter(|path| relative_branding_file_exists(&out_dir, path));
+        let background = background.filter(|path| relative_branding_file_exists(&out_dir, path));
+
+        let mut header_logos: Vec<String> = existing_header_logos
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|path| relative_branding_file_exists(&out_dir, path))
+            .collect();
+
+        let mut found = fs::read_dir(&logos_dir)
+            .map_err(|e| format!("Falha ao ler {}: {}", logos_dir.display(), e))?
+            .filter_map(|entry| entry.ok().map(|e| e.path()))
+            .filter(|path| path.is_file() && is_branding_image(path))
+            .filter_map(|path| {
+                path.file_name()
+                    .and_then(|name| name.to_str())
+                    .map(|name| format!("header-logos/{name}"))
+            })
+            .collect::<Vec<String>>();
+        found.sort_by_key(|path| path.to_ascii_lowercase());
+
+        for rel in found {
+            if !header_logos.iter().any(|item| item == &rel) {
+                header_logos.push(rel);
+            }
+        }
+
+        let obj = serde_json::json!({
+            "logo": logo,
+            "background": background,
+            "headerLogos": header_logos
+        });
+        let mut f = std::fs::File::create(&json_path).map_err(|e| e.to_string())?;
+        f.write_all(serde_json::to_string_pretty(&obj).unwrap().as_bytes())
+            .map_err(|e| e.to_string())?;
+
+        Ok(BrandingResult {
+            ok: true,
+            logo,
+            background,
+            header_logos: Some(header_logos),
+        })
+    }
+
     #[tauri::command]
     pub async fn sync_from_manifest(
         app: AppHandle,
@@ -3367,6 +3487,7 @@ pub fn run() {
             core::open_path_cmd,
             core::set_branding_image,
             core::set_header_logos,
+            core::refresh_branding_config,
             core::gen_manifest_r2,
             core::run_rclone_sync,
             core::get_app_version_config,

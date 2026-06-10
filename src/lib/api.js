@@ -74,6 +74,10 @@ export async function setHeaderLogos(paths) {
   return await invoke("set_header_logos", { paths });
 }
 
+export async function refreshBrandingConfig() {
+  return await invoke("refresh_branding_config");
+}
+
 export async function readImageBase64(pathOrRel) {
   return await invoke("read_image_base64", { pathOrRel });
 }

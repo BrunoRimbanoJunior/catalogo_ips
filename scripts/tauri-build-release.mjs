@@ -4,6 +4,44 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+function unquoteEnvValue(value) {
+  const trimmed = value.trim();
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
+function loadEnvFile(relPath) {
+  const filePath = resolve(relPath);
+  if (!existsSync(filePath)) return;
+
+  const content = readFileSync(filePath, "utf8");
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+
+    const normalized = line.startsWith("export ") ? line.slice(7).trim() : line;
+    const eqIndex = normalized.indexOf("=");
+    if (eqIndex <= 0) continue;
+
+    const key = normalized.slice(0, eqIndex).trim();
+    const value = unquoteEnvValue(normalized.slice(eqIndex + 1));
+    if (!process.env[key]?.trim()) {
+      process.env[key] = value;
+    }
+  }
+}
+
+function loadLocalSigningEnv() {
+  loadEnvFile(".env.local");
+  loadEnvFile(".env.development.local");
+  loadEnvFile(".env.development");
+}
+
 function getPrivateKey() {
   if (process.env.TAURI_SIGNING_PRIVATE_KEY?.trim()) {
     return process.env.TAURI_SIGNING_PRIVATE_KEY.trim();
@@ -40,6 +78,8 @@ function getKeyPassword() {
 }
 
 function main() {
+  loadLocalSigningEnv();
+
   const privateKey = getPrivateKey();
   const keyPassword = getKeyPassword();
 

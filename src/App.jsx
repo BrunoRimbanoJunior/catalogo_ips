@@ -14,6 +14,7 @@ import {
   exportDbTo,
   setBrandingImage,
   setHeaderLogos as setHeaderLogosApi,
+  refreshBrandingConfig,
   runRcloneSync,
   getAppVersionConfig,
   setAppVersionConfig,
@@ -118,6 +119,25 @@ function validateRegistrationForm(form, fallbackEmail = "") {
     return { error: "Informe um CPF válido." };
   }
   return { error: "", email, cpfCnpj };
+}
+
+function toImageAssetPath(path, fallback = "") {
+  const clean = sanitizeStoredPath(path, fallback);
+  if (!clean) return fallback;
+  if (clean.startsWith("http://") || clean.startsWith("https://") || clean.startsWith("/") || /^[A-Za-z]:[\\/]/.test(clean)) {
+    return clean;
+  }
+  return `/images/${clean.replace(/^\.?\/?images\/?/i, "").replace(/\\/g, "/")}`;
+}
+
+function normalizeHeaderLogoList(items) {
+  if (!Array.isArray(items)) return [];
+  const unique = [];
+  for (const item of items) {
+    const normalized = toHeaderLogoPath(item);
+    if (normalized && !unique.includes(normalized)) unique.push(normalized);
+  }
+  return unique;
 }
 
 function normalizeVersionTag(raw = "") {
@@ -957,6 +977,7 @@ function App() {
   const [logoPath, setLogoPath] = useState(() => sanitizeStoredPath(localStorage.getItem("ui.logoPath"), DEFAULT_LOGO));
   const [bgPath, setBgPath] = useState(() => sanitizeStoredPath(localStorage.getItem("ui.bgPath"), DEFAULT_BACKGROUND));
   const [headerLogos, setHeaderLogos] = useState(() => parseStoredArray(localStorage.getItem("ui.headerLogos")));
+  const [brandingRevision, setBrandingRevision] = useState(0);
 
   const loadGroupsFor = async (bid, bname) => {
     try {
@@ -1107,6 +1128,49 @@ function App() {
     if (cachedProfile?.status === "approved" || profile?.status === "approved") return false;
     return true;
   }, [isDev, supabaseConfigured, cachedProfile, profile]);
+
+  const versionedDisplaySrc = useCallback(
+    (path) => {
+      const src = toDisplaySrc(path);
+      if (!src || !brandingRevision || !src.startsWith("/images/")) return src;
+      return `${src}${src.includes("?") ? "&" : "?"}v=${brandingRevision}`;
+    },
+    [brandingRevision]
+  );
+
+  function applyBrandingConfig(branding) {
+    const nextLogo = toImageAssetPath(branding?.logo, DEFAULT_LOGO);
+    const nextBg = toImageAssetPath(branding?.background, DEFAULT_BACKGROUND);
+    const rawHeaders = branding?.header_logos || branding?.headerLogos || [];
+    const nextHeaderLogos = normalizeHeaderLogoList(rawHeaders);
+
+    setLogoPath(nextLogo);
+    setBgPath(nextBg);
+    setHeaderLogos(nextHeaderLogos);
+    localStorage.setItem("ui.logoPath", nextLogo);
+    localStorage.setItem("ui.bgPath", nextBg);
+    localStorage.setItem("ui.headerLogos", JSON.stringify(nextHeaderLogos));
+    setBrandingRevision(Date.now());
+    return nextHeaderLogos;
+  }
+
+  async function loadBrandingConfig() {
+    try {
+      const branding = isDev
+        ? await refreshBrandingConfig()
+        : await fetch(`/images/branding.json?v=${Date.now()}`).then((r) => (r.ok ? r.json() : null));
+      if (!branding) return [];
+      return applyBrandingConfig(branding);
+    } catch (_) {
+      try {
+        const branding = await fetch(`/images/branding.json?v=${Date.now()}`).then((r) => (r.ok ? r.json() : null));
+        if (!branding) return [];
+        return applyBrandingConfig(branding);
+      } catch (_) {
+        return [];
+      }
+    }
+  }
 
   useEffect(() => {
     const preventContextMenu = (event) => {
@@ -1333,31 +1397,7 @@ function App() {
       // Libera UI depois do DB e index
       setReady(true);
 
-      try {
-        const branding = await fetch("/images/branding.json").then((r) => (r.ok ? r.json() : null)).catch(() => null);
-        const brandingLogo = branding?.logo ? `/images/${branding.logo}` : null;
-        const brandingBg = branding?.background ? `/images/${branding.background}` : null;
-        const brandingHeaders = Array.isArray(branding?.headerLogos)
-          ? branding.headerLogos
-              .map((n) => toHeaderLogoPath(n))
-              .filter((p) => p && typeof p === "string")
-          : [];
-
-        if (brandingLogo && (logoPath === DEFAULT_LOGO || !logoPath)) {
-          setLogoPath(brandingLogo);
-          localStorage.setItem("ui.logoPath", brandingLogo);
-        }
-        if (brandingBg && (bgPath === DEFAULT_BACKGROUND || !bgPath)) {
-          setBgPath(brandingBg);
-          localStorage.setItem("ui.bgPath", brandingBg);
-        }
-        if (brandingHeaders.length && headerLogos.length === 0) {
-          setHeaderLogos(brandingHeaders);
-          localStorage.setItem("ui.headerLogos", JSON.stringify(brandingHeaders));
-        }
-      } catch (_) {
-        /* ignore */
-      }
+      await loadBrandingConfig();
     })();
   }, [manifestUrl]);
 
@@ -1918,19 +1958,52 @@ function App() {
       try {
         const res = await setHeaderLogosApi(listRaw);
         const returned = res?.header_logos || res?.headerLogos || [];
-        if (Array.isArray(returned) && returned.length) finalList = returned.map((r) => toHeaderLogoPath(r));
+        if (Array.isArray(returned)) finalList = normalizeHeaderLogoList(returned);
       } catch (_) {
         /* fallback to local-only */
       }
       setHeaderLogos(finalList);
+      localStorage.setItem("ui.headerLogos", JSON.stringify(finalList));
+      setBrandingRevision(Date.now());
       setToolsMsg(`Logos atualizadas (${finalList.length}).`);
     } catch (e) {
       setToolsMsg(`Falha ao aplicar logos: ${e}`);
     }
   }
 
+  async function runRefreshBrandingFromFolder() {
+    try {
+      setToolsMsg("Atualizando logos da pasta...");
+      const list = await loadBrandingConfig();
+      setToolsMsg(`Logos da pasta atualizadas (${list.length}).`);
+    } catch (e) {
+      setToolsMsg(`Falha ao atualizar logos da pasta: ${e}`);
+    }
+  }
+
+  async function runClearHeaderLogos() {
+    try {
+      const res = await setHeaderLogosApi([]);
+      const returned = res?.header_logos || res?.headerLogos || [];
+      const finalList = normalizeHeaderLogoList(returned);
+      setHeaderLogos(finalList);
+      localStorage.setItem("ui.headerLogos", JSON.stringify(finalList));
+      setBrandingRevision(Date.now());
+      setToolsMsg("Logos do appbar limpas.");
+    } catch (e) {
+      setHeaderLogos([]);
+      localStorage.setItem("ui.headerLogos", "[]");
+      setBrandingRevision(Date.now());
+      setToolsMsg(`Logos limpas apenas localmente: ${e}`);
+    }
+  }
+
   function handleHeaderLogoError(path) {
-    setHeaderLogos((prev) => prev.filter((p) => p !== path));
+    setHeaderLogos((prev) => {
+      const next = prev.filter((p) => p !== path);
+      localStorage.setItem("ui.headerLogos", JSON.stringify(next));
+      return next;
+    });
   }
 
   function cycleLaunch(delta) {
@@ -1939,7 +2012,7 @@ function App() {
   }
 
   const headerBgStyle = bgPath
-    ? { backgroundImage: `url(${toDisplaySrc(bgPath)})`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }
+    ? { backgroundImage: `url(${versionedDisplaySrc(bgPath)})`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }
     : undefined;
 
   const displayLogos = headerLogos.filter(Boolean);
@@ -1996,7 +2069,7 @@ function App() {
           <div className="appbar-logo">
             {logoPath ? (
               <a href="https://www.ipsbrasil.com.br" target="_blank" rel="noreferrer">
-                <img className="logo brand-logo" src={toDisplaySrc(logoPath)} alt="Logo" />
+                <img className="logo brand-logo" src={versionedDisplaySrc(logoPath)} alt="Logo" />
               </a>
             ) : null}
           </div>
@@ -2009,7 +2082,7 @@ function App() {
                     key={idx}
                     role="listitem"
                     className="logo-strip-item"
-                    src={toDisplaySrc(src)}
+                    src={versionedDisplaySrc(src)}
                     alt={`Logo ${idx + 1}`}
                     onError={() => handleHeaderLogoError(src)}
                   />
@@ -2139,7 +2212,8 @@ function App() {
                   <button onClick={() => runSetBranding("background")}>Aplicar fundo</button>
                   {bgInput ? <span style={{ fontSize: 12, color: "#555" }}>Atual: {bgInput}</span> : null}
                   <button onClick={runSetHeaderLogos}>Carregar logos (appbar)</button>
-                  <button onClick={() => setHeaderLogos([])}>Limpar logos (appbar)</button>
+                  <button onClick={runRefreshBrandingFromFolder}>Atualizar logos da pasta</button>
+                  <button onClick={runClearHeaderLogos}>Limpar logos (appbar)</button>
                   {headerLogos.length ? <span style={{ fontSize: 12, color: "#555" }}>Ativas: {headerLogos.length}</span> : null}
                 </div>
                 {toolsMsg && <span style={{ gridColumn: "1 / -1", fontSize: 12, color: "#444" }}>{toolsMsg}</span>}
