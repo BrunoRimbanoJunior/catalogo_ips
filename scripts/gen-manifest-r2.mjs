@@ -71,10 +71,7 @@ async function loadEnvFiles() {
 }
 
 function toUtcVersionStamp(date = new Date()) {
-  const pad = (n) => String(n).padStart(2, '0');
-  return Number(
-    `${pad(date.getUTCDate())}${pad(date.getUTCMonth() + 1)}${String(date.getUTCFullYear()).slice(-2)}${pad(date.getUTCHours())}`
-  );
+  return Math.floor(date.getTime() / 1000);
 }
 
 async function sha256File(filePath) {

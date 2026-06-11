@@ -16,7 +16,7 @@ mod core {
         header::{ACCEPT_ENCODING, CONTENT_ENCODING},
         Client,
     };
-    use rusqlite::{params, Connection, OptionalExtension};
+    use rusqlite::{params, Connection, OpenFlags, OptionalExtension};
     use serde_json::json;
     use sha2::{Digest, Sha256};
     use std::collections::{HashMap, HashSet};
@@ -421,6 +421,37 @@ mod core {
         Ok(())
     }
 
+    fn seed_catalog_db_candidates(app: &AppHandle) -> Vec<PathBuf> {
+        let mut candidates = Vec::new();
+        if let Ok(res_dir) = app.path().resource_dir() {
+            candidates.push(res_dir.join("catalog.db"));
+            candidates.push(res_dir.join("data").join("catalog.db"));
+        }
+        if let Ok(cwd) = std::env::current_dir() {
+            let app_root = if cwd.ends_with("src-tauri") {
+                cwd.parent().unwrap_or(&cwd).to_path_buf()
+            } else {
+                cwd
+            };
+            candidates.push(app_root.join("data").join("catalog.db"));
+        }
+        candidates
+    }
+
+    fn copy_seed_catalog_db(app: &AppHandle, db_file: &Path) -> Result<Option<PathBuf>> {
+        for seed in seed_catalog_db_candidates(app) {
+            if !seed.exists() {
+                continue;
+            }
+            if let Some(parent) = db_file.parent() {
+                fs::create_dir_all(parent)?;
+            }
+            fs::copy(&seed, db_file)?;
+            return Ok(Some(seed));
+        }
+        Ok(None)
+    }
+
     #[tauri::command]
     pub fn init_app(app: AppHandle) -> Result<InitInfo, String> {
         let (data_dir, db_file, imgs_dir) = ensure_dirs(&app).map_err(|e| e.to_string())?;
@@ -433,31 +464,7 @@ mod core {
         }
         let created = !db_file.exists();
         if created {
-            if let Ok(res_dir) = app.path().resource_dir() {
-                // Tente multiplos caminhos possiveis dentro de resources
-                let candidates = [
-                    res_dir.join("catalog.db"),
-                    res_dir.join("data").join("catalog.db"),
-                ];
-                for seed in candidates.iter() {
-                    if seed.exists() {
-                        let _ = std::fs::copy(seed, &db_file);
-                        break;
-                    }
-                }
-            }
-            if !db_file.exists() {
-                if let Ok(cwd) = std::env::current_dir() {
-                    let maybe = if cwd.ends_with("src-tauri") {
-                        cwd.parent().unwrap_or(&cwd).join("data").join("catalog.db")
-                    } else {
-                        cwd.join("data").join("catalog.db")
-                    };
-                    if maybe.exists() {
-                        let _ = std::fs::copy(&maybe, &db_file);
-                    }
-                }
-            }
+            let _ = copy_seed_catalog_db(&app, &db_file);
         }
         let conn = open_db(&db_file).map_err(|e| e.to_string())?;
         migrate(&conn).map_err(|e| e.to_string())?;
@@ -1687,6 +1694,7 @@ mod core {
 
     fn looks_like_catalog_asset(bytes: &[u8]) -> bool {
         bytes.starts_with(b"CIMG")
+            || bytes.starts_with(b"SQLite format 3\0")
             || bytes.starts_with(&[0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A])
             || bytes.starts_with(&[0xFF, 0xD8, 0xFF])
             || bytes.starts_with(b"GIF87a")
@@ -1727,6 +1735,36 @@ mod core {
         hasher.update(&bytes);
         let out = hasher.finalize();
         Ok(out.iter().map(|b| format!("{:02x}", b)).collect())
+    }
+
+    fn validate_catalog_db_file(path: &Path) -> Result<i64> {
+        let bytes = fs::read(path)?;
+        if bytes.len() < 4096 {
+            anyhow::bail!(
+                "catalog.db invalido: arquivo muito pequeno ({} bytes)",
+                bytes.len()
+            );
+        }
+        if !bytes.starts_with(b"SQLite format 3\0") {
+            anyhow::bail!("catalog.db invalido: cabecalho SQLite ausente");
+        }
+        drop(bytes);
+
+        let conn = Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_ONLY)?;
+        let quick_check: String = conn.query_row("PRAGMA quick_check", [], |row| row.get(0))?;
+        if quick_check.to_ascii_lowercase() != "ok" {
+            anyhow::bail!("catalog.db invalido: PRAGMA quick_check retornou {quick_check}");
+        }
+        let products: i64 =
+            conn.query_row("SELECT COUNT(1) FROM products", [], |row| row.get(0))?;
+        if products <= 0 {
+            anyhow::bail!("catalog.db invalido: tabela products sem registros");
+        }
+        Ok(products)
+    }
+
+    fn catalog_db_is_usable(path: &Path) -> bool {
+        validate_catalog_db_file(path).is_ok()
     }
 
     async fn download_to_file_raw(url: &str, dest: &Path) -> Result<()> {
@@ -1799,6 +1837,7 @@ mod core {
                 );
             }
         }
+        validate_catalog_db_file(&tmp)?;
         if let Some(parent) = dest.parent() {
             fs::create_dir_all(parent)?;
         }
@@ -2061,29 +2100,25 @@ mod core {
         let logo = logo.filter(|path| relative_branding_file_exists(&out_dir, path));
         let background = background.filter(|path| relative_branding_file_exists(&out_dir, path));
 
-        let mut header_logos: Vec<String> = existing_header_logos
-            .unwrap_or_default()
-            .into_iter()
-            .filter(|path| relative_branding_file_exists(&out_dir, path))
-            .collect();
-
-        let mut found = fs::read_dir(&logos_dir)
-            .map_err(|e| format!("Falha ao ler {}: {}", logos_dir.display(), e))?
-            .filter_map(|entry| entry.ok().map(|e| e.path()))
-            .filter(|path| path.is_file() && is_branding_image(path))
-            .filter_map(|path| {
-                path.file_name()
-                    .and_then(|name| name.to_str())
-                    .map(|name| format!("header-logos/{name}"))
-            })
-            .collect::<Vec<String>>();
-        found.sort_by_key(|path| path.to_ascii_lowercase());
-
-        for rel in found {
-            if !header_logos.iter().any(|item| item == &rel) {
-                header_logos.push(rel);
-            }
-        }
+        let header_logos: Vec<String> = if let Some(existing_header_logos) = existing_header_logos {
+            existing_header_logos
+                .into_iter()
+                .filter(|path| relative_branding_file_exists(&out_dir, path))
+                .collect()
+        } else {
+            let mut found = fs::read_dir(&logos_dir)
+                .map_err(|e| format!("Falha ao ler {}: {}", logos_dir.display(), e))?
+                .filter_map(|entry| entry.ok().map(|e| e.path()))
+                .filter(|path| path.is_file() && is_branding_image(path))
+                .filter_map(|path| {
+                    path.file_name()
+                        .and_then(|name| name.to_str())
+                        .map(|name| format!("header-logos/{name}"))
+                })
+                .collect::<Vec<String>>();
+            found.sort_by_key(|path| path.to_ascii_lowercase());
+            found
+        };
 
         let obj = serde_json::json!({
             "logo": logo,
@@ -2117,28 +2152,41 @@ mod core {
         let (manifest, manifest_hash) =
             fetch_or_seed_manifest(&client, &app, &manifest_url).await?;
         let mut updated_db = false;
-        let local_version = {
+        let local_db_usable = catalog_db_is_usable(&dbf);
+        let local_version = if local_db_usable {
             let conn = open_db(&dbf).map_err(|e| e.to_string())?;
             migrate(&conn).map_err(|e| e.to_string())?;
             get_db_version(&conn).unwrap_or(0)
+        } else {
+            0
         };
-        let manifest_changed = {
+        let manifest_changed = if local_db_usable {
             let conn = open_db(&dbf).map_err(|e| e.to_string())?;
             migrate(&conn).ok();
             let last = get_manifest_hash(&conn).ok().flatten();
             last.as_deref() != Some(&manifest_hash)
+        } else {
+            true
         };
-        if manifest.db.version > local_version {
+        if !local_db_usable || manifest.db.version > local_version {
             // Manifest mudou: limpar pasta de lançamentos para evitar resquícios antigos.
             clear_launches_dir(&imgs_dir).ok();
-            download_to_file_verified(
+            if let Err(err) = download_to_file_verified(
                 &client,
                 &manifest.db.url,
                 &dbf,
                 manifest.db.sha256.as_deref(),
             )
             .await
-            .map_err(|e| e.to_string())?;
+            {
+                if !local_db_usable {
+                    let _ = copy_seed_catalog_db(&app, &dbf);
+                }
+                return Err(format!(
+                    "Falha ao baixar catalog.db do manifest (versao remota {}, url {}): {}",
+                    manifest.db.version, manifest.db.url, err
+                ));
+            }
             let conn = open_db(&dbf).map_err(|e| e.to_string())?;
             migrate(&conn).map_err(|e| e.to_string())?;
             if get_db_version(&conn).unwrap_or(0) < manifest.db.version {

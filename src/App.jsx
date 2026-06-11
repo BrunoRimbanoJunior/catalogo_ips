@@ -1156,14 +1156,12 @@ function App() {
 
   async function loadBrandingConfig() {
     try {
-      const branding = isDev
-        ? await refreshBrandingConfig()
-        : await fetch(`/images/branding.json?v=${Date.now()}`).then((r) => (r.ok ? r.json() : null));
+      const branding = await fetch(`/images/branding.json?v=${Date.now()}`).then((r) => (r.ok ? r.json() : null));
       if (!branding) return [];
       return applyBrandingConfig(branding);
     } catch (_) {
       try {
-        const branding = await fetch(`/images/branding.json?v=${Date.now()}`).then((r) => (r.ok ? r.json() : null));
+        const branding = await refreshBrandingConfig();
         if (!branding) return [];
         return applyBrandingConfig(branding);
       } catch (_) {
@@ -1354,13 +1352,17 @@ function App() {
         setAppVersion(import.meta.env.VITE_APP_VERSION || "0.0.0");
       }
 
-      try {
+      const loadCatalogState = async () => {
         const { brands: b, vehicles: v, makes: mk } = await loadInitialCatalog();
         setBrands(b);
         setVehicles(v);
         setAllVehicles(v);
         setMakes(mk);
         await loadGroupsFor(null, null);
+      };
+
+      try {
+        await loadCatalogState();
       } catch (e) {
         setStatusMsg(`Falha ao carregar catalogos: ${e}`);
       }
@@ -1372,8 +1374,16 @@ function App() {
           setDbVersion(res?.db_version || res?.dbVersion || dbVersion);
           setStatusMsg(`Sincronizado: db v${res?.db_version || res?.dbVersion || "?"} | imgs +${res?.downloaded_images || res?.downloadedImages || 0}`);
           localStorage.setItem("manifestUrl", manifestUrl);
+          if (res?.updated_db || res?.updatedDb) {
+            await loadCatalogState();
+          }
         } catch (e) {
           setStatusMsg(`Falha ao sincronizar: ${e}`);
+          try {
+            await loadCatalogState();
+          } catch (_) {
+            /* mantém a mensagem original de sincronização */
+          }
         } finally {
           setSyncing(false);
         }
@@ -1394,10 +1404,10 @@ function App() {
         }
       }
 
-      // Libera UI depois do DB e index
-      setReady(true);
-
       await loadBrandingConfig();
+
+      // Libera UI depois do DB, index e branding para evitar exibir cache antigo.
+      setReady(true);
     })();
   }, [manifestUrl]);
 
