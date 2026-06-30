@@ -93,6 +93,19 @@ async function loadJsonIfExists(filePath) {
   }
 }
 
+function firstNonEmpty(...values) {
+  for (const value of values) {
+    const normalized = typeof value === 'string' ? value.trim() : value;
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
+async function readPackageVersion() {
+  const pkg = await loadJsonIfExists('package.json');
+  return typeof pkg?.version === 'string' ? pkg.version.trim() : null;
+}
+
 function guessDbUrlFromGit() {
   try {
     const remote = execSync('git config --get remote.origin.url', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
@@ -129,6 +142,7 @@ async function main() {
 
   const outPath = arg('out', DEFAULT_MANIFEST_PATH);
   const existingManifest = await loadJsonIfExists(outPath);
+  const packageVersion = await readPackageVersion();
   const localDbSha = existsSync(DEFAULT_DB_PATH) ? await sha256File(DEFAULT_DB_PATH) : null;
   const existingDbVersion = Number(existingManifest?.db?.version);
   const existingDbSha = existingManifest?.db?.sha256 || null;
@@ -149,7 +163,16 @@ async function main() {
   );
   const dbSha = arg('db-sha', process.env.MANIFEST_DB_SHA || localDbSha || existingDbSha || null);
   const dbUrl = arg('db-url', process.env.MANIFEST_DB_URL || existingManifest?.db?.url || guessDbUrlFromGit());
-  const appVersion = arg('app-version', process.env.APP_VERSION || process.env.VITE_APP_VERSION || null);
+  const appVersion = arg(
+    'app-version',
+    firstNonEmpty(
+      process.env.MANIFEST_APP_VERSION,
+      process.env.APP_VERSION,
+      packageVersion,
+      process.env.VITE_APP_VERSION,
+      existingManifest?.appVersion,
+    )
+  );
   const appDownloadUrl = arg('app-download-url', process.env.MANIFEST_APP_DOWNLOAD_URL || process.env.APP_DOWNLOAD_URL || null);
   const prefix = arg('prefix', '');
 

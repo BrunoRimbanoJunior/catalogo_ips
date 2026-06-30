@@ -52,6 +52,7 @@ Esse comando:
 - lê `.env.development` e `.env` para as credenciais `R2_*`;
 - reaproveita `manifest.json` atual se o `data/catalog.db` não mudou;
 - calcula `db.sha256` a partir de `data/catalog.db` local quando o arquivo existe;
+- usa a versão do `package.json` para preencher `appVersion/appDownloadUrl` quando não houver sobrescrita;
 - usa `MANIFEST_DB_URL` se definido; caso contrário, tenta inferir a URL raw do banco a partir do remote GitHub.
 
 Para forçar versão/URL específicas:
@@ -59,7 +60,7 @@ Para forçar versão/URL específicas:
 pnpm manifest -- --version 25012518 --db-version 25012518 --db-url https://raw.githubusercontent.com/<org>/<repo>/main/data/catalog.db --out manifest.json
 ```
 
-Para incluir dados de release do app:
+Para sobrescrever os dados de release do app:
 ```
 pnpm manifest -- --app-version 1.5.0 --app-download-url https://github.com/<org>/<repo>/releases/download/v1.5.0/catalogo_ips_x64-setup.exe
 ```
