@@ -5,7 +5,7 @@
 import { writeFile, readFile } from 'node:fs/promises';
 import { existsSync, createReadStream } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 const DEFAULT_DB_PATH = 'data/catalog.db';
@@ -70,8 +70,16 @@ async function loadEnvFiles() {
   }
 }
 
-function toUtcVersionStamp(date = new Date()) {
-  return Math.floor(date.getTime() / 1000);
+function twoDigits(value) {
+  return String(value).padStart(2, '0');
+}
+
+function toUtcDateVersion(date = new Date()) {
+  const day = twoDigits(date.getUTCDate());
+  const month = twoDigits(date.getUTCMonth() + 1);
+  const year = twoDigits(date.getUTCFullYear() % 100);
+  const hour = twoDigits(date.getUTCHours());
+  return Number(`${day}${month}${year}${hour}`);
 }
 
 async function sha256File(filePath) {
@@ -101,9 +109,76 @@ function firstNonEmpty(...values) {
   return null;
 }
 
+function positiveNumberOrNull(value) {
+  const num = Number(String(value ?? '').trim());
+  return Number.isFinite(num) && num > 0 ? num : null;
+}
+
 async function readPackageVersion() {
   const pkg = await loadJsonIfExists('package.json');
   return typeof pkg?.version === 'string' ? pkg.version.trim() : null;
+}
+
+function readDbVersionWithSqliteCli(dbPath) {
+  try {
+    const out = execFileSync(
+      'sqlite3',
+      [dbPath, "SELECT value FROM meta WHERE key='db_version' LIMIT 1;"],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+    ).trim();
+    return positiveNumberOrNull(out);
+  } catch (_) {
+    return null;
+  }
+}
+
+function readDbVersionWithNodeSqlite(dbPath) {
+  try {
+    const script = `
+const { DatabaseSync } = require('node:sqlite');
+const db = new DatabaseSync(process.argv[1], { readOnly: true });
+try {
+  const row = db.prepare("SELECT value FROM meta WHERE key='db_version' LIMIT 1").get();
+  process.stdout.write(String(row?.value ?? ''));
+} finally {
+  db.close();
+}
+`;
+    const out = execFileSync(
+      process.execPath,
+      ['--no-warnings', '-e', script, dbPath],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+    ).trim();
+    return positiveNumberOrNull(out);
+  } catch (_) {
+    return null;
+  }
+}
+
+async function readDbVersionWithSqlJs(dbPath) {
+  try {
+    const mod = await import('sql.js');
+    const initSqlJs = mod.default || mod;
+    const SQL = await initSqlJs();
+    const db = new SQL.Database(await readFile(dbPath));
+    try {
+      const result = db.exec("SELECT value FROM meta WHERE key='db_version' LIMIT 1");
+      return positiveNumberOrNull(result?.[0]?.values?.[0]?.[0]);
+    } finally {
+      db.close();
+    }
+  } catch (_) {
+    return null;
+  }
+}
+
+async function readLocalDbVersion(dbPath) {
+  if (!existsSync(dbPath)) return null;
+  return (
+    readDbVersionWithSqliteCli(dbPath) ||
+    readDbVersionWithNodeSqlite(dbPath) ||
+    await readDbVersionWithSqlJs(dbPath)
+  );
 }
 
 function guessDbUrlFromGit() {
@@ -144,6 +219,7 @@ async function main() {
   const existingManifest = await loadJsonIfExists(outPath);
   const packageVersion = await readPackageVersion();
   const localDbSha = existsSync(DEFAULT_DB_PATH) ? await sha256File(DEFAULT_DB_PATH) : null;
+  const localDbVersion = await readLocalDbVersion(DEFAULT_DB_PATH);
   const existingDbVersion = Number(existingManifest?.db?.version);
   const existingDbSha = existingManifest?.db?.sha256 || null;
   const canReuseExistingVersion =
@@ -151,7 +227,7 @@ async function main() {
     existingDbVersion > 0 &&
     ((!localDbSha && !!existingManifest?.db?.url) || (!!localDbSha && !!existingDbSha && localDbSha === existingDbSha));
   const fallbackVersion =
-    canReuseExistingVersion ? existingDbVersion : toUtcVersionStamp();
+    localDbVersion || (canReuseExistingVersion ? existingDbVersion : toUtcDateVersion());
 
   const version = ensureNumber(
     arg('version', process.env.MANIFEST_VERSION || fallbackVersion),

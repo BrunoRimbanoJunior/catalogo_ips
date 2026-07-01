@@ -50,6 +50,7 @@ pnpm manifest
 Esse comando:
 - usa `scripts/gen-manifest-r2.mjs`;
 - lê `.env.development` e `.env` para as credenciais `R2_*`;
+- lê `meta.db_version` de `data/catalog.db` para preencher `db.version`, igual ao workflow;
 - reaproveita `manifest.json` atual se o `data/catalog.db` não mudou;
 - calcula `db.sha256` a partir de `data/catalog.db` local quando o arquivo existe;
 - usa a versão do `package.json` para preencher `appVersion/appDownloadUrl` quando não houver sobrescrita;
