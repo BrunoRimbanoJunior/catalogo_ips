@@ -184,13 +184,22 @@ async function readLocalDbVersion(dbPath) {
 function guessDbUrlFromGit() {
   try {
     const remote = execSync('git config --get remote.origin.url', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    const commit = execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
     const match = remote.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/i);
     if (!match) return DEFAULT_RAW_DB_URL;
     const owner = match[1];
     const repo = match[2];
-    return `https://raw.githubusercontent.com/${owner}/${repo}/main/${DEFAULT_DB_PATH}`;
+    return `https://raw.githubusercontent.com/${owner}/${repo}/${commit}/${DEFAULT_DB_PATH}`;
   } catch (_) {
     return DEFAULT_RAW_DB_URL;
+  }
+}
+
+function rejectMutableGitHubDbUrl(url) {
+  if (/^https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/(?:main|master)\//i.test(url)) {
+    throw new Error(
+      'db.url não pode apontar para uma branch móvel do GitHub. Use a URL com o SHA do commit.',
+    );
   }
 }
 
@@ -218,8 +227,9 @@ async function main() {
   const outPath = arg('out', DEFAULT_MANIFEST_PATH);
   const existingManifest = await loadJsonIfExists(outPath);
   const packageVersion = await readPackageVersion();
-  const localDbSha = existsSync(DEFAULT_DB_PATH) ? await sha256File(DEFAULT_DB_PATH) : null;
-  const localDbVersion = await readLocalDbVersion(DEFAULT_DB_PATH);
+  const dbPath = arg('db-path', DEFAULT_DB_PATH);
+  const localDbSha = existsSync(dbPath) ? await sha256File(dbPath) : null;
+  const localDbVersion = await readLocalDbVersion(dbPath);
   const existingDbVersion = Number(existingManifest?.db?.version);
   const existingDbSha = existingManifest?.db?.sha256 || null;
   const canReuseExistingVersion =
@@ -237,7 +247,13 @@ async function main() {
     arg('db-version', process.env.MANIFEST_DB_VERSION || version),
     'Defina um --db-version válido ou MANIFEST_DB_VERSION.'
   );
-  const dbSha = arg('db-sha', process.env.MANIFEST_DB_SHA || localDbSha || existingDbSha || null);
+  const requestedDbSha = arg('db-sha', process.env.MANIFEST_DB_SHA || null);
+  if (requestedDbSha && localDbSha && requestedDbSha.trim().toLowerCase() !== localDbSha.toLowerCase()) {
+    throw new Error(
+      `O SHA informado para o banco (${requestedDbSha}) não corresponde a ${dbPath} (${localDbSha}).`,
+    );
+  }
+  const dbSha = requestedDbSha || localDbSha || existingDbSha || null;
   const dbUrl = arg('db-url', process.env.MANIFEST_DB_URL || existingManifest?.db?.url || guessDbUrlFromGit());
   const appVersion = arg(
     'app-version',
@@ -253,6 +269,7 @@ async function main() {
   const prefix = arg('prefix', '');
 
   ensure(dbUrl, 'Faltou --db-url');
+  rejectMutableGitHubDbUrl(dbUrl);
 
   const accountId = ensure(process.env.R2_ACCOUNT_ID, 'Defina R2_ACCOUNT_ID');
   const bucket = ensure(process.env.R2_BUCKET, 'Defina R2_BUCKET (nome exato do bucket no R2)');
@@ -274,7 +291,7 @@ async function main() {
     credentials: { accessKeyId, secretAccessKey },
   });
 
-  console.log('Gerando manifest R2...', { outPath, version, dbVersion, dbUrl });
+  console.log('Gerando manifest R2...', { outPath, version, dbVersion, dbUrl, dbSha });
   console.log('Listando objetos do R2...', { bucket, prefix, endpoint });
   let objects;
   try {

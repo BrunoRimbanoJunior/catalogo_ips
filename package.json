@@ -1,7 +1,7 @@
 {
   "name": "catalogo_ips",
   "private": true,
-  "version": "1.5.17",
+  "version": "1.5.18",
   "packageManager": "pnpm@11.4.0",
   "type": "module",
   "scripts": {
@@ -14,6 +14,7 @@
     "tauri:build:signed": "node scripts/tauri-build-release.mjs",
     "manifest": "node scripts/gen-manifest-r2.mjs --out manifest.json",
     "manifest:r2": "node scripts/gen-manifest-r2.mjs",
+    "manifest:validate": "node scripts/validate-manifest.mjs",
     "launches": "node scripts/gen-launches.mjs"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
     "@azure/msal-node": "^2.6.5",
     "@tauri-apps/cli": "^2",
     "@vitejs/plugin-react": "^4.6.0",
+    "sql.js": "^1.13.0",
     "vite": "^7.0.4"
   }
 }

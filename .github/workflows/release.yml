@@ -72,9 +72,17 @@ jobs:
           if [[ -n "$CI_VITE_SUPABASE_ANON_KEY" ]]; then
             echo "VITE_SUPABASE_ANON_KEY=$CI_VITE_SUPABASE_ANON_KEY" >> .env.production
           fi
-          if [[ -n "$CI_VITE_DEFAULT_MANIFEST_URL" ]]; then
-            echo "VITE_DEFAULT_MANIFEST_URL=$CI_VITE_DEFAULT_MANIFEST_URL" >> .env.production
+          # Um override antigo configurado no repositório não pode fazer novas
+          # versões voltarem a consumir o manifest congelado da última release.
+          DEFAULT_MANIFEST_URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/manifest.json"
+          if [[ -n "$CI_VITE_DEFAULT_MANIFEST_URL" && "$CI_VITE_DEFAULT_MANIFEST_URL" != *"/releases/latest/download/manifest.json"* ]]; then
+            DEFAULT_MANIFEST_URL="$CI_VITE_DEFAULT_MANIFEST_URL"
           fi
+          echo "VITE_DEFAULT_MANIFEST_URL=$DEFAULT_MANIFEST_URL" >> .env.production
+
+      - name: Validate bundled database and manifest
+        shell: bash
+        run: node scripts/validate-manifest.mjs --manifest manifest.json --db data/catalog.db
 
       - name: Build and release with Tauri
         uses: tauri-apps/tauri-action@v0

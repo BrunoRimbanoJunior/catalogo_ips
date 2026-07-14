@@ -14,6 +14,7 @@ on:
     paths:
       - 'data/**'
       - 'scripts/gen-manifest-r2.mjs'
+      - 'scripts/validate-manifest.mjs'
     tags:
       - 'v*'
   workflow_run:
@@ -64,6 +65,7 @@ jobs:
           RELEASE_TAG_INPUT: ${{ github.event.inputs.release_tag || '' }}
         run: |
           DB_PATH="data/catalog.db"
+          SOURCE_SHA=$(git rev-parse HEAD)
           DATE_VER=$(date +%d%m%y%H)
           if [[ -f "$DB_PATH" ]]; then
             DB_VER=$(sqlite3 "$DB_PATH" "SELECT value FROM meta WHERE key='db_version' LIMIT 1;" || echo "")
@@ -73,6 +75,7 @@ jobs:
           echo "version=${DB_VER}" >> $GITHUB_OUTPUT
           echo "db_version=${DB_VER}" >> $GITHUB_OUTPUT
           echo "db_sha=${DB_SHA}" >> $GITHUB_OUTPUT
+          echo "source_sha=${SOURCE_SHA}" >> $GITHUB_OUTPUT
           RELEASE_TAG="$RELEASE_TAG_INPUT"
           if [[ -z "$RELEASE_TAG" && "${GITHUB_REF}" == refs/tags/v* ]]; then
             RELEASE_TAG="${GITHUB_REF_NAME}"
@@ -97,7 +100,9 @@ jobs:
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
           R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL }}
         run: |
-          DB_URL="https://raw.githubusercontent.com/${{ github.repository }}/main/data/catalog.db"
+          # O banco fica preso ao commit que foi validado. Nunca apontar um hash
+          # para a branch móvel main, pois ela pode mudar antes do próximo cliente baixar.
+          DB_URL="https://raw.githubusercontent.com/${{ github.repository }}/${{ steps.ver.outputs.source_sha }}/data/catalog.db"
           node scripts/gen-manifest-r2.mjs \
             --version ${{ steps.ver.outputs.version }} \
             --db-version ${{ steps.ver.outputs.db_version }} \
@@ -107,10 +112,12 @@ jobs:
             --app-download-url "${{ steps.ver.outputs.download_url }}" \
             --out manifest.json
 
+      - name: Validate manifest against local and published DB
+        run: node scripts/validate-manifest.mjs --manifest manifest.json --db data/catalog.db --check-remote
+
       - name: Commit and push manifest
-        # Commit tanto em pushes quanto em execuções disparadas por tags ou workflow_run/cron,
-        # desde que estejamos no main ou em ref de tag.
-        if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/')
+        # Todos os eventos trabalham sobre main (checkout explícito acima), inclusive
+        # schedule e workflow_run. Não condicionar por github.ref, que varia por evento.
         run: |
           set -euo pipefail
 
@@ -149,6 +156,8 @@ jobs:
           name: manifest.json
           path: manifest.json
 
+      # Mantido apenas para inspeção da release. O aplicativo usa o manifest
+      # estável da main; db.url dentro dele é sempre imutável por commit.
       - name: Release manifest (tag)
         if: steps.ver.outputs.release_tag != ''
         uses: softprops/action-gh-release@v2

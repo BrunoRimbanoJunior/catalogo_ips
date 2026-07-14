@@ -3,7 +3,7 @@
 App desktop (Tauri + React) para consulta de peças com sincronização de banco/imagens via manifest. Fluxo de controle de acesso usando Supabase.
 
 ## Como funciona
-- Manifest público (`VITE_DEFAULT_MANIFEST_URL`): aponta para o `manifest.json` publicado (asset de release). Contém `appVersion`, `appDownloadUrl`, `db.version/url` e lista de imagens (R2).
+- Manifest público (`VITE_DEFAULT_MANIFEST_URL`): aponta para `manifest.json` na branch `main`. Contém `appVersion`, `appDownloadUrl`, `db.version/url` e lista de imagens (R2).
 - Cliente: ao abrir, lê o manifest, avisa se há nova versão do app, baixa DB/imagens se `db.version` subir e indexa imagens no SQLite local.
 - Auth: formulário de cadastro salva no Supabase (`profiles`) com status `approved`, liberando o app automaticamente.
 
@@ -12,14 +12,14 @@ App desktop (Tauri + React) para consulta de peças com sincronização de banco
 - **Windows**: `catalogo_ips_x64-setup.exe` (instalador estável) ou `catalogo_ips_*_x64-setup.exe`/`.msi`. Basta executar. Se o SmartScreen avisar, clique em “Mais informações” > “Executar assim mesmo”.
 - **macOS**: `catalogo_ips_*_aarch64.dmg` (Apple Silicon) ou `x64.dmg` (Intel). Abra o `.dmg`, arraste para Aplicativos; se o Gatekeeper bloquear, vá em Preferências > Segurança > “Abrir mesmo assim”.
 - **Linux**: `catalogo_ips_*_app.tar.gz` (AppImage). Dê permissão de execução (`chmod +x catalogo_ips_*.AppImage`) e rode; dependendo da distro, pode exigir libs GTK/webkit (já empacotadas na maioria das distros). Se usar installer `.deb/.rpm` quando disponível, instale com o gerenciador de pacotes.
-- Manifest padrão do app: `https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/manifest.json`.
+- Manifest padrão do app: `https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json`.
 
 ## Desenvolvimento local
 Pré-requisitos: Node 20, Rust toolchain, pnpm, Supabase (anon key), manifest público válido.
 1) `pnpm install`
 2) Configurar `.env.development` (exemplo):
    ```
-   VITE_DEFAULT_MANIFEST_URL=https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/manifest.json
+   VITE_DEFAULT_MANIFEST_URL=https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json
    VITE_SUPABASE_URL=...
    VITE_SUPABASE_ANON_KEY=...
    VITE_APP_VERSION=dev
@@ -35,7 +35,7 @@ Local (apenas dev) para gerenciar cadastros sem expor service role no front:
 5) Painel: `http://localhost:8000/admin` (informe o `ADMIN_TOKEN` quando solicitado)
 
 ## Workflows (CI)
-- `manifest.yml`: gera `manifest.json` a partir do R2 (usa secrets `R2_*`), insere `appVersion/appDownloadUrl`, comita na `main` (inclusive em tags) e anexa na release.
+- `manifest.yml`: gera o manifest, prende `db.url` ao commit validado, confere hash/SQLite/versão local e remotamente e só então comita na `main`. Em tags, anexa uma cópia à release para auditoria.
 - `release.yml`: em tags `v*`, alinha versão do Tauri/package com a tag, instala deps (inclui libs GTK para Linux), builda com `tauri-action` e publica instaladores na release.
 - `auto-tag.yml`: tagging automática básica (pode ser ajustada conforme a estratégia).
 
@@ -58,7 +58,7 @@ Esse comando:
 
 Para forçar versão/URL específicas:
 ```
-pnpm manifest -- --version 25012518 --db-version 25012518 --db-url https://raw.githubusercontent.com/<org>/<repo>/main/data/catalog.db --out manifest.json
+pnpm manifest -- --version 25012518 --db-version 25012518 --db-url https://raw.githubusercontent.com/<org>/<repo>/<commit-sha>/data/catalog.db --out manifest.json
 ```
 
 Para sobrescrever os dados de release do app:
@@ -87,5 +87,6 @@ pnpm manifest -- --app-version 1.5.0 --app-download-url https://github.com/<org>
 
 ## Dicas para produção
 - Supabase: RLS ativa na tabela `profiles`, políticas para anon (insert/update/select) e UNIQUE no email. Service role nunca vai para o front.
-- Manifest público sempre no asset de release; configure `VITE_DEFAULT_MANIFEST_URL` para esse endereço.
+- O app consome o manifest estável da `main`; não use o asset `releases/latest/download/manifest.json`, pois ele fica congelado até outra release.
+- Antes de publicar manualmente, rode `pnpm manifest:validate`.
 - Releases: use tags `v*` para gerar instaladores e atualizar o manifest com `appVersion` e link de download.

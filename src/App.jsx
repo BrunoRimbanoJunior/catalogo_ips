@@ -1116,11 +1116,18 @@ function App() {
   }, [brandId]);
 
   const DEFAULT_MANIFEST_URL =
-    "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/latest/download/manifest.json";
-  const manifestUrl = useMemo(
-    () => localStorage.getItem("manifestUrl") || import.meta.env.VITE_DEFAULT_MANIFEST_URL || DEFAULT_MANIFEST_URL,
-    []
-  );
+    "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json";
+  const manifestUrl = useMemo(() => {
+    const configured = import.meta.env.VITE_DEFAULT_MANIFEST_URL || DEFAULT_MANIFEST_URL;
+    const stored = localStorage.getItem("manifestUrl");
+    // Versões anteriores persistiam o asset congelado da última release. Migra
+    // somente esse valor legado; URLs personalizadas continuam preservadas.
+    if (stored?.includes("/releases/latest/download/manifest.json")) {
+      localStorage.setItem("manifestUrl", configured);
+      return configured;
+    }
+    return stored || configured;
+  }, []);
 
   const blockAccess = useMemo(() => {
     if (isDev) return false; // Em desenvolvimento, não bloquear pela aprovação.
