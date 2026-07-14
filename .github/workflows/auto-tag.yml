@@ -49,6 +49,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Create tag if missing
+        id: tag
         if: steps.skip.outputs.skip == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,26 +58,25 @@ jobs:
           if git rev-parse "$NEXT" >/dev/null 2>&1; then
             TAG_SHA=$(git rev-parse "$NEXT^{}")
             HEAD_SHA=$(git rev-parse HEAD)
-            RELEASE_STATE=$(gh release view "$NEXT" --json isDraft --jq 'if .isDraft then "draft" else "published" end' 2>/dev/null || echo "missing")
-            if [ "$TAG_SHA" = "$HEAD_SHA" ]; then
-              echo "Tag $NEXT already points to HEAD."
-            elif [[ "$RELEASE_STATE" == "missing" || "$RELEASE_STATE" == "draft" ]]; then
-              echo "Tag $NEXT has an incomplete Release ($RELEASE_STATE); dispatching recovery build."
+            RELEASE_STATE=$(gh release view "$NEXT" --json isDraft,assets --jq 'if .isDraft then "draft" elif any(.assets[]; .name == "catalogo_ips_x64-setup.exe") then "complete" else "incomplete" end' 2>/dev/null || echo "missing")
+            if [[ "$RELEASE_STATE" == "complete" ]]; then
+              echo "Release $NEXT is already complete on $TAG_SHA; HEAD is $HEAD_SHA. Skipping."
+              echo "dispatch=false" >> "$GITHUB_OUTPUT"
             else
-              echo "Tag $NEXT already exists on $TAG_SHA, but HEAD is $HEAD_SHA." >&2
-              echo "Increment package.json before publishing; refusing to report a false success." >&2
-              exit 1
+              echo "Tag $NEXT has an incomplete Release ($RELEASE_STATE); dispatching recovery build."
+              echo "dispatch=true" >> "$GITHUB_OUTPUT"
             fi
             exit 0
           fi
 
           git tag -a "$NEXT" -m "auto: $NEXT"
           git push origin "$NEXT"
+          echo "dispatch=true" >> "$GITHUB_OUTPUT"
 
       # Pushes feitos com GITHUB_TOKEN não disparam outro workflow por push.
       # Disparamos explicitamente o release.yml para a tag criada/confirmada.
       - name: Dispatch release workflow
-        if: steps.skip.outputs.skip == 'false'
+        if: steps.skip.outputs.skip == 'false' && steps.tag.outputs.dispatch == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEXT: ${{ steps.ver.outputs.next }}
