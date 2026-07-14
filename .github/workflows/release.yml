@@ -4,24 +4,52 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag existente que será compilada e publicada, por exemplo v1.5.19'
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      TARGET_TAG: ${{ inputs.release_tag || github.ref_name }}
+    steps:
+      - name: Validate tag
+        run: |
+          if [[ "$TARGET_TAG" != v* ]]; then
+            echo "Invalid release tag: $TARGET_TAG" >&2
+            exit 1
+          fi
+          git ls-remote --exit-code --tags "https://github.com/${GITHUB_REPOSITORY}.git" "refs/tags/$TARGET_TAG"
+
+      - name: Create draft release if missing
+        run: |
+          if gh release view "$TARGET_TAG" >/dev/null 2>&1; then
+            echo "Release $TARGET_TAG already exists."
+          else
+            gh release create "$TARGET_TAG" \
+              --verify-tag \
+              --draft \
+              --title "$TARGET_TAG" \
+              --notes "Automated release for $TARGET_TAG."
+          fi
+
   build-release:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-          - os: ubuntu-latest
-          - os: macos-13
-          - os: macos-latest
-    runs-on: ${{ matrix.os }}
+    needs: prepare-release
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -35,26 +63,20 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      - name: Export APP_VERSION from tag
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Export release tag and app version
         shell: bash
-        run: echo "APP_VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+        env:
+          TARGET_TAG: ${{ inputs.release_tag || github.ref_name }}
+        run: |
+          if [[ "$TARGET_TAG" != v* ]]; then
+            echo "Invalid release tag: $TARGET_TAG" >&2
+            exit 1
+          fi
+          echo "RELEASE_TAG=$TARGET_TAG" >> "$GITHUB_ENV"
+          echo "APP_VERSION=${TARGET_TAG#v}" >> "$GITHUB_ENV"
 
       - name: Sync version files
-        if: startsWith(github.ref, 'refs/tags/v')
         run: node scripts/sync-version.mjs
-
-      - name: Install Linux deps (glib/gtk)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-3-dev \
-            libwebkit2gtk-4.1-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            libsoup-3.0-dev \
-            pkg-config
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -94,15 +116,14 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           projectPath: .
-          tagName: ${{ github.ref_name }}
-          releaseName: ${{ github.ref_name }}
+          tagName: ${{ env.RELEASE_TAG }}
+          releaseName: ${{ env.RELEASE_TAG }}
           releaseBody: |
-            Automated release for ${{ github.ref_name }}.
-            Includes installers for Windows, macOS and Linux when available.
+            Automated release for ${{ env.RELEASE_TAG }}.
+            Includes installers for Windows.
           includeUpdaterJson: true
 
       - name: Create stable Windows installer name
-        if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
           $src = Get-ChildItem -Path "src-tauri/target/release/bundle/nsis" -Filter "*_x64-setup.exe" |
@@ -112,9 +133,19 @@ jobs:
           Copy-Item $src.FullName "src-tauri/target/release/bundle/nsis/catalogo_ips_x64-setup.exe" -Force
 
       - name: Upload stable Windows installer
-        if: matrix.os == 'windows-latest'
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: src-tauri/target/release/bundle/nsis/catalogo_ips_x64-setup.exe
+
+  publish-release:
+    needs: build-release
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      TARGET_TAG: ${{ inputs.release_tag || github.ref_name }}
+    steps:
+      - name: Publish completed release
+        run: gh release edit "$TARGET_TAG" --draft=false --latest

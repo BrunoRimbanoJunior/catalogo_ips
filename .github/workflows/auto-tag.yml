@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   bump-tag:
@@ -50,13 +51,16 @@ jobs:
       - name: Create tag if missing
         if: steps.skip.outputs.skip == 'false'
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEXT: ${{ steps.ver.outputs.next }}
         run: |
           if git rev-parse "$NEXT" >/dev/null 2>&1; then
-            TAG_SHA=$(git rev-parse "$NEXT")
+            TAG_SHA=$(git rev-parse "$NEXT^{}")
             HEAD_SHA=$(git rev-parse HEAD)
             if [ "$TAG_SHA" = "$HEAD_SHA" ]; then
               echo "Tag $NEXT already points to HEAD."
+            elif ! gh release view "$NEXT" >/dev/null 2>&1; then
+              echo "Tag $NEXT already exists without a Release; dispatching recovery build."
             else
               echo "Tag $NEXT already exists on $TAG_SHA, but HEAD is $HEAD_SHA." >&2
               echo "Increment package.json before publishing; refusing to report a false success." >&2
@@ -67,3 +71,12 @@ jobs:
 
           git tag -a "$NEXT" -m "auto: $NEXT"
           git push origin "$NEXT"
+
+      # Pushes feitos com GITHUB_TOKEN não disparam outro workflow por push.
+      # Disparamos explicitamente o release.yml para a tag criada/confirmada.
+      - name: Dispatch release workflow
+        if: steps.skip.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEXT: ${{ steps.ver.outputs.next }}
+        run: gh workflow run release.yml --ref main -f release_tag="$NEXT"
