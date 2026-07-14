@@ -137,6 +137,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
           files: src-tauri/target/release/bundle/nsis/catalogo_ips_x64-setup.exe
 
   publish-release:

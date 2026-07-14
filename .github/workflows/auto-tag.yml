@@ -57,10 +57,11 @@ jobs:
           if git rev-parse "$NEXT" >/dev/null 2>&1; then
             TAG_SHA=$(git rev-parse "$NEXT^{}")
             HEAD_SHA=$(git rev-parse HEAD)
+            RELEASE_STATE=$(gh release view "$NEXT" --json isDraft --jq 'if .isDraft then "draft" else "published" end' 2>/dev/null || echo "missing")
             if [ "$TAG_SHA" = "$HEAD_SHA" ]; then
               echo "Tag $NEXT already points to HEAD."
-            elif ! gh release view "$NEXT" >/dev/null 2>&1; then
-              echo "Tag $NEXT already exists without a Release; dispatching recovery build."
+            elif [[ "$RELEASE_STATE" == "missing" || "$RELEASE_STATE" == "draft" ]]; then
+              echo "Tag $NEXT has an incomplete Release ($RELEASE_STATE); dispatching recovery build."
             else
               echo "Tag $NEXT already exists on $TAG_SHA, but HEAD is $HEAD_SHA." >&2
               echo "Increment package.json before publishing; refusing to report a false success." >&2
