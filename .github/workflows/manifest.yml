@@ -116,6 +116,7 @@ jobs:
         run: node scripts/validate-manifest.mjs --manifest manifest.json --db data/catalog.db --check-remote
 
       - name: Commit and push manifest
+        id: publish
         # Todos os eventos trabalham sobre main (checkout explícito acima), inclusive
         # schedule e workflow_run. Não condicionar por github.ref, que varia por evento.
         run: |
@@ -124,25 +125,38 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add manifest.json
-          if git diff --cached --quiet; then
-            echo "No manifest changes to commit."
-            exit 0
-          fi
-
-          git commit -m "ci: update manifest.json"
+          # Preserve o artefato validado fora do worktree. Em caso de concorrência,
+          # reconstruímos o commit sobre a main atual em vez de fazer rebase de commits
+          # antigos de manifest, que sempre conflitam no mesmo arquivo JSON.
+          cp manifest.json /tmp/generated-manifest.json
+          SOURCE_DB_BLOB=$(git rev-parse "${{ steps.ver.outputs.source_sha }}:data/catalog.db")
 
           for attempt in 1 2 3; do
             git fetch origin main
-            if ! git merge-base --is-ancestor origin/main HEAD; then
-              git rebase origin/main
+
+            LATEST_DB_BLOB=$(git rev-parse "origin/main:data/catalog.db")
+            if [[ "$LATEST_DB_BLOB" != "$SOURCE_DB_BLOB" ]]; then
+              echo "A main já contém um banco mais novo; não publicando manifest obsoleto."
+              echo "stale=true" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
+
+            git reset --hard origin/main
+            cp /tmp/generated-manifest.json manifest.json
+            git add manifest.json
+
+            if git diff --cached --quiet; then
+              echo "No manifest changes to commit."
+              exit 0
+            fi
+
+            git commit -m "ci: update manifest.json"
 
             if git push origin HEAD:main; then
               exit 0
             fi
 
-            echo "Push attempt ${attempt} failed; retrying..."
+            echo "Push attempt ${attempt} failed; rebuilding on latest main..."
             sleep $((attempt * 2))
           done
 
@@ -151,6 +165,7 @@ jobs:
 
 
       - name: Upload manifest artifact
+        if: steps.publish.outputs.stale != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: manifest.json
@@ -159,7 +174,7 @@ jobs:
       # Mantido apenas para inspeção da release. O aplicativo usa o manifest
       # estável da main; db.url dentro dele é sempre imutável por commit.
       - name: Release manifest (tag)
-        if: steps.ver.outputs.release_tag != ''
+        if: steps.ver.outputs.release_tag != '' && steps.publish.outputs.stale != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.ver.outputs.release_tag }}
