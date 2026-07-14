@@ -58,7 +58,9 @@ jobs:
             if [ "$TAG_SHA" = "$HEAD_SHA" ]; then
               echo "Tag $NEXT already points to HEAD."
             else
-              echo "Tag $NEXT already exists on $TAG_SHA; skipping to avoid moving it."
+              echo "Tag $NEXT already exists on $TAG_SHA, but HEAD is $HEAD_SHA." >&2
+              echo "Increment package.json before publishing; refusing to report a false success." >&2
+              exit 1
             fi
             exit 0
           fi
