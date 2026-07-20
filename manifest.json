@@ -2,9 +2,9 @@
   "appVersion": "1.5.20",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.20/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1782482145,
-    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/3921b9fbc22ee4749c46075851cc6bf8b78f5444/data/catalog.db",
-    "sha256": "49d4bac8f59f231d8c8e98881947c3a89b1a08726ea68222e00ddd5a8422d20e"
+    "version": 1782482146,
+    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/4591c5e242e3a8463d02b71b9ca28175bfeda091/data/catalog.db",
+    "sha256": "23c9bb8da743adcf254cf747c59a5f711964e22c1b34864abd8a9b65518b27fb"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -3203,7 +3203,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7146506020.png",
-        "sha256": "12444bb21e7e94eab9ae619e50331cd8"
+        "sha256": "f2a9cdd400625f119c911b9d4390121b"
       },
       {
         "file": "CAIXA_DIRECAO/7146515910.png",
@@ -3412,6 +3412,10 @@
       {
         "file": "CAIXA_DIRECAO/7156306002.png",
         "sha256": "3394741ea2edea8162dcf7df44c66db8"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7156306002_1.png",
+        "sha256": "71cbc122c5a4b47b5c81b68cbd2851fb"
       },
       {
         "file": "CAIXA_DIRECAO/7156425900.png",
