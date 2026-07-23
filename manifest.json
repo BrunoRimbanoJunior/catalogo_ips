@@ -2,9 +2,9 @@
   "appVersion": "1.5.20",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.20/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1782482146,
+    "version": 1782482149,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/4591c5e242e3a8463d02b71b9ca28175bfeda091/data/catalog.db",
-    "sha256": "23c9bb8da743adcf254cf747c59a5f711964e22c1b34864abd8a9b65518b27fb"
+    "sha256": "3415da889bb9dfd878a225c3eee83f98b79b16ec56219628c3aed9d219361045"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -1634,6 +1634,14 @@
         "sha256": "49486b9a779dd0998ebc577543374a89"
       },
       {
+        "file": "BANDEJAS/7134483003.png",
+        "sha256": "4012285d6160af205d15cbb1f4811763"
+      },
+      {
+        "file": "BANDEJAS/7134483004.png",
+        "sha256": "fb9537b22613f4f2d258940e2c6a01c8"
+      },
+      {
         "file": "BANDEJAS/7134483011.png",
         "sha256": "1638f549a950264b243aa2a9d1a7a384"
       },
@@ -1658,8 +1666,28 @@
         "sha256": "53d6df142bcc6afa80c761c7368f5da3"
       },
       {
+        "file": "BANDEJAS/7136703001.png",
+        "sha256": "cfc5b1e2954648d05f53bc21d4d5d219"
+      },
+      {
+        "file": "BANDEJAS/7136703002.png",
+        "sha256": "f35cf43c71c5439310f0d2eb12b24870"
+      },
+      {
+        "file": "BANDEJAS/7136703011.png",
+        "sha256": "742685f05e0fe26f8d4cf1ce41cfe1f3"
+      },
+      {
         "file": "BANDEJAS/7136703012.png",
         "sha256": "c1cac3aa22a852af5a85fe962fe28cdb"
+      },
+      {
+        "file": "BANDEJAS/7144033001.png",
+        "sha256": "4a77e85c4ac513786e00f7a1e7097165"
+      },
+      {
+        "file": "BANDEJAS/7144033002.png",
+        "sha256": "00184b6cbf50ee4b988108a241b85c85"
       },
       {
         "file": "BANDEJAS/7146303001.png",
@@ -1700,6 +1728,14 @@
       {
         "file": "BANDEJAS/7146503012.png",
         "sha256": "74d9d91f5f887065b9784f2f53075780"
+      },
+      {
+        "file": "BANDEJAS/7146503021.png",
+        "sha256": "cd076ca93345d6a6df51820980b8097e"
+      },
+      {
+        "file": "BANDEJAS/7146503022.png",
+        "sha256": "bde89bbc87038db32fea800740624be4"
       },
       {
         "file": "BANDEJAS/7146513001.png",
@@ -1756,6 +1792,10 @@
       {
         "file": "BANDEJAS/7148603002.png",
         "sha256": "a39af96600db9a80c4c14adcd68a7757"
+      },
+      {
+        "file": "BANDEJAS/7150303001.png",
+        "sha256": "10886f41f7df45c2d9839aae7df67293"
       },
       {
         "file": "BANDEJAS/7150303002.png",
@@ -1940,6 +1980,22 @@
       {
         "file": "BANDEJAS/7163223062.png",
         "sha256": "30e9dd456b3a934d7cec20954b2470ed"
+      },
+      {
+        "file": "BANDEJAS/7163283001.png",
+        "sha256": "5b21fe2601f4eb9a99594d6fc6450f55"
+      },
+      {
+        "file": "BANDEJAS/7163283002.png",
+        "sha256": "241403d92be8131406ccc93f3b9a06b4"
+      },
+      {
+        "file": "BANDEJAS/7163283011.png",
+        "sha256": "ea518a3221196f9f85fb15b8caffee27"
+      },
+      {
+        "file": "BANDEJAS/7163283012.png",
+        "sha256": "ac593e525a15c76b2d23a2c8222f1ad1"
       },
       {
         "file": "BANDEJAS/7163283021.png",
@@ -2130,6 +2186,14 @@
         "sha256": "ab2a3dade6314c7179d8dd646bbff6f9"
       },
       {
+        "file": "BANDEJAS/7170503001.png",
+        "sha256": "805c7f18593744625283b5b573a50c1d"
+      },
+      {
+        "file": "BANDEJAS/7170503002.png",
+        "sha256": "ffe1010e5309b5e01f310f1c960a0685"
+      },
+      {
         "file": "BANDEJAS/7170603001.png",
         "sha256": "726feff0f10adcd03a37f88933b602b0"
       },
@@ -2154,6 +2218,14 @@
         "sha256": "419a2426f787790ddc63968289b9e9f8"
       },
       {
+        "file": "BANDEJAS/7170603051.png",
+        "sha256": "c78fcd8538c109405643a3b6b7d51c56"
+      },
+      {
+        "file": "BANDEJAS/7170603052.png",
+        "sha256": "7debec21d3ad2d30fbb54864319623c7"
+      },
+      {
         "file": "BANDEJAS/7170703001.png",
         "sha256": "6f4545d2ff29a82d4d2155675b87a4b6"
       },
@@ -2170,12 +2242,24 @@
         "sha256": "11eb5413a0e5f37a716799051ec954b8"
       },
       {
+        "file": "BANDEJAS/7173563011.png",
+        "sha256": "7c43439f13dabd6a7ca5cd2c899d9747"
+      },
+      {
+        "file": "BANDEJAS/7173563012.png",
+        "sha256": "ee90548bc55ecfa5ed9da6453b109eb7"
+      },
+      {
         "file": "BANDEJAS/7175263001.png",
         "sha256": "aabd9e99283a990ca6ccf4f5b952c459"
       },
       {
         "file": "BANDEJAS/7175263002.png",
         "sha256": "e767cdb02ce31be14dae72e463f53a1d"
+      },
+      {
+        "file": "BANDEJAS/7175263011.png",
+        "sha256": "f2f8f89f272b54647a779e1821f198bf"
       },
       {
         "file": "BANDEJAS/7175263012.png",
@@ -2196,6 +2280,14 @@
       {
         "file": "BANDEJAS/7175273002.png",
         "sha256": "aee4d2857e9d7ec6645bef863a725c29"
+      },
+      {
+        "file": "BANDEJAS/7175523011.png",
+        "sha256": "fb4a3e2ba1d6431ab4c8483fffd8bef2"
+      },
+      {
+        "file": "BANDEJAS/7175523012.png",
+        "sha256": "c116b495269f0fa6345c3b7dbcecb9e0"
       },
       {
         "file": "BANDEJAS/7175523031.png",
@@ -5310,26 +5402,6 @@
         "sha256": "7a6a9c3a09934265b25ae9b2b49547fd"
       },
       {
-        "file": "LANCAMENTOS/7114566802.png",
-        "sha256": "fb6389d857c50200a58e9e7d39c4476f"
-      },
-      {
-        "file": "LANCAMENTOS/7115466803.png",
-        "sha256": "f5821e79e878f0b5049c5537857f3255"
-      },
-      {
-        "file": "LANCAMENTOS/7115885810.png",
-        "sha256": "0d48908bd0c68430cc6b445206cfad50"
-      },
-      {
-        "file": "LANCAMENTOS/7117406801.png",
-        "sha256": "7c32d9d4f586a9c8b429b758bbd0fcda"
-      },
-      {
-        "file": "LANCAMENTOS/7134455912.png",
-        "sha256": "fa3eac28a7fc966ca831525ee332d3f3"
-      },
-      {
         "file": "LANCAMENTOS/7134905910.png",
         "sha256": "b0512935279b8c28372a84b679ae2dd6"
       },
@@ -5338,28 +5410,12 @@
         "sha256": "5efd29b168bde950ffe68ec5b37dc5c7"
       },
       {
-        "file": "LANCAMENTOS/7146505811.png",
-        "sha256": "327b4abcb1c68a5f413a322cdcde5b73"
+        "file": "LANCAMENTOS/7175275901.png",
+        "sha256": "8cfc8a38e9d7746c90db9e1f72564e1f"
       },
       {
-        "file": "LANCAMENTOS/7146505812.png",
-        "sha256": "b5245f78de2b18dfdef63005344aa78e"
-      },
-      {
-        "file": "LANCAMENTOS/7146906010.png",
-        "sha256": "d1f55d006d170852edbdb6cd60c9cde9"
-      },
-      {
-        "file": "LANCAMENTOS/7149146030.png",
-        "sha256": "3be72fb3c8d9a1df5374204b7978e2e8"
-      },
-      {
-        "file": "LANCAMENTOS/7169766801.png",
-        "sha256": "881f2e65811dd262dc46f77988beab13"
-      },
-      {
-        "file": "LANCAMENTOS/7169766802.png",
-        "sha256": "dbed6c3e1305ee1890c4a7051d6bfff8"
+        "file": "LANCAMENTOS/RESERVATÓRIOS.png",
+        "sha256": "a0423b0a6ef05ac638d894f9d4a15754"
       },
       {
         "file": "LANCAMENTOS/SEMI-EIXOS.png",
