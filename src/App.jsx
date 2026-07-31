@@ -749,8 +749,10 @@ function drawNoImage(page, fonts, x, y, width, height) {
 function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
   const topH = mm(10);
   const textH = mm(25);
+  const imageTopGap = mm(2);
+  const titleFontSize = 10.5;
   const imageY = y + textH;
-  const imageH = height - topH - textH;
+  const imageH = height - topH - textH - imageTopGap;
   const make = displayText(item.make, item.brand).toUpperCase();
   const vehicle = displayText(firstCatalogVehicle(item.vehicle), "APLICAÇÃO").toUpperCase();
   const description = displayText(item.description, "PRODUTO").toUpperCase();
@@ -759,11 +761,11 @@ function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
   page.drawRectangle({ x, y, width, height, color: rgb(1, 1, 1), borderColor: PDF_BORDER, borderWidth: 0.8 });
   page.drawRectangle({ x, y: y + height - topH, width, height: topH, color: PDF_GRAY });
   const titleY = y + height - mm(7);
-  const makeText = fitPdfText(make, fonts.boldOblique, 9.5, width * 0.32);
-  drawPdfText(page, makeText, { x: x + mm(4), y: titleY, size: 9.5, font: fonts.boldOblique, color: PDF_RED });
-  const restX = x + mm(4) + textWidth(fonts.boldOblique, makeText, 9.5) + mm(2);
-  const rest = fitPdfText(`// ${vehicle}`, fonts.boldOblique, 9.5, x + width - mm(4) - restX);
-  drawPdfText(page, rest, { x: restX, y: titleY, size: 9.5, font: fonts.boldOblique, color: PDF_BLACK });
+  const makeText = fitPdfText(make, fonts.boldOblique, titleFontSize, width * 0.34);
+  drawPdfText(page, makeText, { x: x + mm(4), y: titleY, size: titleFontSize, font: fonts.boldOblique, color: PDF_RED });
+  const restX = x + mm(4) + textWidth(fonts.boldOblique, makeText, titleFontSize) + mm(2);
+  const rest = fitPdfText(`// ${vehicle}`, fonts.boldOblique, titleFontSize, x + width - mm(4) - restX);
+  drawPdfText(page, rest, { x: restX, y: titleY, size: titleFontSize, font: fonts.boldOblique, color: PDF_BLACK });
 
   page.drawRectangle({ x, y: imageY, width, height: imageH, borderColor: PDF_BORDER, borderWidth: 0.5 });
   if (image) drawImageContain(page, image, x, imageY, width, imageH);
