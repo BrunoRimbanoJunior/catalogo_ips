@@ -141,6 +141,13 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
     let current_year = crate::years::current_year();
 
     // Limpa tabelas principais antes de reimportar para evitar sobras da planilha anterior.
+    // Mantém a data original dos códigos já cadastrados; somente códigos novos recebem a data atual.
+    tx.execute("DROP TABLE IF EXISTS temp.product_registration_dates", []).ok();
+    tx.execute(
+        "CREATE TEMP TABLE product_registration_dates AS SELECT code, created_at FROM products",
+        [],
+    )
+    .map_err(|e| e.to_string())?;
     tx.execute("DELETE FROM product_vehicles", []).ok();
     tx.execute("DELETE FROM vehicle_makes", []).ok();
     tx.execute("DELETE FROM vehicles", []).ok();
@@ -251,7 +258,7 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
         };
 
         tx.execute(
-            "INSERT INTO products(brand_id, code, description, pgroup, application, details, oem, similar, ean_gtin, altura, largura, comprimento) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
+            "INSERT INTO products(brand_id, code, description, pgroup, application, details, oem, similar, ean_gtin, altura, largura, comprimento, created_at) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, COALESCE((SELECT created_at FROM product_registration_dates WHERE code = ?2), CURRENT_TIMESTAMP))
              ON CONFLICT(code) DO UPDATE SET brand_id=excluded.brand_id, description=excluded.description, pgroup=excluded.pgroup, application=excluded.application, details=excluded.details, oem=excluded.oem, similar=excluded.similar, ean_gtin=excluded.ean_gtin, altura=excluded.altura, largura=excluded.largura, comprimento=excluded.comprimento",
             params![
                 brand_id,

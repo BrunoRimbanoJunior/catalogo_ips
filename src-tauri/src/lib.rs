@@ -108,6 +108,13 @@ mod core {
         pub images: Vec<String>,
     }
     #[derive(Debug, Serialize, Deserialize, Clone)]
+    pub struct RecentProduct {
+        pub code: String,
+        pub description: String,
+        pub application: Option<String>,
+        pub created_at: String,
+    }
+    #[derive(Debug, Serialize, Deserialize, Clone)]
     pub struct SearchParams {
         pub brand_id: Option<i64>,
         pub group: Option<String>,
@@ -254,6 +261,7 @@ mod core {
               id INTEGER PRIMARY KEY, brand_id INTEGER NOT NULL, code TEXT NOT NULL UNIQUE,
               description TEXT NOT NULL, application TEXT, details TEXT, oem TEXT, similar TEXT, pgroup TEXT,
               ean_gtin TEXT, altura TEXT, largura TEXT, comprimento TEXT,
+              created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
               FOREIGN KEY(brand_id) REFERENCES brands(id)
             );
             CREATE TABLE IF NOT EXISTS vehicle_makes (
@@ -306,6 +314,12 @@ mod core {
         let _ = conn.execute("ALTER TABLE products ADD COLUMN altura TEXT", []);
         let _ = conn.execute("ALTER TABLE products ADD COLUMN largura TEXT", []);
         let _ = conn.execute("ALTER TABLE products ADD COLUMN comprimento TEXT", []);
+        // SQLite não aceita CURRENT_TIMESTAMP como default ao adicionar coluna em tabela existente.
+        let _ = conn.execute("ALTER TABLE products ADD COLUMN created_at TEXT", []);
+        let _ = conn.execute(
+            "UPDATE products SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL OR TRIM(created_at) = ''",
+            [],
+        );
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make TEXT", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN make_id INTEGER", []);
         let _ = conn.execute("ALTER TABLE vehicles ADD COLUMN category TEXT", []);
@@ -520,6 +534,32 @@ mod core {
             out.push(r.map_err(|e| e.to_string())?);
         }
         Ok(out)
+    }
+
+    #[tauri::command]
+    pub fn get_recent_products_cmd(app: AppHandle) -> Result<Vec<RecentProduct>, String> {
+        let conn =
+            open_db(&db_path(&app).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+        migrate(&conn).map_err(|e| e.to_string())?;
+        let mut stmt = conn
+            .prepare(
+                "SELECT code, description, application, created_at
+                 FROM products
+                 ORDER BY datetime(created_at) DESC, id DESC
+                 LIMIT 50",
+            )
+            .map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map([], |row| {
+                Ok(RecentProduct {
+                    code: row.get(0)?,
+                    description: row.get(1)?,
+                    application: row.get(2)?,
+                    created_at: row.get(3)?,
+                })
+            })
+            .map_err(|e| e.to_string())?;
+        rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
     }
 
     // moved lower after search_products_cmd (avoid duplicate definitions)
@@ -3523,6 +3563,7 @@ pub fn run() {
             greet,
             core::init_app,
             core::get_brands_cmd,
+            core::get_recent_products_cmd,
             core::get_vehicles_cmd,
             core::get_makes_cmd,
             core::get_vehicles_by_make_cmd,

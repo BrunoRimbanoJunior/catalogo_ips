@@ -8,7 +8,7 @@ import {
   getProductDetails,
   syncFromManifest,
   indexImagesFromManifest,
-  listLaunchImages,
+  fetchRecentProducts,
   readImageBase64,
   importExcel,
   exportDbTo,
@@ -1023,8 +1023,8 @@ function App() {
   const [updateDismissed, setUpdateDismissed] = useState(false);
   const [updaterAvailable, setUpdaterAvailable] = useState(false);
 
-  const [launchImages, setLaunchImages] = useState([]);
-  const [launchState, setLaunchState] = useState({ open: false, index: 0, loading: false, error: "" });
+  const [recentProducts, setRecentProducts] = useState([]);
+  const [launchState, setLaunchState] = useState({ open: false, loading: false, error: "" });
   const [manifestInput, setManifestInput] = useState("");
   const [toolsMsg, setToolsMsg] = useState("");
   const [excelPath, setExcelPath] = useState("");
@@ -1493,12 +1493,10 @@ function App() {
     const handler = (ev) => {
       if (!launchState.open) return;
       if (ev.key === "Escape") setLaunchState((s) => ({ ...s, open: false }));
-      if (ev.key === "ArrowRight") cycleLaunch(1);
-      if (ev.key === "ArrowLeft") cycleLaunch(-1);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [launchState.open, launchImages.length]);
+  }, [launchState.open]);
 
   useEffect(() => {
     (async () => {
@@ -1526,11 +1524,6 @@ function App() {
     }, 250);
     return () => clearTimeout(t);
   }, [numericBrandId, group, vehicleId, codeQuery, make]);
-
-  useEffect(() => {
-    if (!imagesDir) return;
-    loadLaunches(true);
-  }, [imagesDir]);
 
   async function handleUpdateClick(ev) {
     ev?.preventDefault();
@@ -1814,39 +1807,15 @@ function App() {
     }
   }
 
-  async function loadLaunches(auto = false) {
+  async function loadLaunches() {
     setLaunchState((s) => ({ ...s, loading: true, error: "" }));
     try {
-      if (!imagesDir) {
-        setLaunchState((s) => ({ ...s, loading: false, error: "Pasta de imagens não localizada." }));
-        return;
-      }
-      const files = await listLaunchImages();
-      if (!files || files.length === 0) {
-        setLaunchImages([]);
-        setLaunchState((s) => ({ ...s, loading: false, error: "Nenhuma imagem de lançamento encontrada." }));
-        return;
-      }
-      const list = [];
-      const uniq = new Set();
-      for (const f of files) {
-        const full = normalizePath(imagesDir, f);
-        try {
-          const src = await loadLocalImageSrc(full);
-          if (src && !uniq.has(src)) {
-            uniq.add(src);
-            list.push(src);
-          }
-        } catch (_) {
-          // Se falhar (arquivo ausente/criptografia), apenas ignore para evitar thumbs quebradas
-        }
-      }
-      setLaunchImages(list);
-      // Sempre abre o modal quando a lista é carregada manualmente; em auto-init também abrimos para exibir novidades
-      setLaunchState((s) => ({ ...s, loading: false, open: true, index: 0 }));
+      const items = await fetchRecentProducts();
+      setRecentProducts(items || []);
+      setLaunchState({ loading: false, open: true, error: "" });
     } catch (e) {
-      setLaunchImages([]);
-      setLaunchState({ open: false, index: 0, loading: false, error: `Falha ao carregar lançamentos: ${e.message || e}` });
+      setRecentProducts([]);
+      setLaunchState({ open: false, loading: false, error: `Falha ao carregar lançamentos: ${e.message || e}` });
     }
   }
 
@@ -2044,11 +2013,6 @@ function App() {
       localStorage.setItem("ui.headerLogos", JSON.stringify(next));
       return next;
     });
-  }
-
-  function cycleLaunch(delta) {
-    if (!launchImages.length) return;
-    setLaunchState((s) => ({ ...s, open: true, index: (s.index + delta + launchImages.length) % launchImages.length }));
   }
 
   const headerBgStyle = bgPath
@@ -2669,22 +2633,31 @@ function App() {
         </div>
       )}
 
-      {launchState.open && launchImages.length > 0 && (
+      {launchState.open && (
         <div className="launch-modal" onClick={() => setLaunchState((s) => ({ ...s, open: false }))}>
           <div className="launch-modal-body" onClick={(e) => e.stopPropagation()}>
             <button className="launch-close" onClick={() => setLaunchState((s) => ({ ...s, open: false }))}>
               X
             </button>
-            <div className="launch-carousel">
-              <button className="launch-arrow" onClick={() => cycleLaunch(-1)} aria-label="Anterior">
-                &lt;
-              </button>
-              <img src={launchImages[launchState.index]} alt="lançamento" />
-              <button className="launch-arrow" onClick={() => cycleLaunch(1)} aria-label="Próximo">
-                &gt;
-              </button>
+            <h2 className="launch-title">Últimos lançamentos</h2>
+            <div className="launch-table-wrap">
+              <table className="launch-table">
+                <thead>
+                  <tr><th>CÓDIGO</th><th>DESCRIÇÃO</th><th>APLICAÇÃO</th><th>DATA</th></tr>
+                </thead>
+                <tbody>
+                  {recentProducts.map((item) => (
+                    <tr key={item.code}>
+                      <td>{item.code}</td>
+                      <td>{item.description}</td>
+                      <td>{item.application || "—"}</td>
+                      <td>{item.created_at ? new Date(`${item.created_at.replace(" ", "T")}Z`).toLocaleDateString("pt-BR") : "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {recentProducts.length === 0 ? <p className="launch-empty">Nenhum produto cadastrado.</p> : null}
             </div>
-            <div className="launch-counter">{launchState.index + 1} / {launchImages.length}</div>
           </div>
         </div>
       )}

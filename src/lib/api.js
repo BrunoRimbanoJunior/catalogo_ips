@@ -90,6 +90,10 @@ export async function listLaunchImages() {
   return await invoke("list_launch_images");
 }
 
+export async function fetchRecentProducts() {
+  return await invoke("get_recent_products_cmd");
+}
+
 export async function runRcloneSync() {
   return await invoke("run_rclone_sync");
 }
