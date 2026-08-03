@@ -102,6 +102,9 @@ jobs:
           fi
           echo "VITE_DEFAULT_MANIFEST_URL=$DEFAULT_MANIFEST_URL" >> .env.production
 
+      - name: Sync bundled manifest with database
+        run: node scripts/sync-manifest-db.mjs --manifest manifest.json --db data/catalog.db
+
       - name: Validate bundled database and manifest
         shell: bash
         run: node scripts/validate-manifest.mjs --manifest manifest.json --db data/catalog.db
