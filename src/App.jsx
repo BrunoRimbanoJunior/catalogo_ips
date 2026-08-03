@@ -786,7 +786,6 @@ function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
   const rest = fitPdfText(`// ${vehicle}`, fonts.boldOblique, titleFontSize, x + width - mm(4) - restX);
   drawPdfText(page, rest, { x: restX, y: titleY, size: titleFontSize, font: fonts.boldOblique, color: PDF_BLACK });
 
-  page.drawRectangle({ x: imageX, y: imageY, width: imageWidth, height: imageH, borderColor: PDF_BORDER, borderWidth: 0.5 });
   if (image) drawImageContain(page, image, imageX, imageY, imageWidth, imageH);
   else drawNoImage(page, fonts, imageX, imageY, imageWidth, imageH);
 
