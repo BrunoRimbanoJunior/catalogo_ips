@@ -62,6 +62,10 @@ jobs:
             if [[ "$RELEASE_STATE" == "complete" ]]; then
               echo "Release $NEXT is already complete on $TAG_SHA; HEAD is $HEAD_SHA. Skipping."
               echo "dispatch=false" >> "$GITHUB_OUTPUT"
+            elif [[ "$TAG_SHA" != "$HEAD_SHA" ]]; then
+              echo "Tag $NEXT aponta para $TAG_SHA, mas HEAD e $HEAD_SHA." >&2
+              echo "A tag existente nao inclui as correcoes atuais. Incremente a versao antes de gerar outra release." >&2
+              exit 1
             else
               echo "Tag $NEXT has an incomplete Release ($RELEASE_STATE); dispatching recovery build."
               echo "dispatch=true" >> "$GITHUB_OUTPUT"
