@@ -2,9 +2,9 @@
   "appVersion": "1.5.24",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.24/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1782482149,
+    "version": 1782482152,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/4591c5e242e3a8463d02b71b9ca28175bfeda091/data/catalog.db",
-    "sha256": "3415da889bb9dfd878a225c3eee83f98b79b16ec56219628c3aed9d219361045"
+    "sha256": "786d07a5a990e015edf6429fb5d49771a3eb20d79d69dccad5ff22cd473d1599"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -1679,7 +1679,7 @@
       },
       {
         "file": "BANDEJAS/7136703012.png",
-        "sha256": "c1cac3aa22a852af5a85fe962fe28cdb"
+        "sha256": "a3130ba61701aa55ec5c89e591357ad0"
       },
       {
         "file": "BANDEJAS/7144033001.png",
@@ -2186,6 +2186,14 @@
         "sha256": "ab2a3dade6314c7179d8dd646bbff6f9"
       },
       {
+        "file": "BANDEJAS/7170423001.png",
+        "sha256": "a591ab1f230a00d6d1b50346fb410e99"
+      },
+      {
+        "file": "BANDEJAS/7170423002.png",
+        "sha256": "1d58bc8049d11aa8594cdf53e6532162"
+      },
+      {
         "file": "BANDEJAS/7170503001.png",
         "sha256": "805c7f18593744625283b5b573a50c1d"
       },
@@ -2263,7 +2271,7 @@
       },
       {
         "file": "BANDEJAS/7175263012.png",
-        "sha256": "6fa92c9d72ea0635b18e690a8e0d995b"
+        "sha256": "32fde38ea906e94d268f5e406fd7c058"
       },
       {
         "file": "BANDEJAS/7175263041.png",
@@ -3632,6 +3640,10 @@
       {
         "file": "CAIXA_DIRECAO/7169315910.png",
         "sha256": "8dfd42447ff6c998cf5ea88a610c5789"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7169325910.png",
+        "sha256": "2e6e35b043ec483b4959db599834c79c"
       },
       {
         "file": "CAIXA_DIRECAO/7169336010.png",
@@ -5410,6 +5422,10 @@
         "sha256": "5efd29b168bde950ffe68ec5b37dc5c7"
       },
       {
+        "file": "LANCAMENTOS/7169325910.png",
+        "sha256": "efbf115426128134738d42e38f2d112c"
+      },
+      {
         "file": "LANCAMENTOS/7175275901.png",
         "sha256": "8cfc8a38e9d7746c90db9e1f72564e1f"
       },
@@ -5618,6 +5634,10 @@
         "sha256": "601d7ce1d71dbffe12bc84fa87600472"
       },
       {
+        "file": "LATARIA/3170421611.png",
+        "sha256": "67162cf5583ca6e32405af2eaeb7e11d"
+      },
+      {
         "file": "LATARIA/3170501001.png",
         "sha256": "e4320b60e6ddf8a650a56d17d5991da7"
       },
@@ -5680,6 +5700,22 @@
       {
         "file": "LATARIA/3170861204.png",
         "sha256": "4845776d6d3c6017b37da5725c1b35b4"
+      },
+      {
+        "file": "LATARIA/3170861211.png",
+        "sha256": "b5162f8189d21b874d296e91fe2a430b"
+      },
+      {
+        "file": "LATARIA/3170861212.png",
+        "sha256": "0a1bba6599f2fbdf5e93944a3ac68b6d"
+      },
+      {
+        "file": "LATARIA/3170861213.png",
+        "sha256": "39f05a78942024e6a66a8c598f43eaa5"
+      },
+      {
+        "file": "LATARIA/3170861214.png",
+        "sha256": "79f53ea78540e60137336a37c1a89b8c"
       },
       {
         "file": "LATARIA/3170861600.png",
@@ -5796,6 +5832,14 @@
       {
         "file": "PARACHOQUES/3169383030.png",
         "sha256": "28be9c721d55341d60840b0df878c3df"
+      },
+      {
+        "file": "PARACHOQUES/3170421611.png",
+        "sha256": "262c6a947e8a32a21fe895f34a9a5af1"
+      },
+      {
+        "file": "PARACHOQUES/3263361512.png",
+        "sha256": "e9e909c87c0dae09f9bb2b7a5be73c98"
       },
       {
         "file": "PARACHOQUES/3475272901.png",
