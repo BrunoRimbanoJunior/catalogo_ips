@@ -331,15 +331,6 @@ function displayText(value, fallback = "") {
   return text || fallback;
 }
 
-function firstCatalogVehicle(value = "") {
-  return (
-    String(value || "")
-      .split(/[;,\|\n\r]+/)
-      .map((part) => part.trim())
-      .find(Boolean) || ""
-  );
-}
-
 async function loadLocalImageSrc(path = "") {
   if (!path) return "";
   return await readImageBase64(path);
@@ -445,12 +436,25 @@ function wrapPdfText(text, font, size, maxWidth, maxLines = 3) {
 }
 
 function similarCodesText(value = "") {
-  return cleanPdfText(value)
-    .replace(/\b[A-Z0-9À-Ý][A-Z0-9À-Ý .\/-]{1,24}:\s*/gi, " ")
-    .replace(/[;,|]+/g, " ")
+  return String(value || "")
+    .split(/[\n\r;|]+/)
+    .map((entry) => entry.replace(/^\s*[^:]{1,30}:\s*/, "").trim())
+    .filter(Boolean)
+    .join(" | ")
     .replace(/\s+/g, " ")
     .trim()
     .toUpperCase();
+}
+
+function fitPdfLines(text, font, preferredSize, minSize, maxWidth, maxLines) {
+  for (let size = preferredSize; size >= minSize; size -= 0.4) {
+    const lines = wrapPdfText(text, font, size, maxWidth, Number.MAX_SAFE_INTEGER);
+    if (lines.length <= maxLines) return { lines, size };
+  }
+  return {
+    lines: wrapPdfText(text, font, minSize, maxWidth, Number.MAX_SAFE_INTEGER),
+    size: minSize,
+  };
 }
 
 function drawCenteredPdfLines(page, lines, font, size, centerX, topY, maxWidth, color, lineHeight = size * 1.18) {
@@ -685,26 +689,39 @@ function drawPdfIndexPage(page, fonts, entries, pageNo, title) {
   drawPdfText(page, String(pageNo), { x: mm(14), y: mm(7), size: 12, font: fonts.bold, color: rgb(1, 1, 1) });
 }
 
-function drawPdfProductHeader(page, fonts, title) {
-  const headerH = mm(27);
+function drawPdfProductHeader(page, fonts, title, background) {
+  const headerH = mm(32);
   const y = PDF_PAGE.height - headerH;
-  page.drawRectangle({ x: 0, y, width: PDF_PAGE.width * 0.48, height: headerH, color: PDF_RED });
-  page.drawRectangle({ x: PDF_PAGE.width * 0.48, y, width: PDF_PAGE.width * 0.52, height: headerH, color: PDF_LIGHT });
-  drawPdfText(page, "IPS DO BRASIL", { x: mm(12), y: y + mm(11), size: 20, font: fonts.boldOblique, color: rgb(1, 1, 1) });
-  const rightX = PDF_PAGE.width * 0.48;
-  const rightW = PDF_PAGE.width * 0.52;
-  const fitted = fitPdfText(title, fonts.boldOblique, 17, rightW - mm(18));
+  const rightX = PDF_PAGE.width * 0.49;
+  const rightW = PDF_PAGE.width * 0.49;
+
+  if (background) {
+    drawImageCover(page, background, 0, y, PDF_PAGE.width, headerH);
+  } else {
+    page.drawRectangle({ x: 0, y, width: PDF_PAGE.width, height: headerH, color: PDF_LIGHT });
+    page.drawRectangle({ x: 0, y, width: PDF_PAGE.width * 0.44, height: headerH, color: PDF_RED });
+  }
+
+  const fitted = fitPdfText(title, fonts.boldOblique, 18, rightW - mm(10));
   drawPdfText(page, fitted, {
-    x: rightX + (rightW - textWidth(fonts.boldOblique, fitted, 17)) / 2,
-    y: y + mm(17),
-    size: 17,
+    x: rightX + (rightW - textWidth(fonts.boldOblique, fitted, 18)) / 2,
+    y: y + mm(21),
+    size: 18,
     font: fonts.boldOblique,
     color: PDF_RED,
   });
+  const company = "IPS DO BRASIL";
+  drawPdfText(page, company, {
+    x: rightX + (rightW - textWidth(fonts.boldOblique, company, 17)) / 2,
+    y: y + mm(11.5),
+    size: 17,
+    font: fonts.boldOblique,
+    color: PDF_BLACK,
+  });
   drawPdfText(page, "CATÁLOGO 2026", {
-    x: rightX + (rightW - textWidth(fonts.boldOblique, "CATÁLOGO 2026", 11)) / 2,
+    x: rightX + (rightW - textWidth(fonts.boldOblique, "CATÁLOGO 2026", 13)) / 2,
     y: y + mm(3),
-    size: 11,
+    size: 13,
     font: fonts.boldOblique,
     color: PDF_BLACK,
   });
@@ -748,13 +765,15 @@ function drawNoImage(page, fonts, x, y, width, height) {
 
 function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
   const topH = mm(10);
-  const textH = mm(25);
-  const imageTopGap = mm(2);
+  const textH = mm(21);
+  const imageTopGap = mm(1);
   const titleFontSize = 10.5;
   const imageY = y + textH;
   const imageH = height - topH - textH - imageTopGap;
+  const imageWidth = width * 0.99;
+  const imageX = x + (width - imageWidth) / 2;
   const make = displayText(item.make, item.brand).toUpperCase();
-  const vehicle = displayText(firstCatalogVehicle(item.vehicle), "APLICAÇÃO").toUpperCase();
+  const vehicle = displayText(item.vehicle, "APLICAÇÃO").toUpperCase();
   const description = displayText(item.description, "PRODUTO").toUpperCase();
   const similar = similarCodesText(item.similar);
 
@@ -767,18 +786,20 @@ function drawPdfProductCard(page, fonts, item, image, x, y, width, height) {
   const rest = fitPdfText(`// ${vehicle}`, fonts.boldOblique, titleFontSize, x + width - mm(4) - restX);
   drawPdfText(page, rest, { x: restX, y: titleY, size: titleFontSize, font: fonts.boldOblique, color: PDF_BLACK });
 
-  page.drawRectangle({ x, y: imageY, width, height: imageH, borderColor: PDF_BORDER, borderWidth: 0.5 });
-  if (image) drawImageContain(page, image, x, imageY, width, imageH);
-  else drawNoImage(page, fonts, x, imageY, width, imageH);
+  page.drawRectangle({ x: imageX, y: imageY, width: imageWidth, height: imageH, borderColor: PDF_BORDER, borderWidth: 0.5 });
+  if (image) drawImageContain(page, image, imageX, imageY, imageWidth, imageH);
+  else drawNoImage(page, fonts, imageX, imageY, imageWidth, imageH);
 
   page.drawLine({ start: { x, y: y + textH }, end: { x: x + width, y: y + textH }, thickness: 0.6, color: PDF_BORDER });
-  const descLines = wrapPdfText(description, fonts.regular, 9, width - mm(8), 2);
-  drawCenteredPdfLines(page, descLines, fonts.regular, 9, x + width / 2, y + textH - mm(7), width - mm(8), PDF_BLACK, 10.2);
-  const vehicleLines = wrapPdfText(vehicle, fonts.bold, 9.2, width - mm(8), similar ? 1 : 2);
-  drawCenteredPdfLines(page, vehicleLines, fonts.bold, 9.2, x + width / 2, y + mm(similar ? 9.5 : 10.5), width - mm(8), PDF_BLACK, 10.5);
+  const textWidthAvailable = width - mm(8);
+  const descBlock = fitPdfLines(description, fonts.regular, 8.4, 6.4, textWidthAvailable, 1);
+  drawCenteredPdfLines(page, descBlock.lines, fonts.regular, descBlock.size, x + width / 2, y + textH - mm(4.5), textWidthAvailable, PDF_BLACK, descBlock.size * 1.1);
+  const vehicleBlock = fitPdfLines(vehicle, fonts.bold, 8.2, 4.8, textWidthAvailable, similar ? 2 : 4);
+  const vehicleTop = y + mm(similar ? 11 : 11.5);
+  drawCenteredPdfLines(page, vehicleBlock.lines, fonts.bold, vehicleBlock.size, x + width / 2, vehicleTop, textWidthAvailable, PDF_BLACK, vehicleBlock.size * 1.12);
   if (similar) {
-    const similarLines = wrapPdfText(similar, fonts.regular, 6.4, width - mm(8), 2);
-    drawCenteredPdfLines(page, similarLines, fonts.regular, 6.4, x + width / 2, y + mm(5.2), width - mm(8), rgb(0.25, 0.25, 0.25), 7.2);
+    const similarBlock = fitPdfLines(similar, fonts.regular, 6.8, 3.8, textWidthAvailable, 3);
+    drawCenteredPdfLines(page, similarBlock.lines, fonts.regular, similarBlock.size, x + width / 2, y + mm(5.2), textWidthAvailable, rgb(0.25, 0.25, 0.25), similarBlock.size * 1.06);
   }
   if (item.code) {
     drawPdfText(page, String(item.code), { x: x + 1, y: y + 1, size: 1, font: fonts.regular, color: rgb(1, 1, 1), opacity: 0.01 });
@@ -796,6 +817,7 @@ async function buildCatalogPdfBase64({ items, filters, onProgress, volumeLabel =
   const model = buildCatalogPdfModel(items, filters);
   const coverImage = await embedPdfImage(pdfDoc, "/images/capa.png");
   const backImage = await embedPdfImage(pdfDoc, "/images/contra_capa.png");
+  const productHeaderBackground = await embedPdfImage(pdfDoc, "/images/cabecalho_produtos.png");
   const imageCache = new Map();
 
   const cover = pdfDoc.addPage([PDF_PAGE.width, PDF_PAGE.height]);
@@ -836,11 +858,11 @@ async function buildCatalogPdfBase64({ items, filters, onProgress, volumeLabel =
     }
     const pageNo = model.firstProductPage + pageIndex;
     const page = pdfDoc.addPage([PDF_PAGE.width, PDF_PAGE.height]);
-    drawPdfProductHeader(page, fonts, model.coverTitle);
+    drawPdfProductHeader(page, fonts, model.coverTitle, productHeaderBackground);
     drawPdfFooter(page, fonts, pageNo);
     const marginX = mm(10);
     const gap = mm(3);
-    const gridTop = PDF_PAGE.height - mm(31);
+    const gridTop = PDF_PAGE.height - mm(36);
     const gridBottom = mm(23);
     const cardW = (PDF_PAGE.width - marginX * 2 - gap) / 2;
     const cardH = (gridTop - gridBottom - gap * 2) / 3;

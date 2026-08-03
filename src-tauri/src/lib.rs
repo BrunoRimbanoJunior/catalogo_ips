@@ -1336,7 +1336,16 @@ mod core {
                 p.pgroup,
                 NULLIF(MIN(TRIM(COALESCE(v.category,''))), ''),
                 NULLIF(MIN(TRIM(COALESCE(v.make,''))), ''),
-                MIN(TRIM(v.name)),
+                (
+                    SELECT group_concat(vehicle_name, ' | ')
+                    FROM (
+                        SELECT DISTINCT TRIM(v_all.name) AS vehicle_name
+                        FROM product_vehicles pv_all
+                        JOIN vehicles v_all ON v_all.id = pv_all.vehicle_id
+                        WHERE pv_all.product_id = p.id
+                        ORDER BY UPPER(TRIM(v_all.name))
+                    )
+                ),
                 NULLIF(TRIM(COALESCE(p.similar,'')), ''),
                 (
                     SELECT i.filename
@@ -1394,7 +1403,7 @@ mod core {
         }
         sql.push_str(" GROUP BY p.id");
         sql.push_str(
-            " ORDER BY UPPER(TRIM(COALESCE(p.pgroup,''))), UPPER(TRIM(COALESCE(NULLIF(MIN(TRIM(COALESCE(v.make,''))), ''),''))), UPPER(TRIM(MIN(TRIM(v.name)))), UPPER(TRIM(p.description)), UPPER(TRIM(p.code))",
+            " ORDER BY UPPER(TRIM(COALESCE(p.pgroup,''))), UPPER(TRIM(COALESCE(NULLIF(MIN(TRIM(COALESCE(v.make,''))), ''),''))), UPPER(TRIM(p.description)), UPPER(TRIM(p.code))",
         );
         if let Some(limit) = params.limit.filter(|v| *v > 0) {
             sql.push_str(&format!(" LIMIT {}", limit));
