@@ -3319,7 +3319,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7146666001.png",
-        "sha256": "aa1cb4276c2cb15d4b0b2a2070063758"
+        "sha256": "5cca54c116e1d410ff312506f4c9e22f"
       },
       {
         "file": "CAIXA_DIRECAO/7146675910.png",
@@ -5418,24 +5418,12 @@
         "sha256": "7a6a9c3a09934265b25ae9b2b49547fd"
       },
       {
-        "file": "LANCAMENTOS/7134905910.png",
-        "sha256": "b0512935279b8c28372a84b679ae2dd6"
-      },
-      {
-        "file": "LANCAMENTOS/7146336021.png",
-        "sha256": "5efd29b168bde950ffe68ec5b37dc5c7"
-      },
-      {
-        "file": "LANCAMENTOS/7169325910.png",
-        "sha256": "efbf115426128134738d42e38f2d112c"
-      },
-      {
-        "file": "LANCAMENTOS/7175275901.png",
-        "sha256": "8cfc8a38e9d7746c90db9e1f72564e1f"
-      },
-      {
         "file": "LANCAMENTOS/RESERVATÓRIOS.png",
         "sha256": "a0423b0a6ef05ac638d894f9d4a15754"
+      },
+      {
+        "file": "LANCAMENTOS/ROTORES.png",
+        "sha256": "29ef658a2974d8f3a14ce3728619bdf7"
       },
       {
         "file": "LANCAMENTOS/SEMI-EIXOS.png",
@@ -8995,7 +8983,7 @@
       },
       {
         "file": "RESERVATORIOS/8115502401.png",
-        "sha256": "9963cff189e4162211c9a4bc4e715c07"
+        "sha256": "d9d725da55f31de5a029f9c1135e745e"
       },
       {
         "file": "RESERVATORIOS/8115502411.png",
