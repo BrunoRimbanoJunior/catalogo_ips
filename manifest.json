@@ -2,9 +2,9 @@
   "appVersion": "1.5.25",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.25/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1782482152,
-    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/4591c5e242e3a8463d02b71b9ca28175bfeda091/data/catalog.db",
-    "sha256": "786d07a5a990e015edf6429fb5d49771a3eb20d79d69dccad5ff22cd473d1599"
+    "version": 1782482154,
+    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/ddce274f1f4106a309fd3ca69647dad7f9277c52/data/catalog.db",
+    "sha256": "823e5a5b7cfeb934afdce6b49c8b6400b4b0ca753cdbbe330be0c42d67c4aaee"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -2942,6 +2942,10 @@
         "sha256": "31eda3fb02ec1d66f1d5175188954c9f"
       },
       {
+        "file": "CAIXA_DIRECAO/7115486803.png",
+        "sha256": "a93c9538cd22d64e5e3e5e971666f822"
+      },
+      {
         "file": "CAIXA_DIRECAO/7115505900.png",
         "sha256": "e00a77f9c7b688ef937e33a091b259c0"
       },
@@ -3871,7 +3875,7 @@
       },
       {
         "file": "CAIXA_DIRECAO/7177146610.png",
-        "sha256": "d7ff539ba0fc0d55742844fcbbfc3c82"
+        "sha256": "f83862e3e78676e5c58579674a641e3d"
       },
       {
         "file": "CAIXA_DIRECAO/7177236000.png",
@@ -9764,6 +9768,34 @@
       {
         "file": "ROLAMENTOS/7175527343.png",
         "sha256": "3291527daa3f0d48e2ac09df93d65164"
+      },
+      {
+        "file": "ROTORES BOMBA HIDRAULICA/7182915201.png",
+        "sha256": "5c426bda7cd3d3dd386b1cfdea32ae25"
+      },
+      {
+        "file": "ROTORES BOMBA HIDRAULICA/7182945201.png",
+        "sha256": "056170bae3b8c40714b94da0d8a06471"
+      },
+      {
+        "file": "ROTORES BOMBA HIDRAULICA/7183925201.png",
+        "sha256": "ad30e3eca44458d743f3aeefdc02a5c5"
+      },
+      {
+        "file": "ROTORES BOMBA HIDRAULICA/7184915201.png",
+        "sha256": "f675de5754af40a2bc07ab5bbb2ac5db"
+      },
+      {
+        "file": "ROTORES BOMBA HIDRAULICA/7185915201.png",
+        "sha256": "1242bb26d785e0f30417b848e8aa1e52"
+      },
+      {
+        "file": "ROTORES BOMBA HIDRAULICA/7190905201.png",
+        "sha256": "3e7fa6cf31ef10b1725101ffa4b44628"
+      },
+      {
+        "file": "ROTORES BOMBA HIDRAULICA/7190905202.png",
+        "sha256": "a2bfda8816ec2979e5726b29f692bd1d"
       },
       {
         "file": "SEMI_EIXO/7111307601.png",
