@@ -1,11 +1,11 @@
 # Catálogo IPS
 
-App desktop (Tauri + React) para consulta de peças com sincronização de banco/imagens via manifest. Fluxo de controle de acesso usando Supabase.
+App desktop (Tauri + React) para consulta de peças com sincronização de banco/imagens via manifest. Fluxo de controle de acessos, e exibição de imagens e itens em lançamento.
 
 ## Como funciona
 - Manifest público (`VITE_DEFAULT_MANIFEST_URL`): aponta para `manifest.json` na branch `main`. Contém `appVersion`, `appDownloadUrl`, `db.version/url` e lista de imagens (R2).
 - Cliente: ao abrir, lê o manifest, avisa se há nova versão do app, baixa DB/imagens se `db.version` subir e indexa imagens no SQLite local.
-- Auth: formulário de cadastro salva no Supabase (`profiles`) com status `approved`, liberando o app automaticamente.
+- Auth: formulário de cadastro salva no banco (`profiles`), o status pode ser 'aprovado', 'cancelado'.
 
 ## Instalação do cliente
 - Baixar na aba Releases do GitHub (tags `v*`).
