@@ -8,6 +8,7 @@ import {
   getProductDetails,
   syncFromManifest,
   indexImagesFromManifest,
+  listLaunchImages,
   fetchRecentProducts,
   readImageBase64,
   importExcel,
@@ -1025,6 +1026,9 @@ function App() {
 
   const [recentProducts, setRecentProducts] = useState([]);
   const [launchState, setLaunchState] = useState({ open: false, loading: false, error: "" });
+  const [launchImages, setLaunchImages] = useState([]);
+  const [launchCarousel, setLaunchCarousel] = useState({ open: false, index: 0, loading: false, error: "" });
+  const launchCarouselShownRef = useRef(false);
   const [manifestInput, setManifestInput] = useState("");
   const [toolsMsg, setToolsMsg] = useState("");
   const [excelPath, setExcelPath] = useState("");
@@ -1237,11 +1241,14 @@ function App() {
       const msg = `Imagens atualizadas (${downloaded} baixadas${errors ? `, ${errors} erros` : ""}).`;
       setSecondaryStatus(msg);
       setTimeout(() => setSecondaryStatus(""), 2000);
+      if (ready && imagesDir && !launchCarouselShownRef.current) {
+        loadLaunchCarousel();
+      }
     });
     return () => {
       unlisten.then((fn) => fn()).catch(() => {});
     };
-  }, []);
+  }, [ready, imagesDir]);
 
   // Tenta usar o updater nativo do Tauri: baixa e instala sem abrir link externo.
   useEffect(() => {
@@ -1491,12 +1498,22 @@ function App() {
 
   useEffect(() => {
     const handler = (ev) => {
-      if (!launchState.open) return;
-      if (ev.key === "Escape") setLaunchState((s) => ({ ...s, open: false }));
+      if (launchCarousel.open) {
+        if (ev.key === "Escape") setLaunchCarousel((s) => ({ ...s, open: false }));
+        if (ev.key === "ArrowRight") cycleLaunchCarousel(1);
+        if (ev.key === "ArrowLeft") cycleLaunchCarousel(-1);
+        return;
+      }
+      if (launchState.open && ev.key === "Escape") setLaunchState((s) => ({ ...s, open: false }));
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [launchState.open]);
+  }, [launchState.open, launchCarousel.open, launchImages.length]);
+
+  useEffect(() => {
+    if (!ready || !imagesDir || launchCarouselShownRef.current) return;
+    loadLaunchCarousel();
+  }, [ready, imagesDir]);
 
   useEffect(() => {
     (async () => {
@@ -1817,6 +1834,53 @@ function App() {
       setRecentProducts([]);
       setLaunchState({ open: false, loading: false, error: `Falha ao carregar lançamentos: ${e.message || e}` });
     }
+  }
+
+  async function loadLaunchCarousel() {
+    setLaunchCarousel((s) => ({ ...s, loading: true, error: "" }));
+    try {
+      const files = await listLaunchImages();
+      if (!files?.length) {
+        setLaunchImages([]);
+        setLaunchCarousel((s) => ({ ...s, loading: false, error: "Nenhuma imagem de lançamento encontrada." }));
+        return;
+      }
+
+      const sources = [];
+      const unique = new Set();
+      for (const file of files) {
+        try {
+          const src = await loadLocalImageSrc(normalizePath(imagesDir, file));
+          if (src && !unique.has(src)) {
+            unique.add(src);
+            sources.push(src);
+          }
+        } catch (_) {
+          // Ignora arquivos ausentes ou inválidos para não exibir imagens quebradas.
+        }
+      }
+
+      if (!sources.length) {
+        setLaunchImages([]);
+        setLaunchCarousel((s) => ({ ...s, loading: false, error: "Não foi possível abrir as imagens de lançamento." }));
+        return;
+      }
+
+      launchCarouselShownRef.current = true;
+      setLaunchImages(sources);
+      setLaunchCarousel({ open: true, index: 0, loading: false, error: "" });
+    } catch (e) {
+      setLaunchImages([]);
+      setLaunchCarousel({ open: false, index: 0, loading: false, error: `Falha ao carregar imagens de lançamento: ${e.message || e}` });
+    }
+  }
+
+  function cycleLaunchCarousel(delta) {
+    if (!launchImages.length) return;
+    setLaunchCarousel((s) => ({
+      ...s,
+      index: (s.index + delta + launchImages.length) % launchImages.length,
+    }));
   }
 
   async function runSync(manUrl) {
@@ -2630,6 +2694,26 @@ function App() {
             X
           </button>
           <img className="modal-image" src={selectedImages[imageModal.index]} alt="preview" onClick={(e) => { e.stopPropagation(); setImageModal((s) => ({ open: true, index: (s.index + 1) % selectedImages.length })); }} />
+        </div>
+      )}
+
+      {launchCarousel.open && launchImages.length > 0 && (
+        <div className="launch-modal" onClick={() => setLaunchCarousel((s) => ({ ...s, open: false }))}>
+          <div className="launch-modal-body" onClick={(e) => e.stopPropagation()}>
+            <button className="launch-close" onClick={() => setLaunchCarousel((s) => ({ ...s, open: false }))}>
+              X
+            </button>
+            <div className="launch-carousel">
+              <button className="launch-arrow" onClick={() => cycleLaunchCarousel(-1)} aria-label="Anterior">
+                &lt;
+              </button>
+              <img src={launchImages[launchCarousel.index]} alt="lançamento" />
+              <button className="launch-arrow" onClick={() => cycleLaunchCarousel(1)} aria-label="Próximo">
+                &gt;
+              </button>
+            </div>
+            <div className="launch-counter">{launchCarousel.index + 1} / {launchImages.length}</div>
+          </div>
         </div>
       )}
 
