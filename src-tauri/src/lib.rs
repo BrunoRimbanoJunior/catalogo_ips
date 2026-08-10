@@ -33,6 +33,8 @@ mod core {
     const GROUP_EXPR_SQL: &str = "UPPER(TRIM(COALESCE(pgroup,'')))";
     const LAUNCH_CANON: &str = "lancamentos";
     const DEFAULT_IMG_CONCURRENCY: usize = 16;
+    const BRANDING_BACKGROUND_WIDTH: u32 = 1536;
+    const BRANDING_BACKGROUND_HEIGHT: u32 = 1024;
 
     fn normalize_launch_token(s: &str) -> String {
         s.to_lowercase()
@@ -1954,17 +1956,31 @@ mod core {
             cwd.join("public").join("images")
         };
         fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
+        let is_logo = kind.to_lowercase().starts_with("logo");
         let ext = std::path::Path::new(&source_path)
             .extension()
             .and_then(|e| e.to_str())
             .unwrap_or("png");
-        let fixed = if kind.to_lowercase().starts_with("logo") {
+        let fixed = if is_logo {
             format!("logo.{}", ext)
         } else {
-            format!("bg.{}", ext)
+            "bg.png".to_string()
         };
         let dest = out_dir.join(&fixed);
-        fs::copy(&source_path, &dest).map_err(|e| e.to_string())?;
+        if is_logo {
+            fs::copy(&source_path, &dest).map_err(|e| e.to_string())?;
+        } else {
+            let background = image::open(&source_path)
+                .map_err(|e| format!("Falha ao abrir a imagem de fundo: {e}"))?
+                .resize_to_fill(
+                    BRANDING_BACKGROUND_WIDTH,
+                    BRANDING_BACKGROUND_HEIGHT,
+                    image::imageops::FilterType::Lanczos3,
+                );
+            background
+                .save_with_format(&dest, image::ImageFormat::Png)
+                .map_err(|e| format!("Falha ao salvar a imagem de fundo redimensionada: {e}"))?;
+        }
         let json_path = out_dir.join("branding.json");
         let mut logo: Option<String> = None;
         let mut background: Option<String> = None;
@@ -1991,7 +2007,7 @@ mod core {
                 }
             }
         }
-        if kind.to_lowercase().starts_with("logo") {
+        if is_logo {
             logo = Some(fixed.clone());
         } else {
             background = Some(fixed.clone());

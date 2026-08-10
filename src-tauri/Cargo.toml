@@ -44,3 +44,4 @@ aes-gcm = "0.10"
 pbkdf2 = "0.12"
 zip = { version = "0.6", default-features = false, features = ["deflate"] }
 dotenvy = "0.15"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
