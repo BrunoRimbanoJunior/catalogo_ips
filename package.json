@@ -1,7 +1,7 @@
 {
   "name": "catalogo_ips",
   "private": true,
-  "version": "1.5.29",
+  "version": "1.5.30",
   "packageManager": "pnpm@11.4.0",
   "type": "module",
   "scripts": {
@@ -9,13 +9,15 @@
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "organizar-imagens": "node ../scripts/organizar-imagens-por-grupo.mjs",
-    "resolver-sem-cadastro": "node ../scripts/resolver-sem-cadastro.mjs",
+    "organizar-imagens": "node scripts/organizar-imagens-por-grupo.mjs",
+    "resolver-sem-cadastro": "node scripts/resolver-sem-cadastro.mjs",
     "tauri:build:signed": "node scripts/tauri-build-release.mjs",
     "manifest": "node scripts/gen-manifest-r2.mjs --out manifest.json",
     "manifest:r2": "node scripts/gen-manifest-r2.mjs",
     "manifest:validate": "node scripts/validate-manifest.mjs",
-    "launches": "node scripts/gen-launches.mjs"
+    "launches": "node scripts/gen-launches.mjs",
+    "deps:check": "pnpm dedupe --check",
+    "clean:rust": "cargo clean --manifest-path src-tauri/Cargo.toml"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.84.0",
@@ -30,7 +32,6 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.678.0",
-    "@azure/msal-node": "^2.6.5",
     "@tauri-apps/cli": "^2.11.4",
     "@vitejs/plugin-react": "^4.6.0",
     "sql.js": "^1.13.0",

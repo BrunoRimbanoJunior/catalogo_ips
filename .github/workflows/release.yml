@@ -81,6 +81,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check dependency deduplication
+        run: pnpm deps:check
+
       - name: Apply frontend env overrides
         shell: bash
         env:

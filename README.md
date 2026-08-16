@@ -16,7 +16,7 @@ App desktop (Tauri + React) para consulta de peças com sincronização de banco
 
 ## Desenvolvimento local
 Pré-requisitos: Node 20, Rust toolchain, pnpm, Supabase (anon key), manifest público válido.
-1) `pnpm install`
+1) `pnpm install --frozen-lockfile`
 2) Configurar `.env.development` (exemplo):
    ```
    VITE_DEFAULT_MANIFEST_URL=https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/main/manifest.json
@@ -30,7 +30,7 @@ Pré-requisitos: Node 20, Rust toolchain, pnpm, Supabase (anon key), manifest p�
 Local (apenas dev) para gerenciar cadastros sem expor service role no front:
 1) `cd backend`
 2) `.env` com `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `ADMIN_TOKEN`
-3) `uv venv && uv pip install -r requirements.txt`
+3) `cd backend && uv sync --locked`
 4) `uv run uvicorn main:app --reload --port 8000`
 5) Painel: `http://localhost:8000/admin` (informe o `ADMIN_TOKEN` quando solicitado)
 
@@ -89,4 +89,6 @@ pnpm manifest -- --app-version 1.5.0 --app-download-url https://github.com/<org>
 - Supabase: RLS ativa na tabela `profiles`, políticas para anon (insert/update/select) e UNIQUE no email. Service role nunca vai para o front.
 - O app consome o manifest estável da `main`; não use o asset `releases/latest/download/manifest.json`, pois ele fica congelado até outra release.
 - Antes de publicar manualmente, rode `pnpm manifest:validate`.
+- Para conferir se o lockfile pnpm pode ser deduplicado, rode `pnpm deps:check`.
+- Para remover artefatos locais do Rust/Tauri, rode `pnpm clean:rust`.
 - Releases: use tags `v*` para gerar instaladores e atualizar o manifest com `appVersion` e link de download.

@@ -1,6 +1,6 @@
 [package]
 name = "catalogo_ips"
-version = "1.5.29"
+version = "1.5.30"
 description = "Catalogo Eletronico IPS"
 authors = ["Bruno Rimbano Junior"]
 edition = "2021"
@@ -21,8 +21,6 @@ tauri-build = { version = "2.6.3", features = [] }
 tauri = { version = "2.11.5", features = [] }
 tauri-plugin-opener = "2.5.4"
 tauri-plugin-dialog = "2.7.2"
-tauri-plugin-log = "2.9.0"
-tauri-plugin-store = "2.4.4"
 tauri-plugin-updater = "2.10.1"
 tauri-plugin-process = "2.3.1"
 # Banco local (lado Rust, mais rápido)

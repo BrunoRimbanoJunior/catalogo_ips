@@ -7,11 +7,11 @@
    - `ADMIN_CORS_ORIGINS=http://localhost:8000` (opcional, lista separada por vírgula)
 2. Instale dependências:
    ```bash
-   pip install -r requirements.txt
+   uv sync --locked
    ```
 3. Rode o servidor local:
    ```bash
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
 ### Endpoints
