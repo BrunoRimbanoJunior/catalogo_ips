@@ -1,5 +1,11 @@
 # Catálogo IPS
 
+## Correção da publicação 1.5.32
+
+A tag `v1.5.31` aponta para `ad796a6` (10/09/2026), anterior ao cadastro autenticado e ao limite de dois dispositivos. Gerar novamente essa tag recompila o código antigo. As correções de cadastro estão no commit `0506942` e precisam integrar a nova tag `v1.5.32` junto com o incremento de versão. O workflow `auto-tag` agora rejeita uma tag existente que aponta para outro commit, mesmo quando a Release está completa.
+
+Antes do push, concilie a `main` local com a remota preservando as correções: na revisão de 15/09 elas estavam apenas na branch local, divergente da remota. Após a publicação, confirme que o instalador exibe `Este dispositivo` e `Cadastrados: .../2` no cadastro. As migrações do Supabase já aplicadas não precisam ser repetidas por causa desse problema de versão.
+
 App desktop (Tauri + React) para consulta de peças com sincronização de banco/imagens via manifest. Fluxo de controle de acessos, e exibição de imagens e itens em lançamento.
 
 ## Como funciona
