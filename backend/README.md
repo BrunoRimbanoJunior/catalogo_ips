@@ -1,3 +1,5 @@
+> Atualiza??o 2026-09-15: `/auth/register` foi desativado (HTTP 410), pois aceitava cadastro sem autentica??o usando service_role. O app agora usa Supabase Auth e a RPC `register_catalog_profile`; consulte o README principal e aplique a migra??o antes de distribuir. Rotas `/admin/*` continuam exigindo `X-Admin-Token`. As descri??es de cadastro abaixo s?o hist?ricas.
+
 # Backend (FastAPI) para Auth/Cadastro
 
 1. Configure as variáveis no `.env` (copiar `.env.example`):

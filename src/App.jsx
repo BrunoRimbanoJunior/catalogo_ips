@@ -35,7 +35,6 @@ import {
   normalizePath,
   parseStoredArray,
   sanitizeStoredPath,
-  safeParseProfile,
   toDisplaySrc,
   toHeaderLogoPath,
 } from "./lib/catalogUtils";
@@ -967,7 +966,6 @@ function productDetailRows(product) {
 
 function App() {
   const fingerprint = useFingerprint();
-  const cachedProfile = useMemo(() => safeParseProfile(localStorage.getItem("profile.cached")), []);
   const isDev = import.meta.env.MODE !== "production";
   const updaterRef = useRef(null);
   const settingsRef = useRef(null);
@@ -1052,7 +1050,7 @@ function App() {
     favoritesOnly: false,
   });
 
-  const [profile, setProfile] = useState(cachedProfile);
+  const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [registrationEmail, setRegistrationEmail] = useState(localStorage.getItem("registration.email") || "");
   const [authSuccess, setAuthSuccess] = useState("");
@@ -1060,11 +1058,17 @@ function App() {
   const [form, setForm] = useState({ ...REG_DEFAULT, email: registrationEmail });
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [sentOnce, setSentOnce] = useState(false);
+  const [otpEmail, setOtpEmail] = useState("");
+  const [otpCode, setOtpCode] = useState("");
 
   const supabaseConfigured = !!supabase;
   const applyProfileData = useCallback(
     (data) => {
-      if (!data) return null;
+      if (!data) {
+        setProfile(null);
+        localStorage.removeItem("profile.cached");
+        return null;
+      }
       setProfile(data);
       setForm((prev) => ({
         ...prev,
@@ -1088,18 +1092,16 @@ function App() {
     [registrationEmail]
   );
   const loadProfile = useCallback(
-    async (emailOverride = registrationEmail) => {
+    async () => {
       if (!supabase) return null;
-      const email = String(emailOverride || "").trim().toLowerCase();
-      const { data, error } = await supabase
-        .from("profiles")
-        .select(PROFILE_SELECT)
-        .or(`device_fingerprint.eq.${fingerprint}${email ? `,email.eq.${email}` : ""}`)
-        .maybeSingle();
-      if (error && error.code !== "PGRST116") throw error;
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) { applyProfileData(null); throw sessionError; }
+      if (!session) return applyProfileData(null);
+      const { data, error } = await supabase.rpc("get_catalog_profile", { p_fingerprint: fingerprint });
+      if (error) { applyProfileData(null); throw error; }
       return applyProfileData(data);
     },
-    [applyProfileData, fingerprint, registrationEmail]
+    [applyProfileData, fingerprint]
   );
   const refreshAuthStatus = useCallback(
     async ({ silent = false } = {}) => {
@@ -1116,7 +1118,9 @@ function App() {
           return null;
         }
         if (!silent) {
-          if (data.status === "approved") {
+          if (data.status !== "block" && !data.device_authorized) {
+            setAuthError("Este dispositivo ainda não está cadastrado. Envie a ficha para vinculá-lo (até 2 por e-mail).");
+          } else if (data.status === "approved") {
             setAuthSuccess("Cadastro aprovado. Acesso liberado.");
           } else if (data.status === "block") {
             setAuthError("Cadastro bloqueado. Entre em contato com o administrador.");
@@ -1132,8 +1136,19 @@ function App() {
         if (!silent) setAuthLoading(false);
       }
     },
-    [loadProfile, supabaseConfigured]
+    [loadProfile, supabaseConfigured, fingerprint]
   );
+
+  useEffect(() => {
+    if (!supabase) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        applyProfileData(null);
+        setSentOnce(false);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [applyProfileData]);
 
   const selectedBrand = useMemo(() => brands.find((b) => String(b.id) === String(brandId)) || null, [brands, brandId]);
   const numericBrandId = useMemo(() => {
@@ -1158,10 +1173,8 @@ function App() {
 
   const blockAccess = useMemo(() => {
     if (isDev) return false; // Em desenvolvimento, não bloquear pela aprovação.
-    if (cachedProfile?.status === "block" || profile?.status === "block") return true;
-    if (cachedProfile?.status === "approved" || profile?.status === "approved") return false;
-    return true;
-  }, [isDev, supabaseConfigured, cachedProfile, profile]);
+    return authLoading || profile?.status !== "approved" || !profile?.device_authorized;
+  }, [isDev, authLoading, profile, fingerprint]);
 
   const versionedDisplaySrc = useCallback(
     (path) => {
@@ -1468,11 +1481,10 @@ function App() {
 
   useEffect(() => {
     if (!supabaseConfigured || isDev) return undefined;
-    if (profile?.status === "approved" || profile?.status === "block") return undefined;
     if (!registrationEmail && !sentOnce) return undefined;
     const timer = setInterval(() => {
       refreshAuthStatus({ silent: true });
-    }, 15000);
+    }, 60000);
     return () => clearInterval(timer);
   }, [isDev, profile?.status, refreshAuthStatus, registrationEmail, sentOnce, supabaseConfigured]);
 
@@ -1703,38 +1715,41 @@ function App() {
     setFormSubmitting(true);
     try {
       if (!supabase) throw new Error("Supabase não configurado.");
-      let profileId = profile?.id || null;
-      let existingProfile = profile || null;
-      if (validation.email) {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("id,status,device_fingerprint")
-          .eq("email", validation.email)
-          .maybeSingle();
-        if (error && error.code !== "PGRST116") throw error;
-        if (data?.id) {
-          profileId = data.id;
-          existingProfile = { ...existingProfile, ...data };
+      let { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!session || session.user.email?.toLowerCase() !== validation.email) {
+        if (otpEmail !== validation.email || !otpCode.trim()) {
+          const { error } = await supabase.auth.signInWithOtp({ email: validation.email });
+          if (error) throw error;
+          setOtpEmail(validation.email);
+          setOtpCode("");
+          setAuthSuccess("Enviamos um c?digo para seu e-mail. Digite o c?digo e confirme o cadastro.");
+          return;
         }
+        applyProfileData(null);
+        const { data, error } = await supabase.auth.verifyOtp({ email: otpEmail, token: otpCode.trim(), type: "email" });
+        if (error) throw error;
+        session = data.session;
+        if (!session) throw new Error("N?o foi poss?vel iniciar a sess?o. Solicite outro c?digo.");
+        setOtpEmail("");
+        setOtpCode("");
       }
-      const statusToSave = existingProfile?.status === "block" ? "block" : "approved";
-      const payload = {
-        ...form,
-        cpf_cnpj: validation.cpfCnpj,
-        email: validation.email,
-        status: statusToSave,
-        device_fingerprint: existingProfile?.device_fingerprint || fingerprint,
-        id: profileId || undefined,
-      };
-      const { data, error } = await supabase.from("profiles").upsert(payload, { onConflict: "email" }).select().maybeSingle();
+      const { data, error } = await supabase.rpc("register_catalog_profile", {
+        p_profile: { ...form, cpf_cnpj: validation.cpfCnpj },
+        p_fingerprint: fingerprint,
+      });
       if (error) throw error;
-      const resolved = data ? { ...data, status: data.status || statusToSave } : null;
+      if (!data?.id) throw new Error("O servidor n?o retornou o cadastro salvo.");
+      const resolved = data;
       if (resolved) {
         applyProfileData(resolved);
       }
       setRegistrationEmail(validation.email);
       setForm((prev) => ({ ...prev, cpf_cnpj: validation.cpfCnpj, email: validation.email }));
-      if (resolved?.status === "approved") {
+      if (resolved?.status !== "block" && !resolved?.device_authorized) {
+        setAuthError("Este dispositivo ainda não está cadastrado. Envie a ficha para vinculá-lo (até 2 por e-mail).");
+        setSentOnce(false);
+      } else if (resolved?.status === "approved") {
         setAuthSuccess("Cadastro aprovado. Acesso liberado.");
         setSentOnce(false);
       } else if (resolved?.status === "block") {
@@ -2540,13 +2555,20 @@ function App() {
                   <input type="email" inputMode="email" autoCapitalize="none" value={form.email || registrationEmail} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} placeholder="usuario@empresa.com" />
                 </label>
 
+                {otpEmail && (
+                  <label className="auth-field wide">
+                    C?digo enviado para {otpEmail}
+                    <input inputMode="numeric" autoComplete="one-time-code" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} placeholder="C?digo recebido por e-mail" />
+                    <button type="button" disabled={formSubmitting} onClick={() => { setOtpEmail(""); setOtpCode(""); setAuthSuccess("Clique em enviar para solicitar outro c?digo."); }}>Solicitar outro c?digo</button>
+                  </label>
+                )}
                 <div className="auth-meta">
                   <span>Código do cadastro: {profile?.id || "aguardando..."}</span>
-                  <span>Dispositivo vinculado: {profile?.device_fingerprint || fingerprint}</span>
+                  <span>Este dispositivo: {fingerprint} | Cadastrados: {profile?.device_count ?? 0}/2</span>
                 </div>
 
                 <button type="submit" disabled={formSubmitting}>
-                  {formSubmitting ? "Salvando..." : "Salvar dados"}
+                  {formSubmitting ? "Processando..." : otpEmail ? "Confirmar c?digo e salvar" : "Salvar dados"}
                 </button>
                 {authSuccess && <div className="auth-success">{authSuccess}</div>}
                 {authError && <div className="auth-error">{authError}</div>}
@@ -2822,13 +2844,20 @@ function App() {
                         <input type="email" inputMode="email" autoCapitalize="none" value={form.email || registrationEmail} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} placeholder="usuario@empresa.com" />
                       </label>
 
-                      <div className="auth-meta">
+                      {otpEmail && (
+                  <label className="auth-field wide">
+                    C?digo enviado para {otpEmail}
+                    <input inputMode="numeric" autoComplete="one-time-code" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} placeholder="C?digo recebido por e-mail" />
+                    <button type="button" disabled={formSubmitting} onClick={() => { setOtpEmail(""); setOtpCode(""); setAuthSuccess("Clique em enviar para solicitar outro c?digo."); }}>Solicitar outro c?digo</button>
+                  </label>
+                )}
+                <div className="auth-meta">
                         <span>Código do cadastro: {profile?.id || "aguardando..."}</span>
-                        <span>Dispositivo vinculado: {profile?.device_fingerprint || fingerprint}</span>
+                        <span>Este dispositivo: {fingerprint} | Cadastrados: {profile?.device_count ?? 0}/2</span>
                       </div>
 
                       <button type="submit" disabled={formSubmitting}>
-                        {formSubmitting ? "Enviando..." : "Enviar cadastro"}
+                        {formSubmitting ? "Processando..." : otpEmail ? "Confirmar c?digo e salvar" : "Enviar cadastro"}
                       </button>
                       <p className="auth-muted small">Após enviar, o acesso é liberado automaticamente. Caso troque de máquina, solicite reset do dispositivo.</p>
                     </form>

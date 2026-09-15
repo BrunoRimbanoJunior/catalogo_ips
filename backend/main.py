@@ -74,42 +74,12 @@ def health():
 
 
 @app.post("/auth/register")
-def register(payload: Registration, supabase: Client = Depends(get_supabase)):
-    try:
-        auth_res = supabase.auth.admin.get_user_by_email(payload.email)
-        user_id = auth_res.user.id if auth_res and auth_res.user else None
-
-        if not user_id:
-            created = supabase.auth.admin.create_user(
-                {"email": payload.email, "email_confirm": True, "email_confirmed_at": None}
-            )
-            if not created or not created.user:
-                raise HTTPException(status_code=400, detail="Falha ao criar usuário no Supabase.")
-            user_id = created.user.id
-
-        existing_profile = supabase.table("profiles").select("status").eq("id", user_id).maybe_single().execute()
-        status_to_save = "block" if existing_profile.data and existing_profile.data.get("status") == "block" else "approved"
-
-        row = supabase.table("profiles").upsert(
-            {
-                "id": user_id,
-                "email": payload.email,
-                "full_name": payload.full_name,
-                "person_type": payload.person_type,
-                "country": payload.country,
-                "state": payload.state,
-                "city": payload.city,
-                "cpf_cnpj": payload.cpf_cnpj,
-                "phone_area": payload.phone_area,
-                "phone_number": payload.phone_number,
-                "device_fingerprint": payload.device_fingerprint,
-                "status": status_to_save,
-            }
-        ).execute()
-
-        return {"ok": True, "user_id": user_id, "profile": row.data}
-    except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=400, detail=str(exc))
+def register():
+    # Legacy unauthenticated endpoint used service_role and bypassed ownership checks.
+    raise HTTPException(
+        status_code=410,
+        detail="Atualize o aplicativo e confirme seu e-mail para realizar o cadastro.",
+    )
 
 
 @app.get("/admin/profiles")

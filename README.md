@@ -92,3 +92,61 @@ pnpm manifest -- --app-version 1.5.0 --app-download-url https://github.com/<org>
 - Para conferir se o lockfile pnpm pode ser deduplicado, rode `pnpm deps:check`.
 - Para remover artefatos locais do Rust/Tauri, rode `pnpm clean:rust`.
 - Releases: use tags `v*` para gerar instaladores e atualizar o manifest com `appVersion` e link de download.
+
+
+## Cadastro autenticado e troca de m?quina (2026-09-15)
+
+Antes de distribuir esta vers?o:
+
+1. Execute `supabase/migrations/20260915_authenticated_registration.sql` no SQL Editor do projeto correto. Requer a tabela existente `profiles`, incluindo `user_id uuid`, `id` com default e a pol?tica de SELECT do pr?prio usu?rio (`user_id = auth.uid()`). A migra??o aborta se houver e-mails duplicados sem diferenciar mai?sculas/min?sculas; examine essas linhas antes de resolver duplicidades manualmente.
+2. Em Authentication, habilite login/cadastro por e-mail e configure o template de Magic Link para incluir `{{ .Token }}` (ex.: `<p>Seu c?digo: {{ .Token }}</p>`). Confira tamb?m o template de confirma??o de cadastro caso usado pelo projeto. O cliente usa `signInWithOtp` e `verifyOtp` com tipo `email`, sem depender de links que abrem outro navegador.
+3. Configure SMTP para os destinat?rios de produ??o e valide entrega, expira??o, limites de envio e eventuais requisitos de CAPTCHA. Nenhum e-mail foi enviado durante o desenvolvimento.
+4. Gere e distribua um novo instalador. Vers?es antigas que gravam diretamente na tabela precisam ser atualizadas.
+
+A fun??o usa o e-mail da sess?o, nunca o e-mail/status/user_id fornecido pelo cliente. Vincula cadastros antigos com `user_id` vazio somente ao titular autenticado do e-mail, preserva status e dispositivo e aprova apenas cadastros novos. A migra??o retira INSERT/UPDATE/DELETE diretos de `authenticated`: as pol?ticas existentes continuam, mas grava??es passam pela fun??o. Revise outros clientes que dependam de grava??o direta antes de aplicar.
+
+Troca de m?quina: localize o cadastro por e-mail no painel administrativo e limpe `device_fingerprint` (NULL). O titular confirma o mesmo e-mail no novo app e envia a ficha novamente. A fun??o vincula o dispositivo novo somente se o campo estiver vazio. O fingerprint identifica a instala??o/navegador, n?o ? uma identifica??o f?sica inviol?vel.
+
+O cliente inicia sem confiar no antigo `profile.cached`, consulta apenas `user_id` da sess?o e revalida a cada 60 segundos. Sem valida??o online, o acesso fica bloqueado; isso muda o comportamento offline anterior. O modo de desenvolvimento mant?m o bypass existente. Dados do cat?logo j? baixados no computador n?o podem ser protegidos apenas por uma tela de bloqueio.
+
+### Valida??o antes da publica??o
+
+- Novo e-mail: envio de c?digo, rejei??o de c?digo incorreto/expirado, confirma??o, cadastro com `user_id` correto.
+- E-mail legado: recupera??o do mesmo ID sem duplicar linha; bloqueado continua bloqueado.
+- Outra m?quina: recusa at? limpar o dispositivo; ap?s reset e reenvio, novo fingerprint vinculado e m?quina antiga bloqueada na revalida??o.
+- Sess?o ausente/expirada, exclus?o de perfil, indisponibilidade da API: cache antigo n?o libera acesso.
+- Usu?rio A n?o l? o perfil B; grava??o direta e chamada an?nima da RPC s?o recusadas; campos de status/identidade enviados ? RPC n?o alteram a decis?o do servidor.
+
+Refer?ncia: https://supabase.com/docs/guides/auth/auth-email-passwordless
+
+
+## Dois dispositivos por conta (substitui as instrucoes anteriores de dispositivo)
+
+Desktop e mobile agora usam `register_catalog_profile` para salvar e `get_catalog_profile` para consultar. O limite e de DOIS dispositivos totais por e-mail (PC + celular, ou outra combinacao). Reabrir no mesmo dispositivo nao consome vaga. O terceiro recebe erro; status bloqueado permanece bloqueado.
+
+### Ativacao
+
+1. No banco compartilhado, aplique UMA VEZ `supabase/migrations/20260916_two_devices.sql`, depois da migracao de cadastro autenticado ja aplicada. O SQL e identico nos dois repositorios.
+2. Distribua ambos os clientes atualizados. A migracao revoga novamente as gravacoes diretas, inclusive a permissao temporaria do mobile antigo. Versoes anteriores devem ser atualizadas.
+3. O template OTP/SMTP existente continua sendo usado. Nao e necessario criar outro projeto Supabase.
+
+`profile_devices` armazena `user_id`, `fingerprint` e `created_at`. O dispositivo antigo e importado automaticamente, e `profiles.device_fingerprint` e esvaziado depois da importacao. Perfis legados sem `user_id` sao vinculados e importados apos confirmar o e-mail. Agora limpar o campo antigo NAO libera uma vaga.
+
+### Remover um dispositivo antigo (administrador)
+
+Primeiro consulte pelo e-mail no SQL Editor:
+
+```sql
+SELECT p.email, d.user_id, d.fingerprint, d.created_at
+FROM public.profiles p
+JOIN public.profile_devices d ON d.user_id = p.user_id
+WHERE lower(p.email) = lower('EMAIL_DO_USUARIO')
+ORDER BY d.created_at;
+```
+
+Apos identificar o vinculo correto, remova SOMENTE essa linha de `profile_devices` no Table Editor (filtre por user_id e fingerprint). Preserve `profiles` e `auth.users`. O novo dispositivo pode entao enviar a ficha. A consulta periodica dos apps valida autorizacao a cada 60 segundos; ela nao reinscreve dispositivos removidos. Sem validacao online, o acesso nao e garantido. O modo de desenvolvimento conserva seu bypass de acesso.
+
+### Validacao local
+
+Build frontend: `pnpm build`. No desktop, `node --test tests/registration.test.mjs` testa o envio/confirmacao de OTP com rede simulada.
+O teste `tests/two-devices.integration.mjs` do desktop executa as migracoes em PostgreSQL embarcado (PGlite), com Auth simulado: legado, duas vagas, terceira recusada, repeticao, remocao/substituicao, bloqueio, isolamento e permissoes. Preparacao: `npm install --prefix tmp/device-tests --no-audit --no-fund @electric-sql/pglite`; execucao: `node tests/two-devices.integration.mjs`. Chamadas concorrentes sao serializadas pelo PGlite; concorrencia entre sessoes reais ainda deve ser validada no Supabase de teste.
