@@ -1,5 +1,20 @@
 # Catálogo IPS
 
+## Configuração do instalador 1.5.33
+
+A Release 1.5.32 foi compilada sem `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`: ambos estavam vazios na etapa de configuração do Actions. Esses valores são incorporados ao frontend durante o build; apagar AppData não os remove, e criar um `.env` no computador do cliente não corrige um instalador já gerado.
+
+Antes de publicar a próxima versão, configure no repositório GitHub **Settings > Secrets and variables > Actions**, como Repository variables ou Repository secrets:
+
+- `VITE_SUPABASE_URL`: a URL do mesmo projeto usado pelo mobile.
+- `VITE_SUPABASE_ANON_KEY`: a chave pública anon/publishable desse projeto, nunca service_role/secret.
+
+As cópias locais de `.env.production` contêm a configuração, mas não são enviadas ao Git. O workflow lê Variables antes de Secrets; evite valores diferentes com o mesmo nome. Alterar essas configurações exige um novo build para afetar o instalador.
+
+O build agora recusa configuração ausente, URL inválida e chave administrativa no lugar da chave pública. O script de assinatura importa apenas variáveis de assinatura dos arquivos locais; `build-local.ps1` preserva `.env.production`. Teste: `node --test tests/frontend-env.test.mjs scripts/signing-env.test.mjs`.
+
+Limpar os dados locais do aplicativo também remove a sessão e o fingerprint: ao entrar novamente, a instalação pode consumir outra vaga entre os dois dispositivos permitidos. Para liberar uma vaga de teste, remova apenas o vínculo antigo em `profile_devices`, conforme a seção de dispositivos abaixo. Preserve o cadastro do usuário.
+
 ## Correção da publicação 1.5.32
 
 A tag `v1.5.31` aponta para `ad796a6` (10/09/2026), anterior ao cadastro autenticado e ao limite de dois dispositivos. Gerar novamente essa tag recompila o código antigo. As correções de cadastro estão no commit `0506942` e precisam integrar a nova tag `v1.5.32` junto com o incremento de versão. O workflow `auto-tag` agora rejeita uma tag existente que aponta para outro commit, mesmo quando a Release está completa.

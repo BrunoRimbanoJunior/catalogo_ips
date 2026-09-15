@@ -1,10 +1,13 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import { validateFrontendEnv } from "./scripts/frontend-env.mjs";
 
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig(({ command, mode }) => {
+  if (command === "build") validateFrontendEnv(loadEnv(mode, process.cwd(), "VITE_"));
+  return {
   plugins: [react()],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
@@ -28,4 +31,5 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
-}));
+  };
+});

@@ -5,8 +5,11 @@ Param(
 Write-Host "==> Preparando ambiente (Node deps)" -ForegroundColor Cyan
 npm i
 
-Write-Host "==> Gravando .env.production" -ForegroundColor Cyan
-"VITE_DEFAULT_MANIFEST_URL=$ManifestUrl" | Out-File -FilePath .env.production -Encoding utf8
+Write-Host "==> Configurando manifest para este build" -ForegroundColor Cyan
+# Keep .env.production intact: it also contains the public Supabase configuration.
+$previousManifestUrl = $env:VITE_DEFAULT_MANIFEST_URL
+$env:VITE_DEFAULT_MANIFEST_URL = $ManifestUrl
+try {
 
 Write-Host "==> Build frontend (Vite)" -ForegroundColor Cyan
 npm run build
@@ -18,4 +21,7 @@ npx tauri build --verbose
 if ($LASTEXITCODE -ne 0) { throw "Falha no build do Tauri" }
 
 Write-Host "==> Concluído. Bundles em src-tauri/target/release/bundle" -ForegroundColor Green
+} finally {
+  $env:VITE_DEFAULT_MANIFEST_URL = $previousManifestUrl
+}
 

@@ -91,6 +91,10 @@ jobs:
           CI_VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY || secrets.VITE_SUPABASE_ANON_KEY }}
           CI_VITE_DEFAULT_MANIFEST_URL: ${{ vars.VITE_DEFAULT_MANIFEST_URL || secrets.VITE_DEFAULT_MANIFEST_URL }}
         run: |
+          if [[ -z "${CI_VITE_SUPABASE_URL//[[:space:]]/}" || -z "${CI_VITE_SUPABASE_ANON_KEY//[[:space:]]/}" ]]; then
+            echo "::error::Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in repository Settings > Secrets and variables > Actions before building."
+            exit 1
+          fi
           if [[ -n "$CI_VITE_SUPABASE_URL" ]]; then
             echo "VITE_SUPABASE_URL=$CI_VITE_SUPABASE_URL" >> .env.production
           fi

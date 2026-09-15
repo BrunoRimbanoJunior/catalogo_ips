@@ -2574,7 +2574,7 @@ function App() {
                 {authError && <div className="auth-error">{authError}</div>}
               </form>
             ) : (
-              <div className="auth-alert">Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env antes de liberar o acesso.</div>
+              <div className="auth-alert">Este instalador está sem a configuração de acesso. Solicite ao suporte uma versão corrigida do aplicativo.</div>
             )}
           </div>
         </div>
@@ -2868,7 +2868,7 @@ function App() {
                 {authError && <div className="auth-error">{authError}</div>}
               </>
             ) : (
-              <div className="auth-alert">Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env antes de liberar o acesso.</div>
+              <div className="auth-alert">Este instalador está sem a configuração de acesso. Solicite ao suporte uma versão corrigida do aplicativo.</div>
             )}
           </div>
         </div>
