@@ -1173,7 +1173,8 @@ function App() {
 
   const blockAccess = useMemo(() => {
     if (isDev) return false; // Em desenvolvimento, não bloquear pela aprovação.
-    return authLoading || profile?.status !== "approved" || !profile?.device_authorized;
+    if (authLoading) return false; // Estado inicial: a verificação da sessão e do fingerprint ainda está em andamento.
+    return profile?.status !== "approved" || !profile?.device_authorized;
   }, [isDev, authLoading, profile, fingerprint]);
 
   const versionedDisplaySrc = useCallback(
