@@ -12,6 +12,7 @@ import {
   fetchRecentProducts,
   readImageBase64,
   importExcel,
+  importGoogleSheet,
   exportDbTo,
   setBrandingImage,
   setHeaderLogos as setHeaderLogosApi,
@@ -1030,6 +1031,7 @@ function App() {
   const [manifestInput, setManifestInput] = useState("");
   const [toolsMsg, setToolsMsg] = useState("");
   const [excelPath, setExcelPath] = useState("");
+  const [importingSheet, setImportingSheet] = useState(false);
   const [exportPath, setExportPath] = useState("");
   const [logoInput, setLogoInput] = useState("");
   const [bgInput, setBgInput] = useState("");
@@ -1975,6 +1977,8 @@ function App() {
   }
 
   async function runImportExcel() {
+    if (importingSheet || syncing) return;
+    setImportingSheet(true);
     try {
       const picked = await openDialog({ multiple: false, filters: [{ name: "Excel", extensions: ["xlsx", "xls"] }] });
       if (!picked || Array.isArray(picked)) return;
@@ -1991,6 +1995,47 @@ function App() {
       await loadGroupsFor(null, null);
     } catch (e) {
       setToolsMsg(`Falha ao importar Excel: ${e}`);
+    } finally {
+      setImportingSheet(false);
+    }
+  }
+
+  async function runImportGoogleSheet() {
+    if (importingSheet || syncing) return;
+    setImportingSheet(true);
+    let imported = false;
+    try {
+      const picked = await saveDialog({ defaultPath: "catalog.db", filters: [{ name: "Banco SQLite", extensions: ["db"] }] });
+      if (!picked) return;
+      setToolsMsg("Baixando a planilha do Google e importando a primeira aba...");
+      const res = await importGoogleSheet();
+      imported = true;
+      setExcelPath("Google — primeira aba");
+      setDbVersion(res.new_db_version);
+      setToolsMsg("Planilha importada. Gerando o arquivo do banco...");
+      const exported = await exportDbTo(picked);
+      if (!exported?.ok) throw new Error("Falha ao exportar o banco.");
+      setExportPath(exported.output || picked);
+      setToolsMsg(`Banco gerado: ${exported.output || picked}. Linhas: ${res.processed_rows}; produtos importados: ${res.upserted_products}; versão: ${res.new_db_version}. Pronto para publicação.`);
+    } catch (e) {
+      setToolsMsg(imported
+        ? `A planilha foi importada, mas o arquivo não foi exportado: ${e}. Use Exportar DB para tentar novamente.`
+        : `Falha ao importar a planilha do Google: ${e}`);
+    } finally {
+      if (imported) {
+        try {
+          const { brands: b, vehicles: v, makes: mk } = await loadInitialCatalog();
+          setBrands(b || []);
+          setVehicles(v || []);
+          setAllVehicles(v || []);
+          setMakes(mk || []);
+          setPrintGroups((await fetchGroups(null, null)) || []);
+          await loadGroupsFor(null, null);
+        } catch (e) {
+          setToolsMsg((message) => `${message} Não foi possível atualizar a tela: ${e}. Reabra o aplicativo.`);
+        }
+      }
+      setImportingSheet(false);
     }
   }
 
@@ -2250,7 +2295,7 @@ function App() {
               <summary>Ferramentas (dev)</summary>
               <div className="tools-panel" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, marginTop: 8, alignItems: "center" }}>
                 <input placeholder="URL do manifest" value={manifestInput} onChange={(e) => setManifestInput(e.target.value)} />
-                <button disabled={syncing || !manifestInput} onClick={() => runSync(manifestInput)}>
+                <button disabled={syncing || importingSheet || !manifestInput} onClick={() => runSync(manifestInput)}>
                   {syncing ? "Sincronizando..." : "Sincronizar"}
                 </button>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8 }}>
@@ -2287,9 +2332,12 @@ function App() {
                   ) : null}
                 </div>
                 <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <button onClick={runImportExcel}>Importar Excel</button>
+                  <button onClick={runImportExcel} disabled={importingSheet || syncing}>Importar Excel</button>
+                  <button onClick={runImportGoogleSheet} disabled={importingSheet || syncing}>
+                    {importingSheet ? "Importando..." : "Importar do Google e gerar DB"}
+                  </button>
                   {excelPath ? <span style={{ fontSize: 12, color: "#555" }}>Último: {excelPath}</span> : null}
-                  <button onClick={runExportDb}>Exportar DB</button>
+                  <button onClick={runExportDb} disabled={importingSheet || syncing}>Exportar DB</button>
                   {exportPath ? <span style={{ fontSize: 12, color: "#555" }}>Último: {exportPath}</span> : null}
                   <button onClick={() => runSetBranding("logo")}>Aplicar logo</button>
                   {logoInput ? <span style={{ fontSize: 12, color: "#555" }}>Atual: {logoInput}</span> : null}

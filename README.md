@@ -1,5 +1,32 @@
 # Catálogo IPS
 
+## Atualizar o catálogo pela planilha pública do Google
+
+No aplicativo em desenvolvimento, abra **Ferramentas (dev)** e clique em
+**Importar do Google e gerar DB**, ao lado de **Importar Excel**. Escolha onde salvar
+o `catalog.db`. Cancelar a escolha não inicia a importação.
+
+O botão baixa a planilha pública `1niwSFhcEdQNmf90mDVd0OAcrO2Ukc8xX` em Excel,
+importa somente a primeira aba e exporta o banco atualizado. Não exige login,
+credenciais da API nem transferência de propriedade. A planilha precisa continuar
+permitindo leitura e download anônimos. O download tem limite de 50 MB e timeout de
+120 segundos; o endereço está definido em `src-tauri/src/importer.rs`.
+
+A importação substitui os produtos do catálogo local, preservando as datas de
+cadastro dos códigos existentes. Planilhas sem produtos ou sem os cabeçalhos
+obrigatórios são rejeitadas. Os produtos e a versão são gravados na mesma transação.
+O arquivo exportado é validado antes de substituir um destino existente. Se a
+importação concluir e a exportação falhar, use **Exportar DB** para tentar novamente.
+
+O botão gera o arquivo local; a distribuição continua pelo fluxo de publicação de
+`data/catalog.db` e atualização/validação do manifest. Esta ação permanece nas
+ferramentas de desenvolvimento, indisponíveis no instalador de produção.
+
+Validação: `cargo test --manifest-path src-tauri/Cargo.toml --lib --offline` e
+`pnpm build`. Para testar uma cópia real sem alterar o catálogo publicado, salve o
+Excel em `tmp/google-import/source.xlsx` e execute
+`cargo test --manifest-path src-tauri/Cargo.toml --lib import_downloaded_google_sheet -- --ignored --nocapture`.
+
 ## Configuração do instalador 1.5.33
 
 A Release 1.5.32 foi compilada sem `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`: ambos estavam vazios na etapa de configuração do Actions. Esses valores são incorporados ao frontend durante o build; apagar AppData não os remove, e criar um `.env` no computador do cliente não corrige um instalador já gerado.

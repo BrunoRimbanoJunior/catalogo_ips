@@ -1323,7 +1323,7 @@ mod core {
         xml
     }
 
-    fn write_xlsx_file(path: &Path, rows: &[Vec<String>]) -> Result<(), String> {
+    pub(crate) fn write_xlsx_file(path: &Path, rows: &[Vec<String>]) -> Result<(), String> {
         use std::io::Write;
         let file = std::fs::File::create(path).map_err(|e| e.to_string())?;
         let mut zip = zip::ZipWriter::new(file);
@@ -3436,20 +3436,30 @@ mod core {
     #[tauri::command]
     pub fn export_db_to(app: AppHandle, dest_path: String) -> Result<ExportResult, String> {
         let (_, dbf, _) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+        export_db_file(&dbf, &dest_path)
+    }
+
+    pub(crate) fn export_db_file(dbf: &Path, dest_path: &str) -> Result<ExportResult, String> {
         let dest = std::path::PathBuf::from(&dest_path);
-        if dest.exists() {
-            std::fs::remove_file(&dest)
-                .map_err(|e| format!("Falha ao remover destino existente: {}", e))?;
+        if dest.exists() && dest.canonicalize().ok() == dbf.canonicalize().ok() {
+            return Err("Escolha um destino diferente do banco em uso pelo aplicativo.".into());
         }
         let conn = open_db(&dbf).map_err(|e| e.to_string())?;
-        let quoted = dest.to_string_lossy().replace('"', "\\\"");
-        let sql = format!("VACUUM INTO \"{}\"", quoted);
-        if let Err(e) = conn.execute(&sql, []) {
-            return Err(format!("Falha no VACUUM INTO: {}", e));
-        }
+        let stamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH)
+            .map_err(|e| e.to_string())?.as_nanos();
+        let staging = dest.with_extension(format!("{stamp}.tmp"));
+        let result = (|| -> Result<(), String> {
+            conn.execute("VACUUM INTO ?1", params![staging.to_string_lossy().as_ref()])
+                .map_err(|e| format!("Falha ao exportar banco: {e}"))?;
+            validate_catalog_db_file(&staging).map_err(|e| e.to_string())?;
+            std::fs::rename(&staging, &dest).map_err(|e| format!("Falha ao salvar banco: {e}"))?;
+            Ok(())
+        })();
+        if result.is_err() { let _ = std::fs::remove_file(&staging); }
+        result?;
         Ok(ExportResult {
             ok: true,
-            output: dest_path,
+            output: dest_path.to_string(),
         })
     }
 
@@ -3596,6 +3606,7 @@ pub fn run() {
             core::cleanup_images_from_manifest,
             core::list_launch_images,
             core::import_excel,
+            importer::import_google_sheet,
             core::index_images,
             core::export_db_to,
             core::open_path_cmd,

@@ -36,6 +36,10 @@ export async function importExcel(path) {
   return await invoke("import_excel", { path });
 }
 
+export async function importGoogleSheet() {
+  return await invoke("import_google_sheet");
+}
+
 export async function fetchMakes() {
   return await invoke("get_makes_cmd");
 }

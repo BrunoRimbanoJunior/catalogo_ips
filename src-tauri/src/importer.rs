@@ -4,6 +4,139 @@ use calamine::{open_workbook_auto, Reader};
 use rusqlite::{params, OptionalExtension};
 use tauri::AppHandle;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn import_preserves_dates_and_rolls_back_empty_sheet() {
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!("catalog-import-test-{stamp}"));
+        std::fs::create_dir(&dir).unwrap();
+        let db = dir.join("catalog.db");
+        let xlsx = dir.join("source.xlsx");
+        let rows = vec![
+            vec!["Código".into(), "Descrição".into(), "Fabricante".into()],
+            vec!["00123".into(), "Produto de teste".into(), "IPS".into()],
+        ];
+        crate::core::write_xlsx_file(&xlsx, &rows).unwrap();
+        let result = import_excel_to_db(&db, xlsx.to_str().unwrap()).unwrap();
+        assert_eq!(result.upserted_products, 1);
+        let conn = open_db(&db).unwrap();
+        conn.execute("UPDATE products SET created_at = '2020-01-01'", [])
+            .unwrap();
+        import_excel_to_db(&db, xlsx.to_str().unwrap()).unwrap();
+        let date: String = conn
+            .query_row(
+                "SELECT created_at FROM products WHERE code='00123'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(date, "2020-01-01");
+        let version = crate::core::get_db_version(&conn).unwrap();
+        let exported = dir.join("export.db");
+        std::fs::write(&exported, "arquivo anterior").unwrap();
+        crate::core::export_db_file(&db, exported.to_str().unwrap()).unwrap();
+        let exported_conn = open_db(&exported).unwrap();
+        assert_eq!(
+            crate::core::get_db_version(&exported_conn).unwrap(),
+            version
+        );
+        drop(exported_conn);
+        assert!(crate::core::export_db_file(&db, db.to_str().unwrap()).is_err());
+        crate::core::write_xlsx_file(&xlsx, &rows[..1]).unwrap();
+        assert!(import_excel_to_db(&db, xlsx.to_str().unwrap()).is_err());
+        assert_eq!(crate::core::get_db_version(&conn).unwrap(), version);
+        assert_eq!(
+            conn.query_row("SELECT COUNT(*) FROM products", [], |r| r.get::<_, i64>(0))
+                .unwrap(),
+            1
+        );
+        std::fs::write(&xlsx, "<html>Faça login</html>").unwrap();
+        assert!(import_excel_to_db(&db, xlsx.to_str().unwrap()).is_err());
+        assert_eq!(crate::core::get_db_version(&conn).unwrap(), version);
+        drop(conn);
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    #[ignore = "Usa a planilha pública baixada manualmente em tmp/google-import/source.xlsx"]
+    fn import_downloaded_google_sheet() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../tmp/google-import");
+        let db = dir.join("validation.db");
+        let result = import_excel_to_db(&db, dir.join("source.xlsx").to_str().unwrap()).unwrap();
+        let conn = open_db(&db).unwrap();
+        let check: String = conn
+            .query_row("PRAGMA integrity_check", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(check, "ok");
+        assert!(result.upserted_products > 0);
+        crate::core::export_db_file(&db, dir.join("catalog-export.db").to_str().unwrap()).unwrap();
+        println!(
+            "Google: {} linhas, {} produtos importados, versão {}",
+            result.processed_rows, result.upserted_products, result.new_db_version
+        );
+    }
+}
+
+const GOOGLE_XLSX_URL: &str =
+    "https://docs.google.com/spreadsheets/d/1niwSFhcEdQNmf90mDVd0OAcrO2Ukc8xX/export?format=xlsx";
+
+#[tauri::command]
+pub async fn import_google_sheet(app: AppHandle) -> Result<ImportResult, String> {
+    if !cfg!(debug_assertions) {
+        return Err("Importação disponível apenas nas ferramentas de desenvolvimento.".into());
+    }
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(120))
+        .build()
+        .map_err(|e| e.to_string())?;
+    let mut response = client
+        .get(GOOGLE_XLSX_URL)
+        .send()
+        .await
+        .map_err(|e| format!("Falha ao baixar a planilha: {e}"))?
+        .error_for_status()
+        .map_err(|e| format!("Não foi possível baixar a planilha pública: {e}"))?;
+    let mut bytes = Vec::new();
+    while let Some(chunk) = response.chunk().await.map_err(|e| e.to_string())? {
+        if bytes.len() + chunk.len() > 50 * 1024 * 1024 {
+            return Err("A planilha excede o limite de 50 MB.".into());
+        }
+        bytes.extend_from_slice(&chunk);
+    }
+    if !bytes.starts_with(b"PK\x03\x04") {
+        return Err("O Google não retornou um Excel. Verifique se a leitura e o download continuam públicos.".into());
+    }
+    tauri::async_runtime::spawn_blocking(move || {
+        use std::io::Write;
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_err(|e| e.to_string())?
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!(
+            "catalogo-google-{}-{stamp}.xlsx",
+            std::process::id()
+        ));
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .map_err(|e| e.to_string())?;
+        let written = file.write_all(&bytes).map_err(|e| e.to_string());
+        drop(file);
+        let result = written.and_then(|_| import_excel(app, path.to_string_lossy().into_owned()));
+        let _ = std::fs::remove_file(path);
+        result
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ImportResult {
     pub processed_rows: usize,
@@ -70,6 +203,13 @@ fn header_key(s: &str) -> &'static str {
 
 pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String> {
     let (_, dbf, _) = ensure_dirs(&app).map_err(|e| e.to_string())?;
+    import_excel_to_db(&dbf, &path)
+}
+
+pub(crate) fn import_excel_to_db(
+    dbf: &std::path::Path,
+    path: &str,
+) -> Result<ImportResult, String> {
     let mut wb = open_workbook_auto(&path).map_err(|e| format!("Falha abrindo XLSX: {e}"))?;
     let sheet_names = wb.sheet_names().to_vec();
     let sheet = sheet_names
@@ -142,7 +282,8 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
 
     // Limpa tabelas principais antes de reimportar para evitar sobras da planilha anterior.
     // Mantém a data original dos códigos já cadastrados; somente códigos novos recebem a data atual.
-    tx.execute("DROP TABLE IF EXISTS temp.product_registration_dates", []).ok();
+    tx.execute("DROP TABLE IF EXISTS temp.product_registration_dates", [])
+        .ok();
     tx.execute(
         "CREATE TEMP TABLE product_registration_dates AS SELECT code, created_at FROM products",
         [],
@@ -408,10 +549,15 @@ pub fn import_excel(app: AppHandle, path: String) -> Result<ImportResult, String
         }
     }
 
+    if upserted == 0 {
+        return Err(
+            "A primeira aba não contém produtos com código. O catálogo foi preservado.".into(),
+        );
+    }
+    super::core::seed_brand_groups(&tx).map_err(|e| e.to_string())?;
+    let v = super::core::get_db_version(&tx).map_err(|e| e.to_string())? + 1;
+    super::core::set_db_version(&tx, v).map_err(|e| e.to_string())?;
     tx.commit().map_err(|e| e.to_string())?;
-    super::core::seed_brand_groups(&conn).map_err(|e| e.to_string())?;
-    let v = super::core::get_db_version(&conn).unwrap_or(0) + 1;
-    super::core::set_db_version(&conn, v).ok();
 
     Ok(ImportResult {
         processed_rows: processed,
