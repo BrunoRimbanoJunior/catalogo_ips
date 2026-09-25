@@ -2,9 +2,9 @@
   "appVersion": "1.5.34",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.34/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1782482162,
-    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/6eb085ad826131a5b594965240a25868654459b2/data/catalog.db",
-    "sha256": "2728277354531c7753e2d26a9ba06affd9dd64d81f1b63ef64e5f781106613b5"
+    "version": 1782482166,
+    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/0c4d89778277a933bf151c07388c8ff17afbd62f/data/catalog.db",
+    "sha256": "2991dc27e33d3660789e8d43c4785cca6378bfdf6e83feaaf9bd61ca812bfed0"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -235,7 +235,7 @@
       },
       {
         "file": "AMORTECEDORES/7115342811.png",
-        "sha256": "eb1169887aab81ea2900b60619b78326"
+        "sha256": "3aed05cbdf6e932e1bd51752600a64d0"
       },
       {
         "file": "AMORTECEDORES/7115342812.png",
@@ -276,6 +276,10 @@
       {
         "file": "AMORTECEDORES/7115502811.png",
         "sha256": "3faa2e6f71381a398ce6dd9b2031014b"
+      },
+      {
+        "file": "AMORTECEDORES/7115502812.png",
+        "sha256": "0b605a11f190d1500133befb72ecc2d8"
       },
       {
         "file": "AMORTECEDORES/7115502821.png",
@@ -347,7 +351,7 @@
       },
       {
         "file": "AMORTECEDORES/7115662802.png",
-        "sha256": "eeead0cd216627f074c398a82a4fc9f3"
+        "sha256": "0a21fa8ff5a8afb3b0c50c8feea95a4c"
       },
       {
         "file": "AMORTECEDORES/7115662811.png",
@@ -911,7 +915,7 @@
       },
       {
         "file": "AMORTECEDORES/7150362802.png",
-        "sha256": "75b5c503a25c79a1f2b4d21cd009182f"
+        "sha256": "1c2936243f47424bbaa5cf17488fe2f5"
       },
       {
         "file": "AMORTECEDORES/7150362803.png",
@@ -1047,7 +1051,7 @@
       },
       {
         "file": "AMORTECEDORES/7156502802.png",
-        "sha256": "353d981f3b64e593c930b6d578c7ce0f"
+        "sha256": "8d990ca2996e74eacf2ba8b8e75c0761"
       },
       {
         "file": "AMORTECEDORES/7156702801.png",
@@ -1220,6 +1224,10 @@
       {
         "file": "AMORTECEDORES/7169362813.png",
         "sha256": "601900fa96e3042267ff1f17644fbd71"
+      },
+      {
+        "file": "AMORTECEDORES/7169362814.png",
+        "sha256": "ba712d551e0d9bbea19588eca68a5df2"
       },
       {
         "file": "AMORTECEDORES/7169362821.png",
@@ -3524,6 +3532,10 @@
       {
         "file": "CAIXA_DIRECAO/7150816010.png",
         "sha256": "2ebef48e58d20008f098f67aa95441c4"
+      },
+      {
+        "file": "CAIXA_DIRECAO/7150895900.png",
+        "sha256": "76affa761530c42da6be64b8b82f3173"
       },
       {
         "file": "CAIXA_DIRECAO/7151106010.png",
@@ -9951,7 +9963,7 @@
       },
       {
         "file": "SEMI_EIXO/7111307602.png",
-        "sha256": "0f471d15f39ad5fe850dab5d639c8a94"
+        "sha256": "0a134e34116181cd3327506956e2257f"
       },
       {
         "file": "SEMI_EIXO/7111447601.png",
@@ -10000,10 +10012,6 @@
       {
         "file": "SEMI_EIXO/7111827602_1.png",
         "sha256": "22bd8ba26f8289dd3fe9b706eb99d719"
-      },
-      {
-        "file": "SEMI_EIXO/7111937601.png",
-        "sha256": "d1809ccbc55579f49e5b8fd95117f7ac"
       },
       {
         "file": "SEMI_EIXO/7111937601_1.png",
@@ -10166,8 +10174,16 @@
         "sha256": "af0ebf7e476c1b4c88b225c4f34411f8"
       },
       {
+        "file": "SEMI_EIXO/7134837601.png",
+        "sha256": "6aebddcaff87ca9ad92bd04eac4fb0c1"
+      },
+      {
         "file": "SEMI_EIXO/7134837601_1.png",
         "sha256": "ec4b4a22cf77c8ba948979c90679fbda"
+      },
+      {
+        "file": "SEMI_EIXO/7134837602.png",
+        "sha256": "ca6bd03a2db144ca490751c2c17058c7"
       },
       {
         "file": "SEMI_EIXO/7134837602_1.png",
@@ -10196,6 +10212,10 @@
       {
         "file": "SEMI_EIXO/7144037601_1.png",
         "sha256": "81f7784ca4620690387e4646388a2c06"
+      },
+      {
+        "file": "SEMI_EIXO/7144037602.png",
+        "sha256": "2e7c1b05935e53e5e2b563a8a94bee8a"
       },
       {
         "file": "SEMI_EIXO/7144037602_1.png",
@@ -10656,10 +10676,6 @@
       {
         "file": "SEMI_EIXO/7163227604.png",
         "sha256": "d578e650b88ac080ec382203a8e16673"
-      },
-      {
-        "file": "SEMI_EIXO/7163227604_1.png",
-        "sha256": "022be5bcba7c05c5fa763f75d6a56c32"
       },
       {
         "file": "SEMI_EIXO/7163287611.png",
