@@ -1,5 +1,30 @@
 # Catálogo IPS
 
+## Publicar uma nova versão do aplicativo
+
+O `auto-tag` usa a versão de `package.json` para criar a tag no push para `main`.
+Se essa tag já aponta para outro commit, o workflow falha para impedir que uma
+release reutilize a versão de um código anterior. A tag `v1.5.34` aponta para
+`a329f2b`; as alterações posteriores foram preparadas para a versão `1.5.35`.
+
+Antes de publicar outro instalador, escolha uma versão ainda sem tag e execute
+`scripts/sync-version.mjs` com `APP_VERSION` definido. No PowerShell:
+
+```powershell
+$env:APP_VERSION = '1.5.35' # Troque pela próxima versão nas publicações futuras.
+node scripts/sync-version.mjs
+Remove-Item Env:APP_VERSION
+```
+
+Revise e inclua no commit os arquivos de versão alterados pelo script, junto com
+as alterações do aplicativo, e envie para `main`. O workflow cria a nova tag e
+dispara o build de release. Reexecutar o job antigo não resolve o conflito de
+versão, e uma tag publicada deve continuar apontando para seu commit original.
+
+Atualizar somente o catálogo não exige outro instalador: o banco e as imagens
+são distribuídos pelo `manifest.yml`. Nesse caso, uma falha de tag não determina
+o resultado da sincronização dos dados; confira também a execução do manifest.
+
 ## Atualizar o catálogo pela planilha pública do Google
 
 No aplicativo em desenvolvimento, abra **Ferramentas (dev)** e clique em
