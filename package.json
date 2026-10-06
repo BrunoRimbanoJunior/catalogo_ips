@@ -12,6 +12,7 @@
     "organizar-imagens": "node scripts/organizar-imagens-por-grupo.mjs",
     "resolver-sem-cadastro": "node scripts/resolver-sem-cadastro.mjs",
     "tauri:build:signed": "node scripts/tauri-build-release.mjs",
+    "msix:build": "node scripts/build-msix.mjs",
     "manifest": "node scripts/gen-manifest-r2.mjs --out manifest.json",
     "manifest:r2": "node scripts/gen-manifest-r2.mjs",
     "manifest:validate": "node scripts/validate-manifest.mjs",

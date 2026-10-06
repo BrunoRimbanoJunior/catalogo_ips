@@ -1,5 +1,14 @@
 # Catálogo IPS
 
+## Publicar na Microsoft Store (MSIX)
+
+O comando `pnpm.cmd msix:build` compila uma edição x64 com atualizações do aplicativo
+pela Store, empacota o banco inicial e gera o `.msix` em `dist-msix/`. A identidade
+do produto fica em `packaging/msix/store-identity.json`; os detalhes de geração,
+teste e submissão estão em [packaging/msix/README.md](packaging/msix/README.md).
+A Microsoft assina o pacote após a certificação. O arquivo para upload não tem
+assinatura local e não deve ser distribuído como instalador para sideload.
+
 ## Publicar uma nova versão do aplicativo
 
 O `auto-tag` usa a versão de `package.json` para criar a tag no push para `main`.

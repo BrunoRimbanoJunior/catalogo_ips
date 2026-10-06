@@ -57,6 +57,7 @@ const REG_DEFAULT = {
 const GITHUB_REPO = "BrunoRimbanoJunior/catalogo_ips";
 const GITHUB_RELEASES_LATEST = `https://github.com/${GITHUB_REPO}/releases/latest`;
 const GITHUB_LATEST_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
+const IS_MICROSOFT_STORE = import.meta.env.VITE_DISTRIBUTION_CHANNEL === "microsoft-store";
 const PROFILE_SELECT = "id,status,person_type,country,state,city,cpf_cnpj,full_name,phone_area,phone_number,email,device_fingerprint";
 
 function onlyDigits(value = "") {
@@ -1277,6 +1278,9 @@ function App() {
       } catch (_) {
         /* ignore */
       }
+      // A instalação MSIX recebe atualizações do executável pela Microsoft Store.
+      // A sincronização do catálogo continua usando o manifest normalmente.
+      if (IS_MICROSOFT_STORE) return;
       try {
         const updater = await import("@tauri-apps/plugin-updater");
         if (!updater?.check) return;
@@ -1559,6 +1563,7 @@ function App() {
 
   async function handleUpdateClick(ev) {
     ev?.preventDefault();
+    if (IS_MICROSOFT_STORE) return;
     if (updaterRef.current?.downloadAndInstall) {
       try {
         setToolsMsg("Baixando e instalando atualização...");
@@ -2220,7 +2225,7 @@ function App() {
             ) : null}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            {updateInfo && !updateDismissed && (
+            {!IS_MICROSOFT_STORE && updateInfo && !updateDismissed && (
               <div className="update-banner">
                 <span>
                   Nova versão disponível: {updateInfo.availableVersion} (atual {appVersion})

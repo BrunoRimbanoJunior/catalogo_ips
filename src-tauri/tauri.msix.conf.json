@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "build": {
+    "beforeBuildCommand": "node node_modules/vite/bin/vite.js build"
+  },
+  "app": {
+    "security": {
+      "capabilities": [
+        {
+          "identifier": "microsoft-store",
+          "description": "Permissões da edição MSIX, com atualizações pela Store",
+          "windows": ["main"],
+          "permissions": ["core:default", "opener:default", "dialog:default"]
+        }
+      ]
+    }
+  },
+  "bundle": {
+    "createUpdaterArtifacts": false,
+    "resources": {
+      "../data/catalog.db": "data/catalog.db",
+      "../manifest.json": "manifest.json"
+    }
+  }
+}
