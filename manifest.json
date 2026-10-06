@@ -1,10 +1,10 @@
 {
   "appVersion": "1.5.35",
-  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.35/catalogo_ips_x64-setup.exe",
+  "appDownloadUrl": "https://github.com/<org>/<repo>/releases/download/v1.5.35/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1782482167,
+    "version": 1782482169,
     "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/6eb085ad826131a5b594965240a25868654459b2/data/catalog.db",
-    "sha256": "24a77404a3405518582445c962b70d2f11641fbc7218c1f7b8358a67dbf2ffbd"
+    "sha256": "b5720b75c36bf24f6681d9c0fe67bd09c794151922d7b894b9baa2e28941fc88"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
