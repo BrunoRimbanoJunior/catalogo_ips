@@ -305,6 +305,12 @@ button {
 .auth-field input { width: 100%; background: #ffffff !important; border: 1px solid #dcdcdc; color: #111; max-width: 100%; padding: 10px 12px; }
 .auth-field.wide { grid-column: 1 / -1; max-width: 100%; }
 .auth-field.wide input { max-width: 100%; }
+.auth-otp-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; grid-column: 1 / -1; }
+.auth-otp-actions button { min-width: 0; padding: 10px 12px; }
+.auth-otp-actions .auth-finalize { background: #bbf7d0; color: #14532d; border-color: #86efac; font-weight: 700; }
+.auth-otp-actions .auth-finalize:hover:not(:disabled) { background: #86efac; border-color: #4ade80; }
+.auth-otp-actions .auth-finalize:active:not(:disabled) { background: #4ade80; }
+.auth-otp-actions button:disabled { opacity: 0.65; cursor: not-allowed; }
 .auth-row-compact { display: grid; grid-template-columns: 140px 1fr; gap: 12px; grid-column: 1 / -1; }
 .auth-row button { min-width: 140px; }
 .auth-radio { display: flex; gap: 16px; align-items: center; grid-column: 1 / -1; margin: 6px 0; }

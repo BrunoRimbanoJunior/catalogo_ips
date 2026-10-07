@@ -2610,20 +2610,29 @@ function App() {
                 </label>
 
                 {otpEmail && (
-                  <label className="auth-field wide">
-                    C?digo enviado para {otpEmail}
-                    <input inputMode="numeric" autoComplete="one-time-code" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} placeholder="C?digo recebido por e-mail" />
-                    <button type="button" disabled={formSubmitting} onClick={() => { setOtpEmail(""); setOtpCode(""); setAuthSuccess("Clique em enviar para solicitar outro c?digo."); }}>Solicitar outro c?digo</button>
-                  </label>
+                  <>
+                    <label className="auth-field wide">
+                      Código enviado para {otpEmail}
+                      <input inputMode="numeric" autoComplete="one-time-code" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} placeholder="Código recebido por e-mail" />
+                    </label>
+                    <div className="auth-otp-actions">
+                      <button type="button" disabled={formSubmitting} onClick={() => { setOtpEmail(""); setOtpCode(""); setAuthSuccess("Clique em enviar para solicitar outro código."); }}>Solicitar novo código</button>
+                      <button className="auth-finalize" type="submit" disabled={formSubmitting || !otpCode.trim()}>
+                        {formSubmitting ? "Processando..." : "Finalizar"}
+                      </button>
+                    </div>
+                  </>
                 )}
                 <div className="auth-meta">
                   <span>Código do cadastro: {profile?.id || "aguardando..."}</span>
                   <span>Este dispositivo: {fingerprint} | Cadastrados: {profile?.device_count ?? 0}/2</span>
                 </div>
 
-                <button type="submit" disabled={formSubmitting}>
-                  {formSubmitting ? "Processando..." : otpEmail ? "Confirmar c?digo e salvar" : "Salvar dados"}
-                </button>
+                {!otpEmail && (
+                  <button type="submit" disabled={formSubmitting}>
+                    {formSubmitting ? "Processando..." : "Salvar dados"}
+                  </button>
+                )}
                 {authSuccess && <div className="auth-success">{authSuccess}</div>}
                 {authError && <div className="auth-error">{authError}</div>}
               </form>
@@ -2899,20 +2908,29 @@ function App() {
                       </label>
 
                       {otpEmail && (
-                  <label className="auth-field wide">
-                    C?digo enviado para {otpEmail}
-                    <input inputMode="numeric" autoComplete="one-time-code" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} placeholder="C?digo recebido por e-mail" />
-                    <button type="button" disabled={formSubmitting} onClick={() => { setOtpEmail(""); setOtpCode(""); setAuthSuccess("Clique em enviar para solicitar outro c?digo."); }}>Solicitar outro c?digo</button>
-                  </label>
-                )}
-                <div className="auth-meta">
+                        <>
+                          <label className="auth-field wide">
+                            Código enviado para {otpEmail}
+                            <input inputMode="numeric" autoComplete="one-time-code" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} placeholder="Código recebido por e-mail" />
+                          </label>
+                          <div className="auth-otp-actions">
+                            <button type="button" disabled={formSubmitting} onClick={() => { setOtpEmail(""); setOtpCode(""); setAuthSuccess("Clique em enviar para solicitar outro código."); }}>Solicitar novo código</button>
+                            <button className="auth-finalize" type="submit" disabled={formSubmitting || !otpCode.trim()}>
+                              {formSubmitting ? "Processando..." : "Finalizar"}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                      <div className="auth-meta">
                         <span>Código do cadastro: {profile?.id || "aguardando..."}</span>
                         <span>Este dispositivo: {fingerprint} | Cadastrados: {profile?.device_count ?? 0}/2</span>
                       </div>
 
-                      <button type="submit" disabled={formSubmitting}>
-                        {formSubmitting ? "Processando..." : otpEmail ? "Confirmar c?digo e salvar" : "Enviar cadastro"}
-                      </button>
+                      {!otpEmail && (
+                        <button type="submit" disabled={formSubmitting}>
+                          {formSubmitting ? "Processando..." : "Enviar cadastro"}
+                        </button>
+                      )}
                       <p className="auth-muted small">Após enviar, o acesso é liberado automaticamente. Caso troque de máquina, solicite reset do dispositivo.</p>
                     </form>
                   )}

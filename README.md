@@ -181,7 +181,7 @@ pnpm manifest -- --app-version 1.5.0 --app-download-url https://github.com/<org>
 Antes de distribuir esta vers?o:
 
 1. Execute `supabase/migrations/20260915_authenticated_registration.sql` no SQL Editor do projeto correto. Requer a tabela existente `profiles`, incluindo `user_id uuid`, `id` com default e a pol?tica de SELECT do pr?prio usu?rio (`user_id = auth.uid()`). A migra??o aborta se houver e-mails duplicados sem diferenciar mai?sculas/min?sculas; examine essas linhas antes de resolver duplicidades manualmente.
-2. Em Authentication, habilite login/cadastro por e-mail e configure o template de Magic Link para incluir `{{ .Token }}` (ex.: `<p>Seu c?digo: {{ .Token }}</p>`). Confira tamb?m o template de confirma??o de cadastro caso usado pelo projeto. O cliente usa `signInWithOtp` e `verifyOtp` com tipo `email`, sem depender de links que abrem outro navegador.
+2. Em Authentication, habilite login/cadastro por e-mail e configure **os dois templates**, **Confirm sign up** e **Magic Link / OTP**, para incluir `{{ .Token }}` em vez de `{{ .ConfirmationURL }}`. Use o HTML de `supabase/templates/email-otp.html` nos dois. Novos usuários (ou usuários ainda não confirmados) recebem o template de confirmação de cadastro; usuários já confirmados recebem o de Magic Link. O cliente usa `signInWithOtp` e `verifyOtp` com tipo `email`, sem depender de links que abrem outro navegador. Veja o procedimento abaixo.
 3. Configure SMTP para os destinat?rios de produ??o e valide entrega, expira??o, limites de envio e eventuais requisitos de CAPTCHA. Nenhum e-mail foi enviado durante o desenvolvimento.
 4. Gere e distribua um novo instalador. Vers?es antigas que gravam diretamente na tabela precisam ser atualizadas.
 
@@ -200,6 +200,19 @@ O cliente inicia sem confiar no antigo `profile.cached`, consulta apenas `user_i
 - Usu?rio A n?o l? o perfil B; grava??o direta e chamada an?nima da RPC s?o recusadas; campos de status/identidade enviados ? RPC n?o alteram a decis?o do servidor.
 
 Refer?ncia: https://supabase.com/docs/guides/auth/auth-email-passwordless
+
+### E-mail de cadastro chega com link em vez de código
+
+No projeto Supabase usado pelo app publicado, abra **Authentication > Email Templates** (ou **Authentication > Emails > Templates**, conforme a versão do painel):
+
+1. Abra **Confirm sign up**. Defina o assunto como `Seu código de acesso ao Catálogo IPS` e substitua o corpo pelo conteúdo de [`supabase/templates/email-otp.html`](supabase/templates/email-otp.html). Salve.
+2. Repita no template **Magic Link / OTP**. Alterar apenas Magic Link não corrige o primeiro cadastro.
+3. Mantenha a confirmação de e-mail habilitada. O código exibido por `{{ .Token }}` é validado pelo app com `verifyOtp({ email, token, type: "email" })`; `{{ .TokenHash }}` e `{{ .ConfirmationURL }}` não são o código que o usuário deve digitar.
+4. Valide no app da loja com um e-mail ainda não cadastrado e com uma conta já confirmada. Ambos devem receber um código, e o cadastro só deve ser salvo após a validação. Para contas pendentes que receberam o link antigo, solicite um novo envio pelo app sem preencher o código, respeitando o intervalo de envio configurado no Supabase.
+
+O arquivo HTML é uma referência para copiar no painel; adicionar esse arquivo ao repositório ou executar migrações SQL não altera os templates do projeto hospedado. A alteração no painel vale para os próximos envios e, por si só, não exige nova versão na Microsoft Store. Se houver um **Send Email Hook** ativo, ajuste o conteúdo no serviço responsável pelo envio, pois esse hook substitui o envio padrão do Supabase.
+
+Referências: [templates de e-mail](https://supabase.com/docs/guides/auth/auth-email-templates), [fluxo OTP](https://supabase.com/docs/guides/auth/auth-email-passwordless) e [Send Email Hook](https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook).
 
 
 ## Dois dispositivos por conta (substitui as instrucoes anteriores de dispositivo)

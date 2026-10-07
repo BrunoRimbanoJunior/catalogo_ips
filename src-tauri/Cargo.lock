@@ -502,7 +502,7 @@ dependencies = [
 
 [[package]]
 name = "catalogo_ips"
-version = "1.5.35"
+version = "1.5.36"
 dependencies = [
  "aes-gcm",
  "anyhow",
