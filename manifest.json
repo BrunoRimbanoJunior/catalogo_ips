@@ -1,10 +1,10 @@
 {
   "appVersion": "1.5.35",
-  "appDownloadUrl": "https://github.com/<org>/<repo>/releases/download/v1.5.35/catalogo_ips_x64-setup.exe",
+  "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.35/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1782482169,
-    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/6eb085ad826131a5b594965240a25868654459b2/data/catalog.db",
-    "sha256": "b5720b75c36bf24f6681d9c0fe67bd09c794151922d7b894b9baa2e28941fc88"
+    "version": 1782482170,
+    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/8684985813fb52c14801b0b16859b0c45dea7e31/data/catalog.db",
+    "sha256": "a39b5f53f136eadbb387e3fb3f8ea2c264b68fd1d8690b4ab137f32683ef76d2"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -207,7 +207,7 @@
       },
       {
         "file": "AMORTECEDORES/7115302801.png",
-        "sha256": "385662e47c3981d935e574c54e1a76e8"
+        "sha256": "e8bfee06cdce8e00df42c3fa10e79fa9"
       },
       {
         "file": "AMORTECEDORES/7115302802.png",
@@ -2519,7 +2519,7 @@
       },
       {
         "file": "BOMBAS/7115505801.png",
-        "sha256": "27478f2a5745424aec770e0a3cd418e5"
+        "sha256": "0db1b5a103bc7e5ee54a00a83e3ab926"
       },
       {
         "file": "BOMBAS/7115505810.png",
