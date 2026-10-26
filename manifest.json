@@ -2,9 +2,9 @@
   "appVersion": "1.5.36",
   "appDownloadUrl": "https://github.com/BrunoRimbanoJunior/catalogo_ips/releases/download/v1.5.36/catalogo_ips_x64-setup.exe",
   "db": {
-    "version": 1782482169,
-    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/6eb085ad826131a5b594965240a25868654459b2/data/catalog.db",
-    "sha256": "b5720b75c36bf24f6681d9c0fe67bd09c794151922d7b894b9baa2e28941fc88"
+    "version": 1782482171,
+    "url": "https://raw.githubusercontent.com/BrunoRimbanoJunior/catalogo_ips/3e1b212849e2f3bd7a37ee3391532e62449bf61a/data/catalog.db",
+    "sha256": "1554aec9c8aa8afc78355f7c88fa715fd11e930e6f40deca9346f90f11f17ce7"
   },
   "images": {
     "base_url": "https://pub-1c42f71f3a974244953a13b83a68b545.r2.dev/",
@@ -207,7 +207,7 @@
       },
       {
         "file": "AMORTECEDORES/7115302801.png",
-        "sha256": "385662e47c3981d935e574c54e1a76e8"
+        "sha256": "e8bfee06cdce8e00df42c3fa10e79fa9"
       },
       {
         "file": "AMORTECEDORES/7115302802.png",
@@ -2519,7 +2519,7 @@
       },
       {
         "file": "BOMBAS/7115505801.png",
-        "sha256": "27478f2a5745424aec770e0a3cd418e5"
+        "sha256": "0db1b5a103bc7e5ee54a00a83e3ab926"
       },
       {
         "file": "BOMBAS/7115505810.png",
@@ -6158,6 +6158,10 @@
         "sha256": "af08e1447eefb23ed25ab802c8660b14"
       },
       {
+        "file": "POLIAS_E_TENSORES/8111990120.png",
+        "sha256": "bfa5c7108898b87838f96118587c95f1"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8111990121.png",
         "sha256": "3e9cd49e016bac380d46e026f066c813"
       },
@@ -6259,7 +6263,7 @@
       },
       {
         "file": "POLIAS_E_TENSORES/8111990610.png",
-        "sha256": "db69f169da089072a5b359a8067ba32a"
+        "sha256": "fa482354f81600b0a0c8f651c0a2de15"
       },
       {
         "file": "POLIAS_E_TENSORES/8111990611.png",
@@ -6279,15 +6283,15 @@
       },
       {
         "file": "POLIAS_E_TENSORES/8111990615.png",
-        "sha256": "b780b62cdd0beeb0c774b802e66c943a"
+        "sha256": "9489aa5bb5bfc3bf7863e0b877813b46"
       },
       {
         "file": "POLIAS_E_TENSORES/8111990616.png",
-        "sha256": "168f040934b3c0f6943e7e14015b1390"
+        "sha256": "4ce154e7f19c95d00a0aa4773a8e0440"
       },
       {
         "file": "POLIAS_E_TENSORES/8111990617.png",
-        "sha256": "3dbd8b0c43bf886d6d96c45951000902"
+        "sha256": "785e77576b4060ca2c85d684be072c96"
       },
       {
         "file": "POLIAS_E_TENSORES/8111990618.png",
@@ -6295,7 +6299,7 @@
       },
       {
         "file": "POLIAS_E_TENSORES/8111990619.png",
-        "sha256": "47036fbf0dfd4f293a3294d82edebbc7"
+        "sha256": "6dbc8bf33f61bfd8b9450b9d57075f7c"
       },
       {
         "file": "POLIAS_E_TENSORES/8111990620.png",
@@ -6310,8 +6314,16 @@
         "sha256": "ee3ad1d5c53901811701f0295168801c"
       },
       {
+        "file": "POLIAS_E_TENSORES/8111990623.png",
+        "sha256": "2d9aceda53d06b96dc27c1bc9eb23257"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8111990624.png",
         "sha256": "5f595452d7d05efdc55652db59dd121f"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8111990625.png",
+        "sha256": "46e6ce982276b301244bb8fe07e3ab82"
       },
       {
         "file": "POLIAS_E_TENSORES/8111990626.png",
@@ -6335,7 +6347,7 @@
       },
       {
         "file": "POLIAS_E_TENSORES/8111990631.png",
-        "sha256": "a64a756d7bbdb0038372c4b02946ace7"
+        "sha256": "2f13449ad68412c2b54454af2168f2cc"
       },
       {
         "file": "POLIAS_E_TENSORES/8111990632.png",
@@ -6491,11 +6503,11 @@
       },
       {
         "file": "POLIAS_E_TENSORES/8115990601.png",
-        "sha256": "bb83cb71360ba11897a273c53917c66b"
+        "sha256": "d58713878b99ddfde8374451b5ac019a"
       },
       {
         "file": "POLIAS_E_TENSORES/8115990602.png",
-        "sha256": "b03f1a4304dbfa7b8c6487db4efa4527"
+        "sha256": "0d8543da721f8a4a3dd8f437af02b3dd"
       },
       {
         "file": "POLIAS_E_TENSORES/8115990603.png",
@@ -6686,12 +6698,20 @@
         "sha256": "3b99626d78052cf0e204c2c937c68524"
       },
       {
+        "file": "POLIAS_E_TENSORES/8115990649.png",
+        "sha256": "24373771c9d90706a24e16a1e475bed1"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8115990650.png",
         "sha256": "8fbbb00256f9b5d498f01c60e4a18501"
       },
       {
         "file": "POLIAS_E_TENSORES/8115990651.png",
         "sha256": "e8fb7dc6636811c893ab8ecd42b8e6f8"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8115990652.png",
+        "sha256": "20f7c39f9bfaf24e33493666aae24afe"
       },
       {
         "file": "POLIAS_E_TENSORES/8115990653.png",
@@ -6942,6 +6962,10 @@
         "sha256": "77f9ee7c63e6e42a41753da2f21d5c01"
       },
       {
+        "file": "POLIAS_E_TENSORES/8134990126.png",
+        "sha256": "4bc36485d168ec026497d7ce0a354798"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8134990601.png",
         "sha256": "8248caeeb082fc3516f72ce2abec6602"
       },
@@ -7054,12 +7078,20 @@
         "sha256": "06201ed12f34379af3b93a43ddb8ffb1"
       },
       {
+        "file": "POLIAS_E_TENSORES/8134990629.png",
+        "sha256": "6e0a77a8a5506177271dd237da980b7e"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8134990630.png",
         "sha256": "2ad7555abed8979b00d676ea5b3cf5ce"
       },
       {
         "file": "POLIAS_E_TENSORES/8134990631.png",
         "sha256": "0fa6d9a758003a639c45515083d6769b"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8134990632.png",
+        "sha256": "7d6273602c4a9eaeefa7fde4eed9d9b0"
       },
       {
         "file": "POLIAS_E_TENSORES/8134990633.png",
@@ -7072,6 +7104,10 @@
       {
         "file": "POLIAS_E_TENSORES/8138990101.png",
         "sha256": "22b1f6dcab8415c7f0bc5455b0cdcbbb"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8138990102.png",
+        "sha256": "af732b87148b3eea4380e36fc25377f8"
       },
       {
         "file": "POLIAS_E_TENSORES/8138990601.png",
@@ -7398,6 +7434,10 @@
         "sha256": "4619f5fbe2b5b2144c65432453bdab3e"
       },
       {
+        "file": "POLIAS_E_TENSORES/8146990129.png",
+        "sha256": "23c1b2d6d6eb8436a7fd2f045ec7b1c0"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8146990601.png",
         "sha256": "bf11482ea36ec9f73605c2566d09f848"
       },
@@ -7475,7 +7515,7 @@
       },
       {
         "file": "POLIAS_E_TENSORES/8146990620.png",
-        "sha256": "8fa73f79e7e340baa3ac5729d06f306a"
+        "sha256": "99215894b3f52a2d6a0d98c471f89a8d"
       },
       {
         "file": "POLIAS_E_TENSORES/8146990621.png",
@@ -7930,6 +7970,10 @@
         "sha256": "456edb52e92967f5526987ecb4c534b1"
       },
       {
+        "file": "POLIAS_E_TENSORES/8150990114.png",
+        "sha256": "61840bcbdd3302175dff7f59ee763e4b"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8150990115.png",
         "sha256": "52c1bbe26fd597ac5170cef7032ceceb"
       },
@@ -8194,6 +8238,10 @@
         "sha256": "496375ad488d1138d07b5dc9e67b686e"
       },
       {
+        "file": "POLIAS_E_TENSORES/8156990125.png",
+        "sha256": "fbd2f5b29a9126daa2a5dddaa3958af4"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8156990126.png",
         "sha256": "71cdd3696966771b6bedc8d2a666df75"
       },
@@ -8430,12 +8478,24 @@
         "sha256": "0ae1bcc577d027b656c3cd7782476267"
       },
       {
+        "file": "POLIAS_E_TENSORES/8156990651.png",
+        "sha256": "b3465feef009f0d5ee315d1bbc327e51"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8156990652.png",
         "sha256": "8ed60d2a49bb283bfa2e315d5e4fdfd7"
       },
       {
         "file": "POLIAS_E_TENSORES/8156990653.png",
         "sha256": "58adeeda5afa7294be9b3119dad17ea6"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8156990654.png",
+        "sha256": "adca8d364faa20ceb1e0b433dc0f03ae"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8156990655.png",
+        "sha256": "69226d056c38faecf179a88caf52d5fa"
       },
       {
         "file": "POLIAS_E_TENSORES/8156990656.png",
@@ -8456,6 +8516,10 @@
       {
         "file": "POLIAS_E_TENSORES/8156990660.png",
         "sha256": "55ec945eac89e921a3150047324407b1"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8163360201.png",
+        "sha256": "6fa918693d7f922adceaf6a1c8383810"
       },
       {
         "file": "POLIAS_E_TENSORES/8163990101.png",
@@ -8488,6 +8552,10 @@
       {
         "file": "POLIAS_E_TENSORES/8163990108.png",
         "sha256": "b18d53aef34dd8618f2c4801cc9e4fb1"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8163990109.png",
+        "sha256": "29f13339e7a146ed8eb4c1341ee6cdd0"
       },
       {
         "file": "POLIAS_E_TENSORES/8163990110.png",
@@ -8554,8 +8622,16 @@
         "sha256": "27e2eec6c7d41cc5fd787772b232b134"
       },
       {
+        "file": "POLIAS_E_TENSORES/8163990616.png",
+        "sha256": "f656549ecd0218b1d070badf8e2de102"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8163990617.png",
         "sha256": "1cb344a9fb188ebc3adacdda7cbea466"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8163990618.png",
+        "sha256": "dde8424bc1c623632ffcfda9cd679b83"
       },
       {
         "file": "POLIAS_E_TENSORES/8163990619.png",
@@ -8596,6 +8672,10 @@
       {
         "file": "POLIAS_E_TENSORES/8169990108.png",
         "sha256": "4bbf82778f8a180f0b70ae636869748e"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8169990109.png",
+        "sha256": "0f94edabb6fd2d323f3563ae15526f13"
       },
       {
         "file": "POLIAS_E_TENSORES/8169990110.png",
@@ -8666,6 +8746,10 @@
         "sha256": "e31ec103d359c10a11b12223cb5cab4a"
       },
       {
+        "file": "POLIAS_E_TENSORES/8169990613.png",
+        "sha256": "361bcf0af152b386b47846c80a5ef9d2"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8169990614.png",
         "sha256": "8051adb15962d4399dddf8a50119d0dc"
       },
@@ -8734,6 +8818,10 @@
         "sha256": "44d43dfce4694d47c9e9171c44756167"
       },
       {
+        "file": "POLIAS_E_TENSORES/8170990106.png",
+        "sha256": "a38bdae51ab4c244d1f28753d696db20"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8170990107.png",
         "sha256": "96c804a1d51fb1c525676a4ea2638220"
       },
@@ -8742,12 +8830,20 @@
         "sha256": "9a209c4586c5981db74c6fc58d22115f"
       },
       {
+        "file": "POLIAS_E_TENSORES/8170990109.png",
+        "sha256": "e049493630141958bb26c3d7fde8bd29"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8170990110.png",
         "sha256": "4f8a396c64501c0ee025e63fec9b3431"
       },
       {
         "file": "POLIAS_E_TENSORES/8170990111.png",
         "sha256": "abccd01b1e26929628554db4fa406ff3"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8170990112.png",
+        "sha256": "bb190a4e56bcafa99911d08d01f6d99a"
       },
       {
         "file": "POLIAS_E_TENSORES/8170990113.png",
@@ -8882,6 +8978,10 @@
         "sha256": "2f9c005b36771cfcd19980177770a714"
       },
       {
+        "file": "POLIAS_E_TENSORES/8175990110.png",
+        "sha256": "9196d54dc764b0833518aae8de98a7f8"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8175990111.png",
         "sha256": "2be03d52f3af6513af1b07033d066d06"
       },
@@ -8934,12 +9034,20 @@
         "sha256": "ec2a76eae1b987c60d840014d07c8dc4"
       },
       {
+        "file": "POLIAS_E_TENSORES/8175990124.png",
+        "sha256": "b662bbd009d642f3b56063e0bc6d1423"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8175990125.png",
         "sha256": "03c3104565d6b219bbe1813b5400573d"
       },
       {
         "file": "POLIAS_E_TENSORES/8175990126.png",
         "sha256": "63a4b8dc7d1f8f7b190ef2c3f25e7cfb"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8175990127.png",
+        "sha256": "937c5bb5faf649713335ec544bef470c"
       },
       {
         "file": "POLIAS_E_TENSORES/8175990128.png",
@@ -9018,8 +9126,16 @@
         "sha256": "601f50a6c8fa6f1ab491c9178d036baa"
       },
       {
+        "file": "POLIAS_E_TENSORES/8175990617.png",
+        "sha256": "de2faf6be1820818141439398827ef77"
+      },
+      {
         "file": "POLIAS_E_TENSORES/8175990618.png",
         "sha256": "30d53d4eb2364f663bbd1a38995166ed"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8175990619.png",
+        "sha256": "d29df8b140e34210626825f840038fa1"
       },
       {
         "file": "POLIAS_E_TENSORES/8175990620.png",
@@ -9056,6 +9172,10 @@
       {
         "file": "POLIAS_E_TENSORES/8176990105.png",
         "sha256": "579f4c3b2e33c7c656f2b18ec6ff7226"
+      },
+      {
+        "file": "POLIAS_E_TENSORES/8176990106.png",
+        "sha256": "c7dc688739f75cec62e23fecf4d473d9"
       },
       {
         "file": "POLIAS_E_TENSORES/8176990107.png",
